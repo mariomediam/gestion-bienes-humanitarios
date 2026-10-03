@@ -26,8 +26,8 @@ _SMALLINT_MIN = -32768
 _SMALLINT_MAX = 32767
 
 
-def parse_estado_registro_id(raw_value):
-    """Parse the optional estado_registro_id query param.
+def _parse_optional_smallint(raw_value, field_name):
+    """Parse an optional smallint query param.
 
     Returns (value, error_message). value is an int or None.
     None means the filter was omitted.
@@ -39,9 +39,19 @@ def parse_estado_registro_id(raw_value):
     try:
         value = int(normalized)
     except (TypeError, ValueError):
-        return None, 'El filtro estado_registro_id debe ser un número entero'
+        return None, f'El filtro {field_name} debe ser un número entero'
 
     if value < _SMALLINT_MIN or value > _SMALLINT_MAX:
-        return None, 'El filtro estado_registro_id debe ser un número entero'
+        return None, f'El filtro {field_name} debe ser un número entero'
 
     return value, None
+
+
+def parse_estado_registro_id(raw_value):
+    """Parse the optional estado_registro_id query param."""
+    return _parse_optional_smallint(raw_value, 'estado_registro_id')
+
+
+def parse_estado_planilla_id(raw_value):
+    """Parse the optional estado_planilla_id query param."""
+    return _parse_optional_smallint(raw_value, 'estado_planilla_id')
