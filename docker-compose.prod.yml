@@ -1,0 +1,44 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: sgbh_backend_prod
+    env_file:
+      - ./backend/.env.prod
+    environment:
+      - DJANGO_ENV_FILE=.env.prod
+    volumes:
+      - sgbh_storage:/app/storage
+      - backend_static:/app/staticfiles
+    expose:
+      - "8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s = socket.create_connection(('localhost', 8000), timeout=5); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ""
+    container_name: sgbh_frontend_prod
+    ports:
+      - "3080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  sgbh_storage:
+    driver: local
+  backend_static:
+    driver: local

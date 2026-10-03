@@ -1,0 +1,1 @@
+from .tipo_seguro_view import TipoSeguroView
