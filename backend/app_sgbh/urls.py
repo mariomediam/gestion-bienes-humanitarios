@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     EmergenciaTotalView,
+    Formulario2AIntegranteTotalView,
     Formulario2ATotalView,
     PlanillaEntregaTotalView,
     TipoSeguroView,
@@ -21,6 +22,11 @@ urlpatterns = [
         'planillas-bah/total/',
         PlanillaEntregaTotalView.as_view(),
         name='planillas-bah-total',
+    ),
+    path(
+        'integrantes/total/',
+        Formulario2AIntegranteTotalView.as_view(),
+        name='integrantes-total',
     ),
 ]
 

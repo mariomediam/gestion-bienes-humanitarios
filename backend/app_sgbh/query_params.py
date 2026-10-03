@@ -55,3 +55,8 @@ def parse_estado_registro_id(raw_value):
 def parse_estado_planilla_id(raw_value):
     """Parse the optional estado_planilla_id query param."""
     return _parse_optional_smallint(raw_value, 'estado_planilla_id')
+
+
+def parse_condicion_persona_id(raw_value):
+    """Parse the optional condicion_persona_id query param."""
+    return _parse_optional_smallint(raw_value, 'condicion_persona_id')
