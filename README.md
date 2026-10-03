@@ -18,7 +18,7 @@ Sistema de Gestión de Bienes de Ayuda Humanitaria
 ```
 Usuario (navegador)
        │
-    Puerto 3080
+    Puerto 3100
        │
 ┌──────────────────────────┐
 │  Frontend (Nginx)        │  Contenedor Docker
@@ -85,7 +85,7 @@ docker compose exec backend python manage.py migrate  # Migraciones
 - Ubuntu 20.04+ (x86_64)
 - 4 GB RAM mínimo
 - Acceso de red a los servidores SQL Server (192.168.100.20, 192.168.100.51)
-- Puerto 3080 disponible
+- Puerto 3100 disponible
 
 ### Paso 1: Instalar Docker
 
@@ -160,7 +160,7 @@ SYSTEM_CODE=39
 STORAGE_ROOT=/app/storage
 
 # CORS (incluir la URL completa con puerto)
-CORS_ALLOWED_ORIGINS=http://<IP_DEL_SERVIDOR>:3080
+CORS_ALLOWED_ORIGINS=http://<IP_DEL_SERVIDOR>:3100
 
 # JWT
 JWT_ACCESS_TOKEN_LIFETIME_MINUTES=30
@@ -190,7 +190,7 @@ sudo docker compose -f docker-compose.prod.yml ps
 sudo docker compose -f docker-compose.prod.yml logs -f
 
 # Probar en navegador
-# http://<IP_DEL_SERVIDOR>:3080
+# http://<IP_DEL_SERVIDOR>:3100
 ```
 
 ---
@@ -324,15 +324,15 @@ Verificar permisos del volumen de storage:
 sudo docker compose -f docker-compose.prod.yml exec backend ls -la /app/storage
 ```
 
-### Puerto 3080 ya en uso
+### Puerto 3100 ya en uso
 
 Verificar qué proceso usa el puerto:
 
 ```bash
-sudo ss -tlnp | grep 3080
+sudo ss -tlnp | grep 3100
 ```
 
-Cambiar el puerto en `docker-compose.prod.yml` (línea `ports: - "3080:80"`) y en `CORS_ALLOWED_ORIGINS` de `backend/.env.prod`.
+Cambiar el puerto en `docker-compose.prod.yml` (línea `ports: - "3100:80"`) y en `CORS_ALLOWED_ORIGINS` de `backend/.env.prod`.
 
 ### Limpiar todo y empezar de cero
 

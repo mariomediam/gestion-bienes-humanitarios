@@ -1,1 +1,2 @@
+from .emergencia_view import EmergenciaTotalView
 from .tipo_seguro_view import TipoSeguroView

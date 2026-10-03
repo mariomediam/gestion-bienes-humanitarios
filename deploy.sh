@@ -106,10 +106,10 @@ verify() {
     echo ""
     log_info "=== Verificación post-despliegue ==="
 
-    if curl -s -o /dev/null -w "%{http_code}" http://localhost:3080 | grep -q "200"; then
-        log_info "Frontend: OK (http://192.168.100.59:3080)"
+    if curl -s -o /dev/null -w "%{http_code}" http://localhost:3100 | grep -q "200"; then
+        log_info "Frontend: OK (http://192.168.100.59:3100)"
     else
-        log_warn "Frontend: Verificar manualmente en http://192.168.100.59:3080"
+        log_warn "Frontend: Verificar manualmente en http://192.168.100.59:3100"
     fi
 
     echo ""
@@ -120,7 +120,7 @@ verify() {
     echo "  Detener:         docker compose -f $COMPOSE_FILE down"
     echo "  Estado:          docker compose -f $COMPOSE_FILE ps"
     echo ""
-    log_info "Sistema disponible en: http://192.168.100.59:3080"
+    log_info "Sistema disponible en: http://192.168.100.59:3100"
 }
 
 # ---- Main ----

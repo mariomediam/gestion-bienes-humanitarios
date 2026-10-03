@@ -31,7 +31,7 @@ services:
         VITE_API_URL: ""
     container_name: sgbh_frontend_prod
     ports:
-      - "3080:80"
+      - "3100:80"
     depends_on:
       backend:
         condition: service_healthy
