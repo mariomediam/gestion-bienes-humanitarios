@@ -79,3 +79,64 @@ def parse_fecha_desde(raw_value):
         return None, 'El filtro fecha_desde debe tener el formato AAAA-MM-DD'
 
     return value, None
+
+
+_INT_MIN = -2147483648
+_INT_MAX = 2147483647
+
+
+def _parse_optional_int(raw_value, field_name):
+    """Parse an optional int query param.
+
+    Returns (value, error_message). value is an int or None.
+    None means the filter was omitted.
+    """
+    if raw_value is None or str(raw_value).strip() == '':
+        return None, None
+
+    normalized = str(raw_value).strip()
+    try:
+        value = int(normalized)
+    except (TypeError, ValueError):
+        return None, f'El filtro {field_name} debe ser un número entero'
+
+    if value < _INT_MIN or value > _INT_MAX:
+        return None, f'El filtro {field_name} debe ser un número entero'
+
+    return value, None
+
+
+def parse_tipo_peligro_id(raw_value):
+    """Parse the optional tipo_peligro_id query param."""
+    return _parse_optional_int(raw_value, 'tipo_peligro_id')
+
+
+def _parse_optional_text(raw_value, field_name, max_length):
+    """Parse an optional text query param.
+
+    Returns (value, error_message). value is a stripped string or None.
+    None means the filter was omitted.
+    """
+    if raw_value is None:
+        return None, None
+
+    normalized = str(raw_value).strip()
+    if normalized == '':
+        return None, None
+
+    if len(normalized) > max_length:
+        return None, (
+            f'El filtro {field_name} no debe superar {max_length} caracteres'
+        )
+
+    return normalized, None
+
+
+def parse_codigo_tipo_peligro(raw_value):
+    """Parse the optional codigo query param for S43cat_tipos_peligro."""
+    return _parse_optional_text(raw_value, 'codigo', 10)
+
+
+def parse_nombre_tipo_peligro(raw_value):
+    """Parse the optional nombre query param for S43cat_tipos_peligro."""
+    return _parse_optional_text(raw_value, 'nombre', 200)
