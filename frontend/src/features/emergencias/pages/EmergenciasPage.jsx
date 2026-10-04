@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import PlusIcon from '@components/icons/PlusIcon'
+import EmergenciaFormModal from '@features/emergencias/components/EmergenciaFormModal'
 import EmergenciasBusquedaForm from '@features/emergencias/components/EmergenciasBusquedaForm'
 import EmergenciasResultados from '@features/emergencias/components/EmergenciasResultados'
 import useEmergenciasBusqueda from '@features/emergencias/hooks/useEmergenciasBusqueda'
@@ -19,6 +20,7 @@ export default function EmergenciasPage() {
   const [consulta, setConsulta] = useState('')
   const [filtros, setFiltros] = useState(EMPTY_FILTROS)
   const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
+  const [agregarAbierto, setAgregarAbierto] = useState(false)
   const { loading, searched, emergencias, buscar, limpiarResultados } = useEmergenciasBusqueda()
 
   function handleFiltroChange(name, value) {
@@ -37,6 +39,11 @@ export default function EmergenciasPage() {
     limpiarResultados()
   }
 
+  function handleEmergenciaCreada(emergencia) {
+    setAgregarAbierto(false)
+    buscar({ emergencia_id: emergencia.emergencia_id })
+  }
+
   const hayResultados = searched && emergencias.length > 0
 
   return (
@@ -50,6 +57,7 @@ export default function EmergenciasPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
+            onClick={() => setAgregarAbierto(true)}
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             <PlusIcon className="w-4 h-4" />
@@ -80,6 +88,12 @@ export default function EmergenciasPage() {
       />
 
       {searched && <EmergenciasResultados emergencias={emergencias} />}
+
+      <EmergenciaFormModal
+        isOpen={agregarAbierto}
+        onClose={() => setAgregarAbierto(false)}
+        onCreated={handleEmergenciaCreada}
+      />
     </div>
   )
 }
