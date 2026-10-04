@@ -1,4 +1,9 @@
 import Card from '@components/ui/Card'
+import EmergenciaIcon from '@components/icons/EmergenciaIcon'
+import FormularioIcon from '@components/icons/FormularioIcon'
+import PlanillaIcon from '@components/icons/PlanillaIcon'
+import PersonasIcon from '@components/icons/PersonasIcon'
+import TipoPeligroIcon from '@components/icons/TipoPeligroIcon'
 import useDashboard from '@features/home/hooks/useDashboard'
 import EmergenciasUltimoMes from '@features/home/components/EmergenciasUltimoMes'
 
@@ -25,13 +30,13 @@ export default function DashboardPage() {
       <h1 className="text-2xl font-bold text-[#1e3064]">Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <Card title="Emergencias registradas" value={totales.emergencias ?? '—'} />
-        <Card title="Formularios EDAN 2A" value={totales.formularios2a ?? '—'} />
-        <Card title="Planillas BAH" value={totales.planillasBah ?? '—'} />
-        <Card title="Personas atendidas" value={totales.integrantes ?? '—'} />
+        <Card title="Emergencias registradas" value={totales.emergencias ?? '—'} icon={EmergenciaIcon} />
+        <Card title="Formularios EDAN 2A" value={totales.formularios2a ?? '—'} icon={FormularioIcon} />
+        <Card title="Planillas BAH" value={totales.planillasBah ?? '—'} icon={PlanillaIcon} />
+        <Card title="Personas atendidas" value={totales.integrantes ?? '—'} icon={PersonasIcon} />
       </div>
 
-      <Card title="Tipos de peligro">
+      <Card title="Tipos de peligro" icon={TipoPeligroIcon}>
         {tiposPeligro.length === 0 ? (
           <p className="mt-3 text-sm text-gray-500">No hay tipos de peligro registrados</p>
         ) : (
