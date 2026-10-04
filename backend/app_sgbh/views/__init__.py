@@ -1,4 +1,4 @@
-from .emergencia_view import EmergenciaTotalView
+from .emergencia_view import EmergenciaTotalPorTipoPeligroView, EmergenciaTotalView
 from .formulario_2a_integrante_view import Formulario2AIntegranteTotalView
 from .formulario_2a_view import Formulario2ATotalView
 from .planilla_entrega_view import PlanillaEntregaTotalView

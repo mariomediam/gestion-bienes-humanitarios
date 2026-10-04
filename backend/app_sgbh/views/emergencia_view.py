@@ -24,3 +24,22 @@ class EmergenciaTotalView(APIView):
             )
 
         return Response({'total': total}, status=status.HTTP_200_OK)
+
+
+class EmergenciaTotalPorTipoPeligroView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        esta_activo, error = parse_esta_activo(request.query_params.get('esta_activo'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rows = EmergenciaService.count_by_tipo_peligro(esta_activo=esta_activo)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo obtener el total de emergencias por tipo de peligro'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(rows, status=status.HTTP_200_OK)
