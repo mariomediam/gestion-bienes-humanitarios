@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    EmergenciaListView,
     EmergenciaTotalPorTipoPeligroView,
     EmergenciaTotalView,
     Formulario2AIntegranteTotalView,
@@ -13,6 +14,7 @@ app_name = 'sgbh'
 
 urlpatterns = [
     path('tipo-seguro/', TipoSeguroView.as_view(), name='tipo-seguro'),
+    path('emergencias/', EmergenciaListView.as_view(), name='emergencias'),
     path('emergencias/total/', EmergenciaTotalView.as_view(), name='emergencias-total'),
     path(
         'emergencias/total-por-tipo-peligro/',

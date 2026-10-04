@@ -1,4 +1,6 @@
-"""Shared parsers for optional query parameters."""
+"""Shared parsers for query parameters."""
+
+from datetime import date
 
 _TRUE_VALUES = {'1', 'true'}
 _FALSE_VALUES = {'0', 'false'}
@@ -60,3 +62,20 @@ def parse_estado_planilla_id(raw_value):
 def parse_condicion_persona_id(raw_value):
     """Parse the optional condicion_persona_id query param."""
     return _parse_optional_smallint(raw_value, 'condicion_persona_id')
+
+
+def parse_fecha_desde(raw_value):
+    """Parse the required fecha_desde query param as a date.
+
+    Returns (value, error_message).
+    """
+    if raw_value is None or str(raw_value).strip() == '':
+        return None, 'El filtro fecha_desde es obligatorio'
+
+    normalized = str(raw_value).strip()
+    try:
+        value = date.fromisoformat(normalized)
+    except ValueError:
+        return None, 'El filtro fecha_desde debe tener el formato AAAA-MM-DD'
+
+    return value, None
