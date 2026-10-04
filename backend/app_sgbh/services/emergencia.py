@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import CharField, Count, F, OuterRef, Prefetch, Subquery
+from django.db.models import CharField, Count, F, OuterRef, Prefetch, ProtectedError, Subquery
 from django.utils import timezone
 
 from ..db_router import DB_ALIAS
@@ -221,6 +221,36 @@ class EmergenciaService:
                 .get(pk=emergencia.pk)
             )
         return stored
+
+    @staticmethod
+    def delete(emergencia_id):
+        """Delete one S43edan_emergencias row.
+
+        Rejected when S43edan_formulario_2a already references that
+        emergencia_id. The check and the delete run in one transaction.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                emergencia = Emergencia.objects.get(pk=emergencia_id)
+            except Emergencia.DoesNotExist:
+                raise EmergenciaServiceError(
+                    'La emergencia indicada no existe',
+                    not_found=True,
+                )
+
+            if Formulario2A.objects.filter(emergencia_id=emergencia_id).exists():
+                raise EmergenciaServiceError(
+                    'No se puede eliminar la emergencia porque tiene formularios 2A asociados',
+                    conflict=True,
+                )
+
+            try:
+                emergencia.delete()
+            except ProtectedError:
+                raise EmergenciaServiceError(
+                    'No se puede eliminar la emergencia porque tiene formularios 2A asociados',
+                    conflict=True,
+                )
 
 
 def _require_codigo_sinpad(codigo_sinpad):
