@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import ExcelIcon from '@components/icons/ExcelIcon'
+import PlusIcon from '@components/icons/PlusIcon'
 import EmergenciasBusquedaForm from '@features/emergencias/components/EmergenciasBusquedaForm'
 import EmergenciasResultados from '@features/emergencias/components/EmergenciasResultados'
 import useEmergenciasBusqueda from '@features/emergencias/hooks/useEmergenciasBusqueda'
@@ -48,15 +50,17 @@ export default function EmergenciasPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            className="px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
+            className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
+            <PlusIcon className="w-4 h-4" />
             Agregar nueva emergencia
           </button>
           {hayResultados && (
             <button
               type="button"
-              className="px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
+              className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
             >
+              <ExcelIcon className="w-4 h-4" />
               Exportar a Excel
             </button>
           )}

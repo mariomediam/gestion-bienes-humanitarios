@@ -1,4 +1,9 @@
+import ClearIcon from '@components/icons/ClearIcon'
+import FilterIcon from '@components/icons/FilterIcon'
+import SearchIcon from '@components/icons/SearchIcon'
 import TipoPeligroSelect from '@features/emergencias/components/TipoPeligroSelect'
+
+const buttonIconClassName = 'w-4 h-4'
 
 const inputClassName =
   'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500'
@@ -38,8 +43,9 @@ export default function EmergenciasBusquedaForm({
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
+          <SearchIcon className={buttonIconClassName} />
           {loading ? 'Buscando...' : 'Buscar'}
         </button>
         <button
@@ -48,16 +54,18 @@ export default function EmergenciasBusquedaForm({
           aria-expanded={avanzadaAbierta}
           aria-controls="filtros-avanzados-emergencia"
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
+          <FilterIcon className={buttonIconClassName} />
           Búsqueda avanzada
         </button>
         <button
           type="button"
           onClick={onLimpiar}
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
+          <ClearIcon className={buttonIconClassName} />
           Limpiar
         </button>
       </div>
