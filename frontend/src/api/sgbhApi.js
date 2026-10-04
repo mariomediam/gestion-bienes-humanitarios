@@ -1,0 +1,33 @@
+import api from '@api/axios'
+
+export const sgbhApi = {
+  getTotalEmergencias: async () => {
+    const response = await api.get('/api/sgbh/emergencias/total/')
+    return response.data
+  },
+
+  getTotalFormularios2A: async () => {
+    const response = await api.get('/api/sgbh/formularios-2a/total/')
+    return response.data
+  },
+
+  getTotalPlanillasBah: async () => {
+    const response = await api.get('/api/sgbh/planillas-bah/total/')
+    return response.data
+  },
+
+  getTotalIntegrantes: async () => {
+    const response = await api.get('/api/sgbh/integrantes/total/')
+    return response.data
+  },
+
+  getTotalPorTipoPeligro: async () => {
+    const response = await api.get('/api/sgbh/emergencias/total-por-tipo-peligro/')
+    return response.data
+  },
+
+  getEmergencias: async (params) => {
+    const response = await api.get('/api/sgbh/emergencias/', { params })
+    return response.data
+  },
+}

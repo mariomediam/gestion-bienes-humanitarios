@@ -4,7 +4,7 @@ import { Toaster } from 'sonner'
 import useAuthStore from '@store/authStore'
 import LoginPage from '@features/auth/pages/LoginPage'
 import MainLayout from '@components/layout/MainLayout'
-import Test from '@features/sgbh/pages/Test'
+import DashboardPage from '@features/home/pages/DashboardPage'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading, checkAuth } = useAuthStore()
@@ -74,7 +74,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<Test />} />
+          <Route path="/" element={<DashboardPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
