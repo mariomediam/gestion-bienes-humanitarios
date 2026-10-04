@@ -1,4 +1,5 @@
 from .emergencia_view import (
+    EmergenciaBuscarView,
     EmergenciaListView,
     EmergenciaTotalPorTipoPeligroView,
     EmergenciaTotalView,

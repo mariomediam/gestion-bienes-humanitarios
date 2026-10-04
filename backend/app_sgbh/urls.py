@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    EmergenciaBuscarView,
     EmergenciaListView,
     EmergenciaTotalPorTipoPeligroView,
     EmergenciaTotalView,
@@ -17,6 +18,7 @@ urlpatterns = [
     path('tipo-seguro/', TipoSeguroView.as_view(), name='tipo-seguro'),
     path('tipos-peligro/', TipoPeligroListView.as_view(), name='tipos-peligro'),
     path('emergencias/', EmergenciaListView.as_view(), name='emergencias'),
+    path('emergencias/buscar/', EmergenciaBuscarView.as_view(), name='emergencias-buscar'),
     path('emergencias/total/', EmergenciaTotalView.as_view(), name='emergencias-total'),
     path(
         'emergencias/total-por-tipo-peligro/',

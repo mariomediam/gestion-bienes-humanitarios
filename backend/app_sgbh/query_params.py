@@ -72,11 +72,28 @@ def parse_fecha_desde(raw_value):
     if raw_value is None or str(raw_value).strip() == '':
         return None, 'El filtro fecha_desde es obligatorio'
 
+    return _parse_date(raw_value, 'fecha_desde')
+
+
+def parse_optional_date(raw_value, field_name):
+    """Parse an optional date query param.
+
+    Returns (value, error_message). value is a date or None.
+    None means the filter was omitted.
+    """
+    if raw_value is None or str(raw_value).strip() == '':
+        return None, None
+
+    return _parse_date(raw_value, field_name)
+
+
+def _parse_date(raw_value, field_name):
+    """Parse a non-empty date query param. Returns (value, error_message)."""
     normalized = str(raw_value).strip()
     try:
         value = date.fromisoformat(normalized)
     except ValueError:
-        return None, 'El filtro fecha_desde debe tener el formato AAAA-MM-DD'
+        return None, f'El filtro {field_name} debe tener el formato AAAA-MM-DD'
 
     return value, None
 
@@ -111,6 +128,11 @@ def parse_tipo_peligro_id(raw_value):
     return _parse_optional_int(raw_value, 'tipo_peligro_id')
 
 
+def parse_emergencia_id(raw_value):
+    """Parse the optional emergencia_id query param."""
+    return _parse_optional_int(raw_value, 'emergencia_id')
+
+
 def _parse_optional_text(raw_value, field_name, max_length):
     """Parse an optional text query param.
 
@@ -140,3 +162,28 @@ def parse_codigo_tipo_peligro(raw_value):
 def parse_nombre_tipo_peligro(raw_value):
     """Parse the optional nombre query param for S43cat_tipos_peligro."""
     return _parse_optional_text(raw_value, 'nombre', 200)
+
+
+def parse_codigo_sinpad(raw_value):
+    """Parse the optional codigo_sinpad query param."""
+    return _parse_optional_text(raw_value, 'codigo_sinpad', 30)
+
+
+def parse_numero_evaluacion(raw_value):
+    """Parse the optional numero_evaluacion query param."""
+    return _parse_optional_text(raw_value, 'numero_evaluacion', 50)
+
+
+def parse_barrio_sector_urbanizacion(raw_value):
+    """Parse the optional barrio_sector_urbanizacion query param."""
+    return _parse_optional_text(raw_value, 'barrio_sector_urbanizacion', 250)
+
+
+def parse_localidad(raw_value):
+    """Parse the optional localidad query param."""
+    return _parse_optional_text(raw_value, 'localidad', 200)
+
+
+def parse_distrito_nombre(raw_value):
+    """Parse the optional distrito_nombre query param."""
+    return _parse_optional_text(raw_value, 'distrito_nombre', 50)
