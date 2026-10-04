@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import CharField, Count, F, OuterRef, Prefetch, Subquery
+from django.utils import timezone
 
 from ..db_router import DB_ALIAS
 from ..models import Distrito, Emergencia, Formulario2A, TipoPeligro
@@ -11,10 +12,11 @@ _USUARIO_LOGIN_MAX_LENGTH = 20
 class EmergenciaServiceError(Exception):
     """Business rule violation for an emergency operation."""
 
-    def __init__(self, message, *, conflict=False):
+    def __init__(self, message, *, conflict=False, not_found=False):
         super().__init__(message)
         self.message = message
         self.conflict = conflict
+        self.not_found = not_found
 
 
 class EmergenciaService:
@@ -142,19 +144,11 @@ class EmergenciaService:
         if login == '' or len(login) > _USUARIO_LOGIN_MAX_LENGTH:
             raise EmergenciaServiceError('No se pudo identificar al usuario')
 
-        codigo_sinpad = str(codigo_sinpad or '').strip()
-        if codigo_sinpad == '':
-            raise EmergenciaServiceError('El campo codigo_sinpad es obligatorio')
+        codigo_sinpad = _require_codigo_sinpad(codigo_sinpad)
 
         with transaction.atomic(using=DB_ALIAS):
-            if not TipoPeligro.objects.filter(pk=tipo_peligro_id).exists():
-                raise EmergenciaServiceError('El tipo de peligro indicado no existe')
-
-            if Emergencia.objects.filter(codigo_sinpad__iexact=codigo_sinpad).exists():
-                raise EmergenciaServiceError(
-                    'Ya existe una emergencia con el código SINPAD indicado',
-                    conflict=True,
-                )
+            _require_tipo_peligro(tipo_peligro_id)
+            _require_codigo_sinpad_disponible(codigo_sinpad)
 
             emergencia = Emergencia(
                 numero_evaluacion=numero_evaluacion,
@@ -175,6 +169,82 @@ class EmergenciaService:
                 .get(pk=emergencia.pk)
             )
         return stored
+
+    @staticmethod
+    def update(
+        emergencia_id,
+        *,
+        numero_evaluacion,
+        codigo_sinpad,
+        tipo_peligro_id,
+        fecha_emergencia,
+        hora_ocurrencia_estimada=None,
+        esta_activo=True,
+    ):
+        """Update the editable columns of one S43edan_emergencias row.
+
+        The body matches create. codigo_sinpad must not belong to another
+        emergency. c_usuari_login and fecha_creacion stay as stored.
+        fecha_modificacion is set to the current time.
+        """
+        codigo_sinpad = _require_codigo_sinpad(codigo_sinpad)
+
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                emergencia = Emergencia.objects.get(pk=emergencia_id)
+            except Emergencia.DoesNotExist:
+                raise EmergenciaServiceError(
+                    'La emergencia indicada no existe',
+                    not_found=True,
+                )
+
+            _require_tipo_peligro(tipo_peligro_id)
+            _require_codigo_sinpad_disponible(
+                codigo_sinpad,
+                exclude_id=emergencia_id,
+            )
+
+            emergencia.numero_evaluacion = numero_evaluacion
+            emergencia.codigo_sinpad = codigo_sinpad
+            emergencia.tipo_peligro_id = tipo_peligro_id
+            emergencia.fecha_emergencia = fecha_emergencia
+            emergencia.hora_ocurrencia_estimada = hora_ocurrencia_estimada
+            emergencia.esta_activo = esta_activo
+            emergencia.fecha_modificacion = timezone.now()
+            emergencia.save()
+
+            stored = (
+                Emergencia.objects.select_related('tipo_peligro')
+                .prefetch_related(
+                    Prefetch('formularios_2a', queryset=_formularios_con_distrito())
+                )
+                .get(pk=emergencia.pk)
+            )
+        return stored
+
+
+def _require_codigo_sinpad(codigo_sinpad):
+    codigo_sinpad = str(codigo_sinpad or '').strip()
+    if codigo_sinpad == '':
+        raise EmergenciaServiceError('El campo codigo_sinpad es obligatorio')
+    return codigo_sinpad
+
+
+def _require_tipo_peligro(tipo_peligro_id):
+    if not TipoPeligro.objects.filter(pk=tipo_peligro_id).exists():
+        raise EmergenciaServiceError('El tipo de peligro indicado no existe')
+
+
+def _require_codigo_sinpad_disponible(codigo_sinpad, exclude_id=None):
+    """Reject codigo_sinpad when another emergency already uses it."""
+    queryset = Emergencia.objects.filter(codigo_sinpad__iexact=codigo_sinpad)
+    if exclude_id is not None:
+        queryset = queryset.exclude(pk=exclude_id)
+    if queryset.exists():
+        raise EmergenciaServiceError(
+            'Ya existe una emergencia con el código SINPAD indicado',
+            conflict=True,
+        )
 
 
 def _formularios_con_distrito():

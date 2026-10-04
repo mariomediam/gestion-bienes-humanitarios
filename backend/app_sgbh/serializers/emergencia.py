@@ -94,7 +94,7 @@ class EmergenciaCreateSerializer(serializers.Serializer):
 
 
 class EmergenciaSerializer(serializers.Serializer):
-    """Emergency payload returned by the list, search and create endpoints."""
+    """Emergency payload returned by the list, search, create and update endpoints."""
 
     emergencia_id = serializers.IntegerField()
     numero_evaluacion = serializers.CharField()
