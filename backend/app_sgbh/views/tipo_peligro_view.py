@@ -9,6 +9,7 @@ from app_sgbh.query_params import (
     parse_nombre_tipo_peligro,
     parse_tipo_peligro_id,
 )
+from app_sgbh.serializers import TipoPeligroSerializer
 from app_sgbh.services.tipo_peligro import TipoPeligroService
 
 
@@ -41,10 +42,11 @@ class TipoPeligroListView(APIView):
                 nombre=nombre,
                 esta_activo=esta_activo,
             )
+            payload = TipoPeligroSerializer(rows, many=True).data
         except Exception:
             return Response(
                 {'error': 'No se pudo obtener el catálogo de tipos de peligro'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        return Response(rows, status=status.HTTP_200_OK)
+        return Response(payload, status=status.HTTP_200_OK)

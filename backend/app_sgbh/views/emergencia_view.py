@@ -15,7 +15,12 @@ from app_sgbh.query_params import (
     parse_optional_date,
     parse_tipo_peligro_id,
 )
-from app_sgbh.services.emergencia import EmergenciaService
+from app_sgbh.serializers import (
+    EmergenciaCreateSerializer,
+    EmergenciaSerializer,
+    first_error_message,
+)
+from app_sgbh.services.emergencia import EmergenciaService, EmergenciaServiceError
 
 
 class EmergenciaTotalView(APIView):
@@ -66,13 +71,47 @@ class EmergenciaListView(APIView):
 
         try:
             rows = EmergenciaService.list_from_date(fecha_desde)
+            payload = EmergenciaSerializer(rows, many=True).data
         except Exception:
             return Response(
                 {'error': 'No se pudo obtener el listado de emergencias'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        return Response(rows, status=status.HTTP_200_OK)
+        return Response(payload, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = EmergenciaCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            created = EmergenciaService.create(
+                c_usuari_login=getattr(request.user, 'login', ''),
+                **serializer.validated_data,
+            )
+            payload = EmergenciaSerializer(created).data
+        except EmergenciaServiceError as exc:
+            http_status = (
+                status.HTTP_409_CONFLICT if exc.conflict else status.HTTP_400_BAD_REQUEST
+            )
+            return Response({'error': exc.message}, status=http_status)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo registrar la emergencia'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_201_CREATED)
 
 
 class EmergenciaBuscarView(APIView):
@@ -97,13 +136,14 @@ class EmergenciaBuscarView(APIView):
 
         try:
             rows = EmergenciaService.search(**parsed)
+            payload = EmergenciaSerializer(rows, many=True).data
         except Exception:
             return Response(
                 {'error': 'No se pudo obtener la búsqueda de emergencias'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        return Response(rows, status=status.HTTP_200_OK)
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 def _parse_busqueda(params):

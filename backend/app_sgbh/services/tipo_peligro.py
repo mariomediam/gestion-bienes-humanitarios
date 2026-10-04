@@ -21,11 +21,4 @@ class TipoPeligroService:
         if esta_activo is not None:
             queryset = queryset.filter(esta_activo=esta_activo)
 
-        return list(
-            queryset.order_by('nombre').values(
-                'tipo_peligro_id',
-                'codigo',
-                'nombre',
-                'esta_activo',
-            )
-        )
+        return queryset.order_by('nombre')

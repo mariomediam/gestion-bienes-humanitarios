@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app_sgbh.query_params import parse_estado_registro_id
+from app_sgbh.serializers import Formulario2ATotalSerializer
 from app_sgbh.services.formulario_2a import Formulario2AService
 
 
@@ -19,10 +20,11 @@ class Formulario2ATotalView(APIView):
 
         try:
             total = Formulario2AService.count(estado_registro_id=estado_registro_id)
+            payload = Formulario2ATotalSerializer({'total': total}).data
         except Exception:
             return Response(
                 {'error': 'No se pudo obtener el total de formularios EDAN 2A'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        return Response({'total': total}, status=status.HTTP_200_OK)
+        return Response(payload, status=status.HTTP_200_OK)

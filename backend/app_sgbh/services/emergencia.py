@@ -1,18 +1,20 @@
+from django.db import transaction
 from django.db.models import CharField, Count, F, OuterRef, Prefetch, Subquery
 
-from ..models import Distrito, Emergencia, Formulario2A
+from ..db_router import DB_ALIAS
+from ..models import Distrito, Emergencia, Formulario2A, TipoPeligro
 from ..text_search import filter_text_like
 
-_FORMULARIO_UBICACION_FIELDS = (
-    'localidad',
-    'barrio_sector_urbanizacion',
-    'centro_poblado',
-    'caserio',
-    'anexo',
-    'calle_manzana',
-    'edificio_piso_dpto',
-    'otros_ubicacion',
-)
+_USUARIO_LOGIN_MAX_LENGTH = 20
+
+
+class EmergenciaServiceError(Exception):
+    """Business rule violation for an emergency operation."""
+
+    def __init__(self, message, *, conflict=False):
+        super().__init__(message)
+        self.message = message
+        self.conflict = conflict
 
 
 class EmergenciaService:
@@ -46,10 +48,9 @@ class EmergenciaService:
 
     @staticmethod
     def list_from_date(fecha_desde):
-        """List emergencies with fecha_emergencia >= fecha_desde.
+        """Return emergencies with fecha_emergencia >= fecha_desde.
 
-        One item per emergency. Formulario 2A location fields and
-        distrito_nombre are nested in formularios_2a.
+        The queryset is ready for EmergenciaSerializer.
         """
         return EmergenciaService.search(fecha_desde=fecha_desde)
 
@@ -66,12 +67,12 @@ class EmergenciaService:
         distrito_nombre=None,
         esta_activo=None,
     ):
-        """List emergencies using optional filters combined with AND.
+        """Return emergencies using optional filters combined with AND.
 
-        One item per emergency, ordered by fecha_emergencia and
-        hora_ocurrencia_estimada descending. Formulario 2A location fields
-        and distrito_nombre are nested in formularios_2a. When a formulario
-        or distrito filter is sent, only matching formularios are included.
+        Ordered by fecha_emergencia and hora_ocurrencia_estimada descending.
+        Related formularios include location fields and distrito_nombre.
+        When a formulario or distrito filter is sent, only matching
+        formularios are included. The queryset is ready for EmergenciaSerializer.
         """
         formularios = _formularios_con_distrito()
         formulario_filtrado = False
@@ -118,7 +119,62 @@ class EmergenciaService:
             .prefetch_related(Prefetch('formularios_2a', queryset=formularios))
             .order_by('-fecha_emergencia', '-hora_ocurrencia_estimada')
         )
-        return [_emergencia_to_dict(emergencia) for emergencia in emergencias]
+        return emergencias
+
+    @staticmethod
+    def create(
+        *,
+        numero_evaluacion,
+        codigo_sinpad,
+        tipo_peligro_id,
+        fecha_emergencia,
+        c_usuari_login,
+        hora_ocurrencia_estimada=None,
+        esta_activo=True,
+    ):
+        """Insert one row in S43edan_emergencias.
+
+        codigo_sinpad is required. The insert is rejected when that code
+        already exists, compared without case sensitivity.
+        c_usuari_login comes from the authenticated user.
+        """
+        login = str(c_usuari_login or '').strip()
+        if login == '' or len(login) > _USUARIO_LOGIN_MAX_LENGTH:
+            raise EmergenciaServiceError('No se pudo identificar al usuario')
+
+        codigo_sinpad = str(codigo_sinpad or '').strip()
+        if codigo_sinpad == '':
+            raise EmergenciaServiceError('El campo codigo_sinpad es obligatorio')
+
+        with transaction.atomic(using=DB_ALIAS):
+            if not TipoPeligro.objects.filter(pk=tipo_peligro_id).exists():
+                raise EmergenciaServiceError('El tipo de peligro indicado no existe')
+
+            if Emergencia.objects.filter(codigo_sinpad__iexact=codigo_sinpad).exists():
+                raise EmergenciaServiceError(
+                    'Ya existe una emergencia con el código SINPAD indicado',
+                    conflict=True,
+                )
+
+            emergencia = Emergencia(
+                numero_evaluacion=numero_evaluacion,
+                codigo_sinpad=codigo_sinpad,
+                tipo_peligro_id=tipo_peligro_id,
+                fecha_emergencia=fecha_emergencia,
+                hora_ocurrencia_estimada=hora_ocurrencia_estimada,
+                esta_activo=esta_activo,
+                c_usuari_login=login,
+            )
+            emergencia.save()
+
+            stored = (
+                Emergencia.objects.select_related('tipo_peligro')
+                .prefetch_related(
+                    Prefetch('formularios_2a', queryset=_formularios_con_distrito())
+                )
+                .get(pk=emergencia.pk)
+            )
+        return stored
 
 
 def _formularios_con_distrito():
@@ -131,30 +187,3 @@ def _formularios_con_distrito():
     return Formulario2A.objects.annotate(
         distrito_nombre=Subquery(distrito_nombre, output_field=CharField())
     )
-
-
-def _emergencia_to_dict(emergencia):
-    """Map an emergency and its prefetched formularios to the list payload."""
-    return {
-        'emergencia_id': emergencia.emergencia_id,
-        'numero_evaluacion': emergencia.numero_evaluacion,
-        'codigo_sinpad': emergencia.codigo_sinpad,
-        'tipo_peligro_id': emergencia.tipo_peligro_id,
-        'fecha_emergencia': emergencia.fecha_emergencia,
-        'hora_ocurrencia_estimada': emergencia.hora_ocurrencia_estimada,
-        'esta_activo': emergencia.esta_activo,
-        'c_usuari_login': emergencia.c_usuari_login,
-        'fecha_creacion': emergencia.fecha_creacion,
-        'fecha_modificacion': emergencia.fecha_modificacion,
-        'nombre_tipo_peligro': emergencia.tipo_peligro.nombre,
-        'formularios_2a': [
-            {
-                'distrito_nombre': formulario.distrito_nombre,
-                **{
-                    field: getattr(formulario, field)
-                    for field in _FORMULARIO_UBICACION_FIELDS
-                },
-            }
-            for formulario in emergencia.formularios_2a.all()
-        ],
-    }
