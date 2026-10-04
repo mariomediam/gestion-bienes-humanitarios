@@ -20,8 +20,10 @@ export default function EmergenciasPage() {
   const [consulta, setConsulta] = useState('')
   const [filtros, setFiltros] = useState(EMPTY_FILTROS)
   const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
-  const [agregarAbierto, setAgregarAbierto] = useState(false)
-  const { loading, searched, emergencias, buscar, limpiarResultados } = useEmergenciasBusqueda()
+  const [formularioAbierto, setFormularioAbierto] = useState(false)
+  const [emergenciaEdicion, setEmergenciaEdicion] = useState(null)
+  const { loading, searched, emergencias, buscar, limpiarResultados, reemplazarEmergencia } =
+    useEmergenciasBusqueda()
 
   function handleFiltroChange(name, value) {
     setFiltros((current) => ({ ...current, [name]: value }))
@@ -39,8 +41,29 @@ export default function EmergenciasPage() {
     limpiarResultados()
   }
 
-  function handleEmergenciaCreada(emergencia) {
-    setAgregarAbierto(false)
+  function handleAbrirCrear() {
+    setEmergenciaEdicion(null)
+    setFormularioAbierto(true)
+  }
+
+  function handleAbrirModificar(emergencia) {
+    setEmergenciaEdicion(emergencia)
+    setFormularioAbierto(true)
+  }
+
+  function handleCerrarFormulario() {
+    setFormularioAbierto(false)
+    setEmergenciaEdicion(null)
+  }
+
+  function handleEmergenciaGuardada(emergencia) {
+    const eraEdicion = emergenciaEdicion !== null
+    setFormularioAbierto(false)
+    setEmergenciaEdicion(null)
+    if (eraEdicion) {
+      reemplazarEmergencia(emergencia)
+      return
+    }
     buscar({ emergencia_id: emergencia.emergencia_id })
   }
 
@@ -57,7 +80,7 @@ export default function EmergenciasPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setAgregarAbierto(true)}
+            onClick={handleAbrirCrear}
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             <PlusIcon className="w-4 h-4" />
@@ -87,12 +110,16 @@ export default function EmergenciasPage() {
         loading={loading}
       />
 
-      {searched && <EmergenciasResultados emergencias={emergencias} />}
+      {searched && (
+        <EmergenciasResultados emergencias={emergencias} onModificar={handleAbrirModificar} />
+      )}
 
       <EmergenciaFormModal
-        isOpen={agregarAbierto}
-        onClose={() => setAgregarAbierto(false)}
-        onCreated={handleEmergenciaCreada}
+        key={emergenciaEdicion ? emergenciaEdicion.emergencia_id : 'nueva'}
+        isOpen={formularioAbierto}
+        emergencia={emergenciaEdicion}
+        onClose={handleCerrarFormulario}
+        onSaved={handleEmergenciaGuardada}
       />
     </div>
   )

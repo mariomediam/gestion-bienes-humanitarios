@@ -41,6 +41,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  actualizarEmergencia: async (emergenciaId, data) => {
+    const response = await api.put(`/api/sgbh/emergencias/${emergenciaId}/`, data)
+    return response.data
+  },
+
   getTiposPeligro: async (params) => {
     const response = await api.get('/api/sgbh/tipos-peligro/', { params })
     return response.data

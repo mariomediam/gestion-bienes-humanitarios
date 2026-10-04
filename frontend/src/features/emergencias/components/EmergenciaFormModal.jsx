@@ -20,10 +20,35 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
-export default function EmergenciaFormModal({ isOpen, onClose, onCreated }) {
-  const [form, setForm] = useState(EMPTY_FORM)
+function toTimeInput(hora) {
+  if (!hora) return ''
+  return String(hora).slice(0, 5)
+}
+
+function formFromEmergencia(emergencia) {
+  return {
+    numero_evaluacion: emergencia.numero_evaluacion ?? '',
+    codigo_sinpad: emergencia.codigo_sinpad ?? '',
+    tipoPeligro: emergencia.tipo_peligro_id
+      ? {
+          value: emergencia.tipo_peligro_id,
+          label: emergencia.nombre_tipo_peligro ?? '',
+        }
+      : null,
+    fecha_emergencia: emergencia.fecha_emergencia
+      ? String(emergencia.fecha_emergencia).slice(0, 10)
+      : '',
+    hora_ocurrencia_estimada: toTimeInput(emergencia.hora_ocurrencia_estimada),
+  }
+}
+
+export default function EmergenciaFormModal({ isOpen, onClose, onSaved, emergencia = null }) {
+  const [form, setForm] = useState(() =>
+    emergencia ? formFromEmergencia(emergencia) : EMPTY_FORM,
+  )
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
+  const isEdit = emergencia !== null
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -88,16 +113,28 @@ export default function EmergenciaFormModal({ isOpen, onClose, onCreated }) {
     if (form.hora_ocurrencia_estimada) {
       payload.hora_ocurrencia_estimada = form.hora_ocurrencia_estimada
     }
+    if (isEdit) {
+      payload.esta_activo = emergencia.esta_activo
+    }
 
     setLoading(true)
     try {
-      const created = await sgbhApi.crearEmergencia(payload)
-      toast.success('Emergencia registrada correctamente')
+      const saved = isEdit
+        ? await sgbhApi.actualizarEmergencia(emergencia.emergencia_id, payload)
+        : await sgbhApi.crearEmergencia(payload)
+      toast.success(
+        isEdit ? 'Emergencia modificada correctamente' : 'Emergencia registrada correctamente',
+      )
       setForm(EMPTY_FORM)
       setErrors({})
-      onCreated(created)
+      onSaved(saved)
     } catch (error) {
-      toast.error(getErrorMessage(error, 'No se pudo registrar la emergencia'))
+      toast.error(
+        getErrorMessage(
+          error,
+          isEdit ? 'No se pudo modificar la emergencia' : 'No se pudo registrar la emergencia',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -110,12 +147,12 @@ export default function EmergenciaFormModal({ isOpen, onClose, onCreated }) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="titulo-agregar-emergencia"
+        aria-labelledby="titulo-emergencia"
         className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4"
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 id="titulo-agregar-emergencia" className="text-lg font-semibold text-[#1e3064]">
-            Agregar nueva emergencia
+          <h2 id="titulo-emergencia" className="text-lg font-semibold text-[#1e3064]">
+            {isEdit ? 'Modificar emergencia' : 'Agregar nueva emergencia'}
           </h2>
           <button
             type="button"
