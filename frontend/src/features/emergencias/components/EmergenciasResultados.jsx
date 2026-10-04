@@ -5,8 +5,14 @@ import { formatFechaHora } from '@utils/dates'
 const actionButtonClassName =
   'group relative inline-flex items-center justify-center w-8 h-8 text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors'
 
+const deleteButtonClassName =
+  'group relative inline-flex items-center justify-center w-8 h-8 text-red-600 bg-white border border-gray-300 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-colors'
+
 const actionTooltipClassName =
   'pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-[#1e3064] px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'
+
+const deleteTooltipClassName =
+  'pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-red-600 px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'
 
 function UbicacionList({ formularios }) {
   if (!formularios?.length) {
@@ -69,9 +75,9 @@ export default function EmergenciasResultados({ emergencias }) {
                           Modificar
                         </span>
                       </button>
-                      <button type="button" aria-label="Eliminar" className={actionButtonClassName}>
+                      <button type="button" aria-label="Eliminar" className={deleteButtonClassName}>
                         <TrashIcon className="w-4 h-4" />
-                        <span className={actionTooltipClassName} aria-hidden="true">
+                        <span className={deleteTooltipClassName} aria-hidden="true">
                           Eliminar
                         </span>
                       </button>
