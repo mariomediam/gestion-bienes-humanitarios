@@ -1188,3 +1188,24 @@ ALTER TABLE [dbo].[S43personas]  WITH CHECK ADD  CONSTRAINT [CK_personas_documen
 GO
 ALTER TABLE [dbo].[S43personas] CHECK CONSTRAINT [CK_personas_documento]
 GO
+
+/****** Object:  View [dbo].[DISTRITO]    Script Date: 3/10/2026 23:14:06 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER VIEW [dbo].[DISTRITO]
+AS
+
+SELECT left(c_lugar_id,2) as departamento_id,
+substring(c_lugar_id,3,2) as provincia_id,
+substring(c_lugar_id,5,2) as distrito_id, 
+n_lugar_nombre as distrito_nombre, 
+f_activo
+FROM PVL.dbo.LUGAR
+WHERE c_tiplug_id=3
+
+GO

@@ -1241,3 +1241,27 @@ class Persona(models.Model):
 
     def __str__(self):
         return f'{self.apellido_paterno} {self.apellido_materno}, {self.nombres}'
+
+
+class Distrito(models.Model):
+    """Read-only view DISTRITO in SIAC.
+
+    The view exposes districts from PVL.dbo.LUGAR (c_tiplug_id = 3).
+    The three location codes identify each row.
+    """
+
+    pk = models.CompositePrimaryKey('departamento_id', 'provincia_id', 'distrito_id')
+    departamento_id = models.CharField(max_length=2)
+    provincia_id = models.CharField(max_length=2)
+    distrito_id = models.CharField(max_length=2)
+    distrito_nombre = models.CharField(max_length=50)
+    f_activo = models.BooleanField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'DISTRITO'
+        verbose_name = 'Distrito'
+        verbose_name_plural = 'Distritos'
+
+    def __str__(self):
+        return f'{self.departamento_id}{self.provincia_id}{self.distrito_id} - {self.distrito_nombre}'
