@@ -1,15 +1,7 @@
-export function getFechaUnMesAnterior(from = new Date()) {
-  const year = from.getFullYear()
-  const month = from.getMonth()
-  const day = from.getDate()
-  const lastDayOfPreviousMonth = new Date(year, month, 0).getDate()
-  const targetDay = Math.min(day, lastDayOfPreviousMonth)
-  const target = new Date(year, month - 1, targetDay)
-  const targetYear = target.getFullYear()
-  const targetMonth = String(target.getMonth() + 1).padStart(2, '0')
-  const targetDayText = String(target.getDate()).padStart(2, '0')
+import { addMonth, format } from '@formkit/tempo'
 
-  return `${targetYear}-${targetMonth}-${targetDayText}`
+export function getFechaUnMesAnterior(from = new Date()) {
+  return format(addMonth(from, -1), 'YYYY-MM-DD')
 }
 
 export function formatFechaHora(fecha, hora) {
