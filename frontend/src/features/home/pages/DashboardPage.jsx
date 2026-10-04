@@ -30,13 +30,13 @@ export default function DashboardPage() {
       <h1 className="text-2xl font-bold text-[#1e3064]">Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <Card title="Emergencias registradas" value={totales.emergencias ?? '—'} icon={EmergenciaIcon} />
-        <Card title="Formularios EDAN 2A" value={totales.formularios2a ?? '—'} icon={FormularioIcon} />
-        <Card title="Planillas BAH" value={totales.planillasBah ?? '—'} icon={PlanillaIcon} />
-        <Card title="Personas atendidas" value={totales.integrantes ?? '—'} icon={PersonasIcon} />
+        <Card title="Emergencias registradas" value={totales.emergencias ?? '—'} icon={EmergenciaIcon} iconClassName="bg-red-100 text-red-600" />
+        <Card title="Formularios EDAN 2A" value={totales.formularios2a ?? '—'} icon={FormularioIcon} iconClassName="bg-blue-100 text-blue-600" />
+        <Card title="Planillas BAH" value={totales.planillasBah ?? '—'} icon={PlanillaIcon} iconClassName="bg-emerald-100 text-emerald-600" />
+        <Card title="Personas atendidas" value={totales.integrantes ?? '—'} icon={PersonasIcon} iconClassName="bg-violet-100 text-violet-600" />
       </div>
 
-      <Card title="Tipos de peligro" icon={TipoPeligroIcon}>
+      <Card title="Tipos de peligro" icon={TipoPeligroIcon} iconClassName="bg-amber-100 text-amber-600">
         {tiposPeligro.length === 0 ? (
           <p className="mt-3 text-sm text-gray-500">No hay tipos de peligro registrados</p>
         ) : (
