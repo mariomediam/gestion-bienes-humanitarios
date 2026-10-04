@@ -30,4 +30,14 @@ export const sgbhApi = {
     const response = await api.get('/api/sgbh/emergencias/', { params })
     return response.data
   },
+
+  buscarEmergencias: async (params) => {
+    const response = await api.get('/api/sgbh/emergencias/buscar/', { params })
+    return response.data
+  },
+
+  getTiposPeligro: async (params) => {
+    const response = await api.get('/api/sgbh/tipos-peligro/', { params })
+    return response.data
+  },
 }

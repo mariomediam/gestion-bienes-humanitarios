@@ -5,6 +5,7 @@ import useAuthStore from '@store/authStore'
 import LoginPage from '@features/auth/pages/LoginPage'
 import MainLayout from '@components/layout/MainLayout'
 import DashboardPage from '@features/home/pages/DashboardPage'
+import EmergenciasPage from '@features/emergencias/pages/EmergenciasPage'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading, checkAuth } = useAuthStore()
@@ -75,6 +76,7 @@ function App() {
           }
         >
           <Route path="/" element={<DashboardPage />} />
+          <Route path="emergencias" element={<EmergenciasPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
