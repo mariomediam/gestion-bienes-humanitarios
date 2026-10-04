@@ -1,4 +1,12 @@
+import PencilIcon from '@components/icons/PencilIcon'
+import TrashIcon from '@components/icons/TrashIcon'
 import { formatFechaHora } from '@utils/dates'
+
+const actionButtonClassName =
+  'group relative inline-flex items-center justify-center w-8 h-8 text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors'
+
+const actionTooltipClassName =
+  'pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-[#1e3064] px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'
 
 function UbicacionList({ formularios }) {
   if (!formularios?.length) {
@@ -31,12 +39,13 @@ export default function EmergenciasResultados({ emergencias }) {
               <th scope="col" className="px-5 py-3 font-medium">Ubicación</th>
               <th scope="col" className="px-5 py-3 font-medium">Tipo de peligro</th>
               <th scope="col" className="px-5 py-3 font-medium">Fecha y hora estimada</th>
+              <th scope="col" className="px-5 py-3 font-medium">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {emergencias.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-5 py-6 text-center text-gray-500">
+                <td colSpan={6} className="px-5 py-6 text-center text-gray-500">
                   No se encontraron emergencias
                 </td>
               </tr>
@@ -51,6 +60,22 @@ export default function EmergenciasResultados({ emergencias }) {
                   <td className="px-5 py-3 text-gray-800">{emergencia.nombre_tipo_peligro}</td>
                   <td className="px-5 py-3 text-gray-800 whitespace-nowrap">
                     {formatFechaHora(emergencia.fecha_emergencia, emergencia.hora_ocurrencia_estimada)}
+                  </td>
+                  <td className="relative z-10 px-5 py-3 whitespace-nowrap">
+                    <div className="flex gap-2">
+                      <button type="button" aria-label="Modificar" className={actionButtonClassName}>
+                        <PencilIcon className="w-4 h-4" />
+                        <span className={actionTooltipClassName} aria-hidden="true">
+                          Modificar
+                        </span>
+                      </button>
+                      <button type="button" aria-label="Eliminar" className={actionButtonClassName}>
+                        <TrashIcon className="w-4 h-4" />
+                        <span className={actionTooltipClassName} aria-hidden="true">
+                          Eliminar
+                        </span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
