@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    DistritoBuscarView,
     EmergenciaBuscarView,
     EmergenciaDetailView,
     EmergenciaListView,
@@ -33,6 +34,7 @@ urlpatterns = [
     ),
     path('tipo-seguro/', TipoSeguroView.as_view(), name='tipo-seguro'),
     path('tipos-peligro/', TipoPeligroListView.as_view(), name='tipos-peligro'),
+    path('distritos/buscar/', DistritoBuscarView.as_view(), name='distritos-buscar'),
     path('emergencias/', EmergenciaListView.as_view(), name='emergencias'),
     path(
         'emergencias/<int:emergencia_id>/',

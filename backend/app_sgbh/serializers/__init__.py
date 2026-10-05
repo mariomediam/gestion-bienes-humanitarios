@@ -1,3 +1,4 @@
+from .distrito import DistritoSerializer
 from .emergencia import (
     EmergenciaCreateSerializer,
     EmergenciaSerializer,
@@ -15,6 +16,7 @@ from .tipo_peligro import TipoPeligroSerializer
 from .tipo_seguro import TipoSeguroSerializer
 
 __all__ = [
+    'DistritoSerializer',
     'EmergenciaCreateSerializer',
     'EmergenciaSerializer',
     'Formulario2ABusquedaSerializer',

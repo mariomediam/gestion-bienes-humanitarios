@@ -29,6 +29,11 @@ def parse_esta_activo(raw_value):
     return parse_optional_bool(raw_value, 'esta_activo')
 
 
+def parse_f_activo(raw_value):
+    """Parse the optional f_activo query param."""
+    return parse_optional_bool(raw_value, 'f_activo')
+
+
 def parse_es_evaluador_edan(raw_value):
     """Parse the optional es_evaluador_edan query param."""
     return parse_optional_bool(raw_value, 'es_evaluador_edan')
