@@ -54,4 +54,14 @@ export const sgbhApi = {
     const response = await api.get('/api/sgbh/tipos-peligro/', { params })
     return response.data
   },
+
+  buscarDistritos: async (params) => {
+    const response = await api.get('/api/sgbh/distritos/buscar/', { params })
+    return response.data
+  },
+
+  buscarFormularios2A: async (params) => {
+    const response = await api.get('/api/sgbh/formularios-2a/buscar/', { params })
+    return response.data
+  },
 }

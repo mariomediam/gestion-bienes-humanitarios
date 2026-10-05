@@ -6,6 +6,7 @@ import LoginPage from '@features/auth/pages/LoginPage'
 import MainLayout from '@components/layout/MainLayout'
 import DashboardPage from '@features/home/pages/DashboardPage'
 import EmergenciasPage from '@features/emergencias/pages/EmergenciasPage'
+import Formularios2APage from '@features/formularios2a/pages/Formularios2APage'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading, checkAuth } = useAuthStore()
@@ -77,6 +78,7 @@ function App() {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="emergencias" element={<EmergenciasPage />} />
+          <Route path="formularios-2A" element={<Formularios2APage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
