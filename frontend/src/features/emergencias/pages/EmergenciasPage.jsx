@@ -4,6 +4,7 @@ import PlusIcon from '@components/icons/PlusIcon'
 import EmergenciaFormModal from '@features/emergencias/components/EmergenciaFormModal'
 import EmergenciasBusquedaForm from '@features/emergencias/components/EmergenciasBusquedaForm'
 import EmergenciasResultados from '@features/emergencias/components/EmergenciasResultados'
+import { exportEmergenciasExcel } from '@features/emergencias/exportEmergenciasExcel'
 import useEmergenciasBusqueda from '@features/emergencias/hooks/useEmergenciasBusqueda'
 import { buildEmergenciaSearchParams } from '@features/emergencias/searchParams'
 
@@ -96,6 +97,7 @@ export default function EmergenciasPage() {
           {hayResultados && (
             <button
               type="button"
+              onClick={() => exportEmergenciasExcel(emergencias)}
               className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
             >
               <ExcelIcon className="w-4 h-4" />
