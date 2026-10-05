@@ -10,7 +10,12 @@ from app_sgbh.query_params import (
     parse_personal_id,
 )
 from app_sgbh.services.personal import PersonalService
-from app_sgbh.views.personal_view import PersonalBuscarView, _parse_busqueda
+from app_sgbh.views.personal_view import (
+    PersonalBuscarView,
+    PersonalEncargadosAlmacenBuscarView,
+    PersonalEvaluadoresBuscarView,
+    _parse_busqueda,
+)
 
 
 def test_parse_busqueda_omits_every_filter_when_params_are_empty():
@@ -132,6 +137,98 @@ def test_get_personal_buscar_returns_rows():
         esta_activo=True,
     )
     serializer_cls.assert_called_once_with('queryset', many=True)
+
+
+def test_get_evaluadores_buscar_forces_evaluador_and_keeps_other_filters():
+    factory = APIRequestFactory()
+    request = factory.get(
+        '/api/sgbh/personal/buscar/evaluadores/',
+        {'personal_id': '3', 'esta_activo': '1', 'es_encargado_almacen': '0'},
+    )
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+
+    with (
+        patch(
+            'app_sgbh.views.personal_view.PersonalService.search',
+            return_value='queryset',
+        ) as search,
+        patch('app_sgbh.views.personal_view.PersonalSerializer') as serializer_cls,
+    ):
+        serializer_cls.return_value.data = []
+        response = PersonalEvaluadoresBuscarView.as_view()(request)
+
+    assert response.status_code == 200
+    search.assert_called_once_with(
+        personal_id=3,
+        es_encargado_almacen=False,
+        esta_activo=True,
+        es_evaluador_edan=True,
+    )
+
+
+def test_get_evaluadores_buscar_returns_every_evaluator_without_params():
+    factory = APIRequestFactory()
+    request = factory.get('/api/sgbh/personal/buscar/evaluadores/')
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+
+    with (
+        patch(
+            'app_sgbh.views.personal_view.PersonalService.search',
+            return_value='queryset',
+        ) as search,
+        patch('app_sgbh.views.personal_view.PersonalSerializer') as serializer_cls,
+    ):
+        serializer_cls.return_value.data = []
+        response = PersonalEvaluadoresBuscarView.as_view()(request)
+
+    assert response.status_code == 200
+    search.assert_called_once_with(
+        personal_id=None,
+        es_encargado_almacen=None,
+        esta_activo=None,
+        es_evaluador_edan=True,
+    )
+
+
+def test_get_encargados_almacen_buscar_forces_encargado_and_keeps_other_filters():
+    factory = APIRequestFactory()
+    request = factory.get(
+        '/api/sgbh/personal/buscar/encargados-almacen/',
+        {'es_evaluador_edan': 'true', 'esta_activo': 'false'},
+    )
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+
+    with (
+        patch(
+            'app_sgbh.views.personal_view.PersonalService.search',
+            return_value='queryset',
+        ) as search,
+        patch('app_sgbh.views.personal_view.PersonalSerializer') as serializer_cls,
+    ):
+        serializer_cls.return_value.data = []
+        response = PersonalEncargadosAlmacenBuscarView.as_view()(request)
+
+    assert response.status_code == 200
+    search.assert_called_once_with(
+        personal_id=None,
+        es_evaluador_edan=True,
+        esta_activo=False,
+        es_encargado_almacen=True,
+    )
+
+
+def test_get_encargados_almacen_buscar_rejects_invalid_filter():
+    factory = APIRequestFactory()
+    request = factory.get(
+        '/api/sgbh/personal/buscar/encargados-almacen/',
+        {'personal_id': 'x'},
+    )
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+
+    response = PersonalEncargadosAlmacenBuscarView.as_view()(request)
+
+    assert response.status_code == 400
+    assert response.data['error'] == 'El filtro personal_id debe ser un número entero'
 
 
 def test_get_personal_buscar_rejects_invalid_filter():
