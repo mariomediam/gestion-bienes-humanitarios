@@ -1,7 +1,28 @@
+from django.db import transaction
 from django.db.models import CharField, Count, OuterRef, Prefetch, Subquery
 
-from ..models import Distrito, Formulario2A, Formulario2AVivienda
+from ..db_router import DB_ALIAS
+from ..models import (
+    Distrito,
+    Emergencia,
+    EstadoRegistro,
+    Formulario2A,
+    Formulario2AVivienda,
+    Personal,
+)
 from ..text_search import filter_text_like
+
+_USUARIO_LOGIN_MAX_LENGTH = 20
+
+
+class Formulario2AServiceError(Exception):
+    """Business rule violation for a Formulario 2A operation."""
+
+    def __init__(self, message, *, conflict=False, not_found=False):
+        super().__init__(message)
+        self.message = message
+        self.conflict = conflict
+        self.not_found = not_found
 
 
 class Formulario2AService:
@@ -67,6 +88,116 @@ class Formulario2AService:
             queryset = queryset.filter(estado_registro_id=estado_registro_id)
         result = queryset.aggregate(total=Count('*'))
         return result['total']
+
+    @staticmethod
+    def create(
+        *,
+        emergencia_id,
+        departamento_id,
+        provincia_id,
+        distrito_id,
+        fecha_empadronamiento,
+        evaluador_id,
+        estado_registro_id,
+        c_usuari_login,
+        hora_empadronamiento=None,
+        localidad=None,
+        barrio_sector_urbanizacion=None,
+        centro_poblado=None,
+        caserio=None,
+        anexo=None,
+        calle_manzana=None,
+        edificio_piso_dpto=None,
+        otros_ubicacion=None,
+        numero_hoja=1,
+        total_hojas=None,
+        institucion=None,
+    ):
+        """Insert one row in S43edan_formulario_2a.
+
+        The emergency, district, EDAN evaluator and registration state must
+        exist. The evaluator must have es_evaluador_edan enabled.
+        c_usuari_login comes from the authenticated user.
+        fecha_creacion uses the model default. fecha_modificacion stays null.
+        """
+        login = str(c_usuari_login or '').strip()
+        if login == '' or len(login) > _USUARIO_LOGIN_MAX_LENGTH:
+            raise Formulario2AServiceError('No se pudo identificar al usuario')
+
+        _require_hojas(numero_hoja, total_hojas)
+
+        with transaction.atomic(using=DB_ALIAS):
+            _require_emergencia(emergencia_id)
+            _require_distrito(departamento_id, provincia_id, distrito_id)
+            _require_evaluador(evaluador_id)
+            _require_estado_registro(estado_registro_id)
+
+            formulario = Formulario2A(
+                emergencia_id=emergencia_id,
+                departamento_id=departamento_id,
+                provincia_id=provincia_id,
+                distrito_id=distrito_id,
+                fecha_empadronamiento=fecha_empadronamiento,
+                hora_empadronamiento=hora_empadronamiento,
+                localidad=localidad,
+                barrio_sector_urbanizacion=barrio_sector_urbanizacion,
+                centro_poblado=centro_poblado,
+                caserio=caserio,
+                anexo=anexo,
+                calle_manzana=calle_manzana,
+                edificio_piso_dpto=edificio_piso_dpto,
+                otros_ubicacion=otros_ubicacion,
+                numero_hoja=numero_hoja,
+                total_hojas=total_hojas,
+                institucion=institucion,
+                evaluador_id=evaluador_id,
+                estado_registro_id=estado_registro_id,
+                c_usuari_login=login,
+            )
+            formulario.save()
+            stored = _formularios_busqueda().get(pk=formulario.pk)
+        return stored
+
+
+def _require_hojas(numero_hoja, total_hojas):
+    if numero_hoja is None or numero_hoja < 1:
+        raise Formulario2AServiceError(
+            'El campo numero_hoja debe ser un número entero mayor que cero'
+        )
+    if total_hojas is not None and total_hojas < numero_hoja:
+        raise Formulario2AServiceError(
+            'El campo total_hojas debe ser mayor o igual que numero_hoja'
+        )
+
+
+def _require_emergencia(emergencia_id):
+    if not Emergencia.objects.filter(pk=emergencia_id).exists():
+        raise Formulario2AServiceError('La emergencia indicada no existe')
+
+
+def _require_distrito(departamento_id, provincia_id, distrito_id):
+    exists = Distrito.objects.filter(
+        departamento_id=departamento_id,
+        provincia_id=provincia_id,
+        distrito_id=distrito_id,
+    ).exists()
+    if not exists:
+        raise Formulario2AServiceError('El distrito indicado no existe')
+
+
+def _require_evaluador(evaluador_id):
+    personal = Personal.objects.filter(pk=evaluador_id).first()
+    if personal is None:
+        raise Formulario2AServiceError('El evaluador indicado no existe')
+    if not personal.es_evaluador_edan:
+        raise Formulario2AServiceError(
+            'El personal indicado no puede registrarse como evaluador EDAN'
+        )
+
+
+def _require_estado_registro(estado_registro_id):
+    if not EstadoRegistro.objects.filter(pk=estado_registro_id).exists():
+        raise Formulario2AServiceError('El estado de registro indicado no existe')
 
 
 def _formularios_busqueda():

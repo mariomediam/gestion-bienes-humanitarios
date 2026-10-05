@@ -16,9 +16,48 @@ from app_sgbh.query_params import (
 )
 from app_sgbh.serializers import (
     Formulario2ABusquedaSerializer,
+    Formulario2ACreateSerializer,
     Formulario2ATotalSerializer,
+    first_error_message,
 )
-from app_sgbh.services.formulario_2a import Formulario2AService
+from app_sgbh.services.formulario_2a import (
+    Formulario2AService,
+    Formulario2AServiceError,
+)
+
+
+class Formulario2ACreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = Formulario2ACreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            created = Formulario2AService.create(
+                c_usuari_login=getattr(request.user, 'login', ''),
+                **serializer.validated_data,
+            )
+            payload = Formulario2ABusquedaSerializer(created).data
+        except Formulario2AServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo registrar el formulario EDAN 2A'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_201_CREATED)
 
 
 class Formulario2ABuscarView(APIView):
@@ -73,6 +112,16 @@ class Formulario2ATotalView(APIView):
             )
 
         return Response(payload, status=status.HTTP_200_OK)
+
+
+def _respuesta_error_servicio(exc):
+    if exc.not_found:
+        http_status = status.HTTP_404_NOT_FOUND
+    elif exc.conflict:
+        http_status = status.HTTP_409_CONFLICT
+    else:
+        http_status = status.HTTP_400_BAD_REQUEST
+    return Response({'error': exc.message}, status=http_status)
 
 
 def _parse_busqueda(params):
