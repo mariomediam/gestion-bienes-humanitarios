@@ -6,8 +6,8 @@ _TRUE_VALUES = {'1', 'true'}
 _FALSE_VALUES = {'0', 'false'}
 
 
-def parse_esta_activo(raw_value):
-    """Parse the optional esta_activo query param.
+def parse_optional_bool(raw_value, field_name):
+    """Parse an optional boolean query param.
 
     Returns (value, error_message). value is True, False or None.
     None means the filter was omitted.
@@ -21,7 +21,22 @@ def parse_esta_activo(raw_value):
     if normalized in _FALSE_VALUES:
         return False, None
 
-    return None, 'El filtro esta_activo debe ser 1, 0, true o false'
+    return None, f'El filtro {field_name} debe ser 1, 0, true o false'
+
+
+def parse_esta_activo(raw_value):
+    """Parse the optional esta_activo query param."""
+    return parse_optional_bool(raw_value, 'esta_activo')
+
+
+def parse_es_evaluador_edan(raw_value):
+    """Parse the optional es_evaluador_edan query param."""
+    return parse_optional_bool(raw_value, 'es_evaluador_edan')
+
+
+def parse_es_encargado_almacen(raw_value):
+    """Parse the optional es_encargado_almacen query param."""
+    return parse_optional_bool(raw_value, 'es_encargado_almacen')
 
 
 _SMALLINT_MIN = -32768
@@ -62,6 +77,11 @@ def parse_estado_planilla_id(raw_value):
 def parse_condicion_persona_id(raw_value):
     """Parse the optional condicion_persona_id query param."""
     return _parse_optional_smallint(raw_value, 'condicion_persona_id')
+
+
+def parse_personal_id(raw_value):
+    """Parse the optional personal_id query param."""
+    return _parse_optional_smallint(raw_value, 'personal_id')
 
 
 def parse_fecha_desde(raw_value):

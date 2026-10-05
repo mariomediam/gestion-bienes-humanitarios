@@ -8,6 +8,7 @@ from .views import (
     EmergenciaTotalView,
     Formulario2AIntegranteTotalView,
     Formulario2ATotalView,
+    PersonalBuscarView,
     PlanillaEntregaTotalView,
     TipoPeligroListView,
     TipoSeguroView,
@@ -16,6 +17,7 @@ from .views import (
 app_name = 'sgbh'
 
 urlpatterns = [
+    path('personal/buscar/', PersonalBuscarView.as_view(), name='personal-buscar'),
     path('tipo-seguro/', TipoSeguroView.as_view(), name='tipo-seguro'),
     path('tipos-peligro/', TipoPeligroListView.as_view(), name='tipos-peligro'),
     path('emergencias/', EmergenciaListView.as_view(), name='emergencias'),
