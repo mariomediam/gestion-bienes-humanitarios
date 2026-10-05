@@ -207,3 +207,18 @@ def parse_localidad(raw_value):
 def parse_distrito_nombre(raw_value):
     """Parse the optional distrito_nombre query param."""
     return _parse_optional_text(raw_value, 'distrito_nombre', 50)
+
+
+def parse_departamento_id(raw_value):
+    """Parse the optional departamento_id query param (CHAR(2))."""
+    return _parse_optional_text(raw_value, 'departamento_id', 2)
+
+
+def parse_provincia_id(raw_value):
+    """Parse the optional provincia_id query param (CHAR(2))."""
+    return _parse_optional_text(raw_value, 'provincia_id', 2)
+
+
+def parse_distrito_id(raw_value):
+    """Parse the optional distrito_id query param (CHAR(2))."""
+    return _parse_optional_text(raw_value, 'distrito_id', 2)

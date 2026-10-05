@@ -6,6 +6,7 @@ from .views import (
     EmergenciaListView,
     EmergenciaTotalPorTipoPeligroView,
     EmergenciaTotalView,
+    Formulario2ABuscarView,
     Formulario2AIntegranteTotalView,
     Formulario2ATotalView,
     PersonalBuscarView,
@@ -44,6 +45,11 @@ urlpatterns = [
         'emergencias/total-por-tipo-peligro/',
         EmergenciaTotalPorTipoPeligroView.as_view(),
         name='emergencias-total-por-tipo-peligro',
+    ),
+    path(
+        'formularios-2a/buscar/',
+        Formulario2ABuscarView.as_view(),
+        name='formularios-2a-buscar',
     ),
     path(
         'formularios-2a/total/',

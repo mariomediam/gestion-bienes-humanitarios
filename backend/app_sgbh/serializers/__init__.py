@@ -3,7 +3,11 @@ from .emergencia import (
     EmergenciaSerializer,
     first_error_message,
 )
-from .formulario_2a import Formulario2ATotalSerializer, Formulario2AUbicacionSerializer
+from .formulario_2a import (
+    Formulario2ABusquedaSerializer,
+    Formulario2ATotalSerializer,
+    Formulario2AUbicacionSerializer,
+)
 from .formulario_2a_integrante import Formulario2AIntegranteTotalSerializer
 from .personal import PersonalSerializer
 from .planilla_entrega import PlanillaEntregaTotalSerializer
@@ -13,6 +17,7 @@ from .tipo_seguro import TipoSeguroSerializer
 __all__ = [
     'EmergenciaCreateSerializer',
     'EmergenciaSerializer',
+    'Formulario2ABusquedaSerializer',
     'Formulario2AIntegranteTotalSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
