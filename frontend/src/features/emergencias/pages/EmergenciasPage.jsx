@@ -22,8 +22,15 @@ export default function EmergenciasPage() {
   const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
   const [formularioAbierto, setFormularioAbierto] = useState(false)
   const [emergenciaEdicion, setEmergenciaEdicion] = useState(null)
-  const { loading, searched, emergencias, buscar, limpiarResultados, reemplazarEmergencia } =
-    useEmergenciasBusqueda()
+  const {
+    loading,
+    searched,
+    emergencias,
+    buscar,
+    limpiarResultados,
+    reemplazarEmergencia,
+    quitarEmergencia,
+  } = useEmergenciasBusqueda()
 
   function handleFiltroChange(name, value) {
     setFiltros((current) => ({ ...current, [name]: value }))
@@ -111,7 +118,11 @@ export default function EmergenciasPage() {
       />
 
       {searched && (
-        <EmergenciasResultados emergencias={emergencias} onModificar={handleAbrirModificar} />
+        <EmergenciasResultados
+          emergencias={emergencias}
+          onModificar={handleAbrirModificar}
+          onEliminada={quitarEmergencia}
+        />
       )}
 
       <EmergenciaFormModal

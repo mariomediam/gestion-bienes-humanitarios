@@ -46,6 +46,10 @@ export const sgbhApi = {
     return response.data
   },
 
+  eliminarEmergencia: async (emergenciaId) => {
+    await api.delete(`/api/sgbh/emergencias/${emergenciaId}/`)
+  },
+
   getTiposPeligro: async (params) => {
     const response = await api.get('/api/sgbh/tipos-peligro/', { params })
     return response.data

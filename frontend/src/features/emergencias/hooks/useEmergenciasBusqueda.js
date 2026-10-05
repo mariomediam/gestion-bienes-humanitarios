@@ -38,5 +38,19 @@ export default function useEmergenciasBusqueda() {
     )
   }
 
-  return { loading, searched, emergencias, buscar, limpiarResultados, reemplazarEmergencia }
+  function quitarEmergencia(emergenciaId) {
+    setEmergencias((current) =>
+      current.filter((item) => item.emergencia_id !== emergenciaId),
+    )
+  }
+
+  return {
+    loading,
+    searched,
+    emergencias,
+    buscar,
+    limpiarResultados,
+    reemplazarEmergencia,
+    quitarEmergencia,
+  }
 }
