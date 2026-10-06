@@ -15,8 +15,8 @@ function unir(partes, separador = ' ') {
 function Campo({ label, value }) {
   return (
     <div className="min-w-0">
-      <dt className="text-xs font-medium text-[#1e3064]">{label}</dt>
-      <dd className="mt-1 text-sm text-gray-800 wrap-break-word">{value}</dd>
+      <dt className="text-xs font-medium text-gray-800">{label}</dt>
+      <dd className="mt-0 mb-1 text-sm text-[#1e3064] wrap-break-word">{value}</dd>
     </div>
   )
 }
@@ -35,7 +35,7 @@ export default function Formulario2AEmergenciaCard({ formulario }) {
         </button>
       </div>
 
-      <dl className="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 md:grid-cols-4">
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-10 px-5 py-4 sm:grid-cols-2 md:grid-cols-2">
         <Campo
           label="Código SINPAD y tipo de peligro"
           value={unir([formulario.codigo_sinpad, formulario.nombre_tipo_peligro])}
