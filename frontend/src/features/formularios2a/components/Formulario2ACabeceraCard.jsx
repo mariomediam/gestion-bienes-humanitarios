@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PencilIcon from '@components/icons/PencilIcon'
+import PlusIcon from '@components/icons/PlusIcon'
 import Formulario2AFormModal from '@features/formularios2a/components/Formulario2AFormModal'
 import { formatFechaHora } from '@utils/dates'
 
@@ -35,14 +36,23 @@ export default function Formulario2ACabeceraCard({ formulario, onSaved }) {
     <section className="bg-white rounded-lg border border-gray-200">
       <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-gray-200">
         <h1 className="text-base font-semibold text-[#1e3064]">Datos del formulario EDAN 2A</h1>
-        <button
-          type="button"
-          onClick={() => setEdicionAbierta(true)}
-          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
-        >
-          <PencilIcon className="w-4 h-4" />
-          Modificar
-        </button>
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
+          >
+            <PlusIcon className="w-4 h-4" />
+            Agregar vivienda
+          </button>
+          <button
+            type="button"
+            onClick={() => setEdicionAbierta(true)}
+            className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
+          >
+            <PencilIcon className="w-4 h-4" />
+            Modificar
+          </button>
+        </div>
       </div>
 
       <dl className="grid grid-cols-1 gap-x-6 gap-y-2 px-5 py-4 sm:grid-cols-2 md:grid-cols-2">

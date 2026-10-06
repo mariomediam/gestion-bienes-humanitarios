@@ -46,9 +46,11 @@ No está documentado completamente:
 
 ## Anulaciones y reversión
 
-No está definido de manera final:
 
 - si una Planilla BAH anulada desbloquea el Formulario 2A;
+
+No está definido de manera final:
+
 - si la anulación de una planilla genera un movimiento inverso o cambia el estado del movimiento existente;
 - cómo se auditan reversiones de movimientos confirmados.
 
