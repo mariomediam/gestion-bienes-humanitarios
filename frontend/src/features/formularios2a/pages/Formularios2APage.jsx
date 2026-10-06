@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import PlusIcon from '@components/icons/PlusIcon'
 import Formulario2ACodigoSinpadModal from '@features/formularios2a/components/Formulario2ACodigoSinpadModal'
@@ -18,6 +19,7 @@ const EMPTY_FILTROS = {
 }
 
 export default function Formularios2APage() {
+  const navigate = useNavigate()
   const [consulta, setConsulta] = useState('')
   const [filtros, setFiltros] = useState(EMPTY_FILTROS)
   const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
@@ -52,7 +54,7 @@ export default function Formularios2APage() {
 
   function handleFormularioGuardado(formulario) {
     setEmergenciaSeleccionada(null)
-    buscar({ formulario_2a_id: formulario.formulario_2a_id })
+    navigate(`/formularios-2A/${formulario.formulario_2a_id}`)
   }
 
   const hayResultados = searched && formularios.length > 0
