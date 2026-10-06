@@ -17,6 +17,7 @@ from .personal import PersonalSerializer
 from .planilla_entrega import PlanillaEntregaTotalSerializer
 from .tipo_peligro import TipoPeligroSerializer
 from .tipo_seguro import TipoSeguroSerializer
+from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
 
 __all__ = [
     'DistritoSerializer',
@@ -33,5 +34,6 @@ __all__ = [
     'PlanillaEntregaTotalSerializer',
     'TipoPeligroSerializer',
     'TipoSeguroSerializer',
+    'TipoUsoInstalacionSerializer',
     'first_error_message',
 ]

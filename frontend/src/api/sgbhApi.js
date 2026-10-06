@@ -55,6 +55,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  getTiposUsoInstalacion: async (params) => {
+    const response = await api.get('/api/sgbh/tipos-uso-instalacion/', { params })
+    return response.data
+  },
+
   buscarDistritos: async (params) => {
     const response = await api.get('/api/sgbh/distritos/buscar/', { params })
     return response.data

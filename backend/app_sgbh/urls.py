@@ -18,6 +18,7 @@ from .views import (
     PlanillaEntregaTotalView,
     TipoPeligroListView,
     TipoSeguroView,
+    TipoUsoInstalacionListView,
 )
 
 app_name = 'sgbh'
@@ -36,6 +37,11 @@ urlpatterns = [
     ),
     path('tipo-seguro/', TipoSeguroView.as_view(), name='tipo-seguro'),
     path('tipos-peligro/', TipoPeligroListView.as_view(), name='tipos-peligro'),
+    path(
+        'tipos-uso-instalacion/',
+        TipoUsoInstalacionListView.as_view(),
+        name='tipos-uso-instalacion',
+    ),
     path('distritos/buscar/', DistritoBuscarView.as_view(), name='distritos-buscar'),
     path('emergencias/', EmergenciaListView.as_view(), name='emergencias'),
     path(
