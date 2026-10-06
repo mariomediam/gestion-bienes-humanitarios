@@ -182,6 +182,11 @@ class Formulario2AService:
         return stored
 
     @staticmethod
+    def require_modificable(formulario):
+        """Reject changes when the form is inactive or has an issued BAH planilla."""
+        _require_formulario_modificable(formulario)
+
+    @staticmethod
     def update(
         formulario_2a_id,
         *,

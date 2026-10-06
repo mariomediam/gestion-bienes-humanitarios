@@ -14,7 +14,10 @@ from .formulario_2a_view import (
     Formulario2ADetailView,
     Formulario2ATotalView,
 )
-from .formulario_2a_vivienda_view import Formulario2AViviendaBuscarView
+from .formulario_2a_vivienda_view import (
+    Formulario2AViviendaBuscarView,
+    Formulario2AViviendaCreateView,
+)
 from .material_pared_view import MaterialParedListView
 from .material_piso_view import MaterialPisoListView
 from .material_techo_view import MaterialTechoListView

@@ -1,5 +1,81 @@
 from rest_framework import serializers
 
+_INT_MIN = -2147483648
+_INT_MAX = 2147483647
+_SMALLINT_MIN = -32768
+_SMALLINT_MAX = 32767
+
+
+class OptionalBooleanField(serializers.BooleanField):
+    """Boolean field that stores a blank value as null."""
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('required', False)
+        kwargs.setdefault('allow_null', True)
+        kwargs.setdefault('default', None)
+        super().__init__(**kwargs)
+
+    def run_validation(self, data=serializers.empty):
+        if data == '' or (isinstance(data, str) and data.strip() == ''):
+            return None
+        return super().run_validation(data)
+
+
+def _id_field(name, *, required, smallint=True):
+    """Integer foreign key with the Spanish messages used by the API."""
+    obligatorio = f'El campo {name} es obligatorio'
+    invalido = f'El campo {name} debe ser un número entero'
+    messages = {
+        'invalid': invalido,
+        'min_value': invalido,
+        'max_value': invalido,
+    }
+    kwargs = {
+        'min_value': _SMALLINT_MIN if smallint else _INT_MIN,
+        'max_value': _SMALLINT_MAX if smallint else _INT_MAX,
+        'error_messages': messages,
+    }
+    if required:
+        messages['required'] = obligatorio
+        messages['null'] = obligatorio
+    else:
+        kwargs['required'] = False
+        kwargs['allow_null'] = True
+        kwargs['default'] = None
+    return serializers.IntegerField(**kwargs)
+
+
+class ViviendaCreateSerializer(serializers.Serializer):
+    """Validate the body used to insert S43edan_formulario_2a_viviendas.
+
+    numero_orden is assigned by Formulario2AViviendaService for the parent
+    form. Foreign keys and the parent form lock are checked there.
+    fecha_creacion uses the column default.
+    """
+
+    formulario_2a_id = _id_field('formulario_2a_id', required=True, smallint=False)
+    numero_lote = serializers.CharField(
+        max_length=50,
+        trim_whitespace=True,
+        error_messages={
+            'required': 'El campo numero_lote es obligatorio',
+            'blank': 'El campo numero_lote es obligatorio',
+            'null': 'El campo numero_lote es obligatorio',
+            'invalid': 'El campo numero_lote debe ser texto',
+            'max_length': 'El campo numero_lote no debe superar 50 caracteres',
+        },
+    )
+    tenencia_propia = OptionalBooleanField(
+        error_messages={
+            'invalid': 'El campo tenencia_propia debe ser 1, 0, true o false',
+        },
+    )
+    tipo_uso_instalacion_id = _id_field('tipo_uso_instalacion_id', required=True)
+    condicion_vivienda_id = _id_field('condicion_vivienda_id', required=False)
+    material_techo_id = _id_field('material_techo_id', required=False)
+    material_pared_id = _id_field('material_pared_id', required=False)
+    material_piso_id = _id_field('material_piso_id', required=False)
+
 
 class ViviendaBusquedaSerializer(serializers.Serializer):
     """One vivienda row returned by the search endpoint.
