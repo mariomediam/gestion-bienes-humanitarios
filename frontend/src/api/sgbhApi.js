@@ -65,6 +65,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  getMaterialesTecho: async (params) => {
+    const response = await api.get('/api/sgbh/materiales-techo/', { params })
+    return response.data
+  },
+
   buscarDistritos: async (params) => {
     const response = await api.get('/api/sgbh/distritos/buscar/', { params })
     return response.data

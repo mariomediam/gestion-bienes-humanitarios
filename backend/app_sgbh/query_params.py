@@ -79,6 +79,16 @@ def parse_condicion_vivienda_id(raw_value):
     return _parse_optional_smallint(raw_value, 'condicion_vivienda_id')
 
 
+def parse_material_techo_id(raw_value):
+    """Parse the optional material_techo_id query param."""
+    return _parse_optional_smallint(raw_value, 'material_techo_id')
+
+
+def parse_codigo_formulario_material_techo(raw_value):
+    """Parse the optional codigo_formulario query param for S43cat_materiales_techo."""
+    return _parse_optional_smallint(raw_value, 'codigo_formulario')
+
+
 def parse_estado_registro_id(raw_value):
     """Parse the optional estado_registro_id query param."""
     return _parse_optional_smallint(raw_value, 'estado_registro_id')
@@ -222,6 +232,11 @@ def parse_codigo_condicion_vivienda(raw_value):
 def parse_nombre_condicion_vivienda(raw_value):
     """Parse the optional nombre query param for S43cat_condiciones_vivienda."""
     return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_nombre_material_techo(raw_value):
+    """Parse the optional nombre query param for S43cat_materiales_techo."""
+    return _parse_optional_text(raw_value, 'nombre', 200)
 
 
 def parse_codigo_sinpad(raw_value):

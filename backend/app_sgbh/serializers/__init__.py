@@ -14,6 +14,7 @@ from .formulario_2a import (
     Formulario2AUbicacionSerializer,
 )
 from .formulario_2a_integrante import Formulario2AIntegranteTotalSerializer
+from .material_techo import MaterialTechoSerializer
 from .personal import PersonalSerializer
 from .planilla_entrega import PlanillaEntregaTotalSerializer
 from .tipo_peligro import TipoPeligroSerializer
@@ -32,6 +33,7 @@ __all__ = [
     'Formulario2AIntegranteTotalSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
+    'MaterialTechoSerializer',
     'PersonalSerializer',
     'PlanillaEntregaTotalSerializer',
     'TipoPeligroSerializer',
