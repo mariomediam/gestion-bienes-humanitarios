@@ -15,6 +15,7 @@ const EMPTY_FORM = {
   hora_empadronamiento: '',
   localidad: '',
   barrio_sector_urbanizacion: '',
+  centro_poblado: '',
   caserio: '',
   anexo: '',
   calle_manzana: '',
@@ -28,6 +29,7 @@ const EMPTY_FORM = {
 const TEXT_FIELDS = [
   ['localidad', 200],
   ['barrio_sector_urbanizacion', 250],
+  ['centro_poblado', 200],
   ['caserio', 200],
   ['anexo', 200],
   ['calle_manzana', 250],
@@ -72,6 +74,7 @@ function formFromFormulario(formulario) {
     hora_empadronamiento: toTimeInput(formulario.hora_empadronamiento),
     localidad: textoCampo(formulario.localidad),
     barrio_sector_urbanizacion: textoCampo(formulario.barrio_sector_urbanizacion),
+    centro_poblado: textoCampo(formulario.centro_poblado),
     caserio: textoCampo(formulario.caserio),
     anexo: textoCampo(formulario.anexo),
     calle_manzana: textoCampo(formulario.calle_manzana),
@@ -210,7 +213,6 @@ export default function Formulario2AFormModal({
 
     if (isEdit) {
       payload.institucion = formulario.institucion ?? null
-      payload.centro_poblado = formulario.centro_poblado ?? null
     } else {
       payload.emergencia_id = emergenciaId
       payload.institucion = INSTITUCION
@@ -351,6 +353,18 @@ export default function Formulario2AFormModal({
               />
             </Campo>
 
+            <Campo id="centro-poblado-formulario-2a" label="Centro poblado" error={errors.centro_poblado}>
+              <input
+                id="centro-poblado-formulario-2a"
+                type="text"
+                value={form.centro_poblado}
+                onChange={(event) => handleChange('centro_poblado', event.target.value)}
+                maxLength={200}
+                disabled={loading}
+                className={inputClassName}
+              />
+            </Campo>
+
             <Campo id="caserio-formulario-2a-nuevo" label="Caserío" error={errors.caserio}>
               <input
                 id="caserio-formulario-2a-nuevo"
@@ -399,7 +413,7 @@ export default function Formulario2AFormModal({
               />
             </Campo>
 
-            <Campo id="otros-ubicacion-formulario-2a" label="Otros datos de ubicación" error={errors.otros_ubicacion} className="sm:col-span-2">
+            <Campo id="otros-ubicacion-formulario-2a" label="Otros datos de ubicación" error={errors.otros_ubicacion}>
               <input
                 id="otros-ubicacion-formulario-2a"
                 type="text"

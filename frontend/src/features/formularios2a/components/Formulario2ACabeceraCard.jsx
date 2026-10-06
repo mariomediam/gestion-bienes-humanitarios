@@ -45,7 +45,7 @@ export default function Formulario2ACabeceraCard({ formulario, onSaved }) {
         </button>
       </div>
 
-      <dl className="grid grid-cols-1 gap-x-6 gap-y-10 px-5 py-4 sm:grid-cols-2 md:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-2 px-5 py-4 sm:grid-cols-2 md:grid-cols-2">
         <Campo
           label="Código SINPAD y tipo de peligro"
           value={unir([formulario.codigo_sinpad, formulario.nombre_tipo_peligro])}
