@@ -17,6 +17,7 @@ def test_parse_busqueda_omits_every_filter_when_params_are_empty():
 
     assert error is None
     assert parsed == {
+        'formulario_2a_id': None,
         'codigo_sinpad': None,
         'tipo_peligro_id': None,
         'departamento_id': None,
@@ -33,6 +34,7 @@ def test_parse_busqueda_omits_every_filter_when_params_are_empty():
 def test_parse_busqueda_accepts_several_filters_together():
     parsed, error = _parse_busqueda(
         {
+            'formulario_2a_id': '10',
             'codigo_sinpad': ' 45821 ',
             'tipo_peligro_id': '3',
             'departamento_id': '20',
@@ -48,6 +50,7 @@ def test_parse_busqueda_accepts_several_filters_together():
 
     assert error is None
     assert parsed == {
+        'formulario_2a_id': 10,
         'codigo_sinpad': '45821',
         'tipo_peligro_id': 3,
         'departamento_id': '20',
@@ -64,6 +67,7 @@ def test_parse_busqueda_accepts_several_filters_together():
 @pytest.mark.parametrize(
     ('params', 'message'),
     [
+        ({'formulario_2a_id': 'abc'}, 'formulario_2a_id debe ser un número entero'),
         ({'tipo_peligro_id': 'abc'}, 'tipo_peligro_id debe ser un número entero'),
         ({'estado_registro_id': 'x'}, 'estado_registro_id debe ser un número entero'),
         ({'departamento_id': '200'}, 'departamento_id no debe superar 2 caracteres'),
@@ -112,6 +116,7 @@ def test_search_combines_filters_with_and():
         return_value=queryset,
     ):
         result = Formulario2AService.search(
+            formulario_2a_id=10,
             codigo_sinpad='45821',
             tipo_peligro_id=3,
             departamento_id='20',
@@ -126,6 +131,7 @@ def test_search_combines_filters_with_and():
 
     assert result == 'rows'
     assert queryset.filter.call_args_list == [
+        ((), {'formulario_2a_id': 10}),
         ((), {'emergencia__codigo_sinpad': '45821'}),
         ((), {'emergencia__tipo_peligro_id': 3}),
         ((), {'departamento_id': '20'}),
@@ -207,6 +213,7 @@ def test_get_formularios_2a_buscar_returns_rows():
     request = factory.get(
         '/api/sgbh/formularios-2a/buscar/',
         {
+            'formulario_2a_id': '10',
             'codigo_sinpad': '45821',
             'tipo_peligro_id': '3',
             'departamento_id': '20',
@@ -233,6 +240,7 @@ def test_get_formularios_2a_buscar_returns_rows():
     assert response.status_code == 200
     assert response.data == rows
     search.assert_called_once_with(
+        formulario_2a_id=10,
         codigo_sinpad='45821',
         tipo_peligro_id=3,
         departamento_id='20',
@@ -266,6 +274,7 @@ def test_get_formularios_2a_buscar_returns_every_row_without_params():
 
     assert response.status_code == 200
     search.assert_called_once_with(
+        formulario_2a_id=None,
         codigo_sinpad=None,
         tipo_peligro_id=None,
         departamento_id=None,

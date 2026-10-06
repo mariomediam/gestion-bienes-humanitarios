@@ -158,6 +158,11 @@ def parse_emergencia_id(raw_value):
     return _parse_optional_int(raw_value, 'emergencia_id')
 
 
+def parse_formulario_2a_id(raw_value):
+    """Parse the optional formulario_2a_id query param."""
+    return _parse_optional_int(raw_value, 'formulario_2a_id')
+
+
 def _parse_optional_text(raw_value, field_name, max_length):
     """Parse an optional text query param.
 

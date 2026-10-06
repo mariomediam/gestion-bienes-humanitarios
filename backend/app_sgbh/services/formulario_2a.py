@@ -28,6 +28,7 @@ class Formulario2AServiceError(Exception):
 class Formulario2AService:
     @staticmethod
     def search(
+        formulario_2a_id=None,
         codigo_sinpad=None,
         tipo_peligro_id=None,
         departamento_id=None,
@@ -50,6 +51,8 @@ class Formulario2AService:
         is returned. The queryset is ready for Formulario2ABusquedaSerializer.
         """
         queryset = _formularios_busqueda()
+        if formulario_2a_id is not None:
+            queryset = queryset.filter(formulario_2a_id=formulario_2a_id)
         if codigo_sinpad is not None:
             queryset = queryset.filter(emergencia__codigo_sinpad=codigo_sinpad)
         if tipo_peligro_id is not None:

@@ -9,6 +9,7 @@ from app_sgbh.query_params import (
     parse_departamento_id,
     parse_distrito_id,
     parse_estado_registro_id,
+    parse_formulario_2a_id,
     parse_localidad,
     parse_optional_date,
     parse_provincia_id,
@@ -131,6 +132,7 @@ def _parse_busqueda(params):
     fecha_desde and fecha_hasta bound fecha_empadronamiento.
     """
     parsers = (
+        ('formulario_2a_id', parse_formulario_2a_id),
         ('codigo_sinpad', parse_codigo_sinpad),
         ('tipo_peligro_id', parse_tipo_peligro_id),
         ('departamento_id', parse_departamento_id),
