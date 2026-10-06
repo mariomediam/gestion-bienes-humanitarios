@@ -13,6 +13,7 @@ from .views import (
     Formulario2ADetailView,
     Formulario2AIntegranteTotalView,
     Formulario2ATotalView,
+    Formulario2AViviendaBuscarView,
     MaterialParedListView,
     MaterialPisoListView,
     MaterialTechoListView,
@@ -99,6 +100,11 @@ urlpatterns = [
         'formularios-2a/total/',
         Formulario2ATotalView.as_view(),
         name='formularios-2a-total',
+    ),
+    path(
+        'viviendas/buscar/',
+        Formulario2AViviendaBuscarView.as_view(),
+        name='viviendas-buscar',
     ),
     path(
         'planillas-bah/total/',
