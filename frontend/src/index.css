@@ -199,3 +199,22 @@ body {
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+.formulario-2a-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #e5e7eb;
+}
+
+.formulario-2a-scroll::-webkit-scrollbar {
+  width: 12px;
+}
+
+.formulario-2a-scroll::-webkit-scrollbar-track {
+  background: #e5e7eb;
+}
+
+.formulario-2a-scroll::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border: 2px solid #e5e7eb;
+  border-radius: 999px;
+}

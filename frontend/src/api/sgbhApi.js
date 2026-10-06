@@ -64,4 +64,14 @@ export const sgbhApi = {
     const response = await api.get('/api/sgbh/formularios-2a/buscar/', { params })
     return response.data
   },
+
+  crearFormulario2A: async (data) => {
+    const response = await api.post('/api/sgbh/formularios-2a/', data)
+    return response.data
+  },
+
+  buscarEvaluadores: async (params) => {
+    const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
+    return response.data
+  },
 }

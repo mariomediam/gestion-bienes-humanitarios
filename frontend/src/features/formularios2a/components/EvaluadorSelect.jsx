@@ -29,52 +29,37 @@ const selectStyles = {
   }),
 }
 
-let distritosRequest = null
-
 function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
-function loadDistritosActivos() {
-  if (!distritosRequest) {
-    distritosRequest = sgbhApi
-      .buscarDistritos({ f_activo: true })
-      .then((rows) =>
-        rows
-          .map((row) => ({
-            value: `${row.departamento_id}${row.provincia_id}${row.distrito_id}`,
-            label: `${row.distrito_nombre} (${row.departamento_id}${row.provincia_id}${row.distrito_id})`,
-            departamento_id: row.departamento_id,
-            provincia_id: row.provincia_id,
-            distrito_id: row.distrito_id,
-          }))
-          .sort((left, right) => left.label.localeCompare(right.label, 'es')),
-      )
-      .catch((error) => {
-        distritosRequest = null
-        throw error
-      })
-  }
-
-  return distritosRequest
+function nombreEvaluador(row) {
+  return [row.apellido_paterno, row.apellido_materno, row.nombres].filter(Boolean).join(' ')
 }
 
-export default function DistritoSelect({ inputId, value, onChange, disabled }) {
+export default function EvaluadorSelect({ inputId, value, onChange, disabled }) {
   const [options, setOptions] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
 
-    loadDistritosActivos()
+    sgbhApi
+      .buscarEvaluadores({ esta_activo: true })
       .then((rows) => {
-        if (active) {
-          setOptions(rows)
-        }
+        if (!active) return
+        setOptions(
+          rows
+            .map((row) => ({
+              value: row.personal_id,
+              label: nombreEvaluador(row),
+            }))
+            .sort((left, right) => left.label.localeCompare(right.label, 'es')),
+        )
       })
       .catch((error) => {
         if (active) {
-          toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de distritos'))
+          toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de evaluadores'))
         }
       })
       .finally(() => {
@@ -100,9 +85,9 @@ export default function DistritoSelect({ inputId, value, onChange, disabled }) {
       isClearable
       menuPortalTarget={document.body}
       menuPosition="fixed"
-      placeholder="Seleccione un distrito"
+      placeholder="Seleccione un evaluador"
       loadingMessage={() => 'Cargando...'}
-      noOptionsMessage={() => 'No se encontraron distritos'}
+      noOptionsMessage={() => 'No se encontraron evaluadores'}
       styles={selectStyles}
     />
   )
