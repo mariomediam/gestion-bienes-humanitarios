@@ -1,3 +1,4 @@
+from .condicion_vivienda import CondicionViviendaSerializer
 from .distrito import DistritoSerializer
 from .emergencia import (
     EmergenciaCreateSerializer,
@@ -20,6 +21,7 @@ from .tipo_seguro import TipoSeguroSerializer
 from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
 
 __all__ = [
+    'CondicionViviendaSerializer',
     'DistritoSerializer',
     'EmergenciaCreateSerializer',
     'EmergenciaSerializer',

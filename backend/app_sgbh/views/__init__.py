@@ -1,3 +1,4 @@
+from .condicion_vivienda_view import CondicionViviendaListView
 from .distrito_view import DistritoBuscarView
 from .emergencia_view import (
     EmergenciaBuscarView,

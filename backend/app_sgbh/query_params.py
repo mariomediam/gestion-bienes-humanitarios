@@ -74,6 +74,11 @@ def parse_tipo_uso_instalacion_id(raw_value):
     return _parse_optional_smallint(raw_value, 'tipo_uso_instalacion_id')
 
 
+def parse_condicion_vivienda_id(raw_value):
+    """Parse the optional condicion_vivienda_id query param."""
+    return _parse_optional_smallint(raw_value, 'condicion_vivienda_id')
+
+
 def parse_estado_registro_id(raw_value):
     """Parse the optional estado_registro_id query param."""
     return _parse_optional_smallint(raw_value, 'estado_registro_id')
@@ -206,6 +211,16 @@ def parse_codigo_tipo_uso_instalacion(raw_value):
 
 def parse_nombre_tipo_uso_instalacion(raw_value):
     """Parse the optional nombre query param for S43cat_tipos_uso_instalacion."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_condicion_vivienda(raw_value):
+    """Parse the optional codigo query param for S43cat_condiciones_vivienda."""
+    return _parse_optional_text(raw_value, 'codigo', 30)
+
+
+def parse_nombre_condicion_vivienda(raw_value):
+    """Parse the optional nombre query param for S43cat_condiciones_vivienda."""
     return _parse_optional_text(raw_value, 'nombre', 100)
 
 

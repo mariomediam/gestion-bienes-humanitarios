@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    CondicionViviendaListView,
     DistritoBuscarView,
     EmergenciaBuscarView,
     EmergenciaDetailView,
@@ -41,6 +42,11 @@ urlpatterns = [
         'tipos-uso-instalacion/',
         TipoUsoInstalacionListView.as_view(),
         name='tipos-uso-instalacion',
+    ),
+    path(
+        'condiciones-vivienda/',
+        CondicionViviendaListView.as_view(),
+        name='condiciones-vivienda',
     ),
     path('distritos/buscar/', DistritoBuscarView.as_view(), name='distritos-buscar'),
     path('emergencias/', EmergenciaListView.as_view(), name='emergencias'),

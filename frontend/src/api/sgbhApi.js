@@ -60,6 +60,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  getCondicionesVivienda: async (params) => {
+    const response = await api.get('/api/sgbh/condiciones-vivienda/', { params })
+    return response.data
+  },
+
   buscarDistritos: async (params) => {
     const response = await api.get('/api/sgbh/distritos/buscar/', { params })
     return response.data
