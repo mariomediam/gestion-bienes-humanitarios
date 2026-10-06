@@ -10,6 +10,7 @@ from .formulario_2a_integrante_view import Formulario2AIntegranteTotalView
 from .formulario_2a_view import (
     Formulario2ABuscarView,
     Formulario2ACreateView,
+    Formulario2ADetailView,
     Formulario2ATotalView,
 )
 from .personal_view import (

@@ -273,11 +273,8 @@ class Formulario2AViviendaBusquedaSerializer(serializers.Serializer):
     numero_lote = serializers.CharField(allow_null=True)
 
 
-class Formulario2ABusquedaSerializer(serializers.Serializer):
-    """One Formulario 2A row returned by the search endpoint.
-
-    Viviendas are nested so the response has one object per formulario_2a_id.
-    """
+class Formulario2ADetalleSerializer(serializers.Serializer):
+    """One Formulario 2A row returned by the detail endpoint."""
 
     formulario_2a_id = serializers.IntegerField()
     emergencia_id = serializers.IntegerField()
@@ -310,10 +307,18 @@ class Formulario2ABusquedaSerializer(serializers.Serializer):
     nombre_tipo_peligro = serializers.CharField(source='emergencia.tipo_peligro.nombre')
     distrito_nombre = serializers.CharField(allow_null=True)
     evaluador_nombre = serializers.SerializerMethodField()
-    viviendas = Formulario2AViviendaBusquedaSerializer(many=True)
 
     def get_evaluador_nombre(self, obj):
         personal = obj.evaluador
         return (
             f'{personal.apellido_paterno} {personal.apellido_materno} {personal.nombres}'
         )
+
+
+class Formulario2ABusquedaSerializer(Formulario2ADetalleSerializer):
+    """One Formulario 2A row returned by the search endpoint.
+
+    Viviendas are nested so the response has one object per formulario_2a_id.
+    """
+
+    viviendas = Formulario2AViviendaBusquedaSerializer(many=True)

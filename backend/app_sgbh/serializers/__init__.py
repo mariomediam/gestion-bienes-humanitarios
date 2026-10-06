@@ -7,6 +7,7 @@ from .emergencia import (
 from .formulario_2a import (
     Formulario2ABusquedaSerializer,
     Formulario2ACreateSerializer,
+    Formulario2ADetalleSerializer,
     Formulario2ATotalSerializer,
     Formulario2AUbicacionSerializer,
 )
@@ -22,6 +23,7 @@ __all__ = [
     'EmergenciaSerializer',
     'Formulario2ABusquedaSerializer',
     'Formulario2ACreateSerializer',
+    'Formulario2ADetalleSerializer',
     'Formulario2AIntegranteTotalSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',

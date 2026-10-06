@@ -81,6 +81,22 @@ class Formulario2AService:
         return queryset.order_by('-fecha_empadronamiento', '-hora_empadronamiento')
 
     @staticmethod
+    def get(formulario_2a_id):
+        """Return one Formulario 2A by primary key.
+
+        Includes codigo_sinpad, the hazard name, distrito_nombre and the
+        evaluator name. Raises Formulario2AServiceError when the row does
+        not exist.
+        """
+        try:
+            return _formularios_con_distrito().get(pk=formulario_2a_id)
+        except Formulario2A.DoesNotExist:
+            raise Formulario2AServiceError(
+                'El formulario EDAN 2A indicado no existe',
+                not_found=True,
+            ) from None
+
+    @staticmethod
     def count(estado_registro_id=None):
         """Count rows in S43edan_formulario_2a.
 
@@ -203,22 +219,27 @@ def _require_estado_registro(estado_registro_id):
         raise Formulario2AServiceError('El estado de registro indicado no existe')
 
 
-def _formularios_busqueda():
-    """Formulario 2A rows with distrito_nombre and nested viviendas.
+def _formularios_con_distrito():
+    """Formulario 2A rows with emergency, hazard, distrito and evaluator.
 
     distrito_nombre comes from DISTRITO matched by the three ubigeo codes.
-    Viviendas stay on the parent row instead of duplicating the formulario.
     """
     distrito_nombre = Distrito.objects.filter(
         departamento_id=OuterRef('departamento_id'),
         provincia_id=OuterRef('provincia_id'),
         distrito_id=OuterRef('distrito_id'),
     ).values('distrito_nombre')[:1]
+    return Formulario2A.objects.annotate(
+        distrito_nombre=Subquery(distrito_nombre, output_field=CharField())
+    ).select_related('emergencia', 'emergencia__tipo_peligro', 'evaluador')
+
+
+def _formularios_busqueda():
+    """Formulario 2A rows with distrito_nombre and nested viviendas.
+
+    Viviendas stay on the parent row instead of duplicating the formulario.
+    """
     viviendas = Formulario2AVivienda.objects.order_by('numero_orden', 'vivienda_id')
-    return (
-        Formulario2A.objects.annotate(
-            distrito_nombre=Subquery(distrito_nombre, output_field=CharField())
-        )
-        .select_related('emergencia', 'emergencia__tipo_peligro', 'evaluador')
-        .prefetch_related(Prefetch('viviendas', queryset=viviendas))
+    return _formularios_con_distrito().prefetch_related(
+        Prefetch('viviendas', queryset=viviendas)
     )

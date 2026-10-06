@@ -18,9 +18,12 @@ from app_sgbh.query_params import (
 from app_sgbh.serializers import (
     Formulario2ABusquedaSerializer,
     Formulario2ACreateSerializer,
+    Formulario2ADetalleSerializer,
     Formulario2ATotalSerializer,
     first_error_message,
 )
+
+_FORMULARIO_2A_ID_MAX = 2147483647
 from app_sgbh.services.formulario_2a import (
     Formulario2AService,
     Formulario2AServiceError,
@@ -59,6 +62,30 @@ class Formulario2ACreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class Formulario2ADetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, formulario_2a_id):
+        if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:
+            return Response(
+                {'error': 'El campo formulario_2a_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            formulario = Formulario2AService.get(formulario_2a_id)
+            payload = Formulario2ADetalleSerializer(formulario).data
+        except Formulario2AServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo obtener el formulario EDAN 2A'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 class Formulario2ABuscarView(APIView):
