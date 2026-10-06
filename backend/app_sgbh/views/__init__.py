@@ -14,6 +14,8 @@ from .formulario_2a_view import (
     Formulario2ADetailView,
     Formulario2ATotalView,
 )
+from .material_pared_view import MaterialParedListView
+from .material_piso_view import MaterialPisoListView
 from .material_techo_view import MaterialTechoListView
 from .personal_view import (
     PersonalBuscarView,

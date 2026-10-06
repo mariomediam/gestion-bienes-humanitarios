@@ -13,6 +13,8 @@ from .views import (
     Formulario2ADetailView,
     Formulario2AIntegranteTotalView,
     Formulario2ATotalView,
+    MaterialParedListView,
+    MaterialPisoListView,
     MaterialTechoListView,
     PersonalBuscarView,
     PersonalEncargadosAlmacenBuscarView,
@@ -48,6 +50,16 @@ urlpatterns = [
         'condiciones-vivienda/',
         CondicionViviendaListView.as_view(),
         name='condiciones-vivienda',
+    ),
+    path(
+        'materiales-pared/',
+        MaterialParedListView.as_view(),
+        name='materiales-pared',
+    ),
+    path(
+        'materiales-piso/',
+        MaterialPisoListView.as_view(),
+        name='materiales-piso',
     ),
     path(
         'materiales-techo/',

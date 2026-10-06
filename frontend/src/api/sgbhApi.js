@@ -65,6 +65,16 @@ export const sgbhApi = {
     return response.data
   },
 
+  getMaterialesPared: async (params) => {
+    const response = await api.get('/api/sgbh/materiales-pared/', { params })
+    return response.data
+  },
+
+  getMaterialesPiso: async (params) => {
+    const response = await api.get('/api/sgbh/materiales-piso/', { params })
+    return response.data
+  },
+
   getMaterialesTecho: async (params) => {
     const response = await api.get('/api/sgbh/materiales-techo/', { params })
     return response.data
