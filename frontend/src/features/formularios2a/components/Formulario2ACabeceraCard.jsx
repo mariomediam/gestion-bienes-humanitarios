@@ -2,6 +2,7 @@ import { useState } from 'react'
 import PencilIcon from '@components/icons/PencilIcon'
 import PlusIcon from '@components/icons/PlusIcon'
 import Formulario2AFormModal from '@features/formularios2a/components/Formulario2AFormModal'
+import Formulario2AViviendaFormModal from '@features/formularios2a/components/Formulario2AViviendaFormModal'
 import { formatFechaHora } from '@utils/dates'
 
 function texto(value) {
@@ -24,12 +25,18 @@ function Campo({ label, value }) {
   )
 }
 
-export default function Formulario2ACabeceraCard({ formulario, onSaved }) {
+export default function Formulario2ACabeceraCard({ formulario, onSaved, onViviendaGuardada }) {
   const [edicionAbierta, setEdicionAbierta] = useState(false)
+  const [altaViviendaAbierta, setAltaViviendaAbierta] = useState(false)
 
   function handleSaved(saved) {
     setEdicionAbierta(false)
     onSaved?.(saved)
+  }
+
+  function handleViviendaGuardada() {
+    setAltaViviendaAbierta(false)
+    onViviendaGuardada?.()
   }
 
   return (
@@ -39,6 +46,7 @@ export default function Formulario2ACabeceraCard({ formulario, onSaved }) {
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <button
             type="button"
+            onClick={() => setAltaViviendaAbierta(true)}
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             <PlusIcon className="w-4 h-4" />
@@ -87,6 +95,13 @@ export default function Formulario2ACabeceraCard({ formulario, onSaved }) {
         codigoSinpad={formulario.codigo_sinpad ?? ''}
         onClose={() => setEdicionAbierta(false)}
         onSaved={handleSaved}
+      />
+      <Formulario2AViviendaFormModal
+        key={altaViviendaAbierta ? 'abierta' : 'cerrada'}
+        isOpen={altaViviendaAbierta}
+        formulario2aId={formulario.formulario_2a_id}
+        onClose={() => setAltaViviendaAbierta(false)}
+        onSaved={handleViviendaGuardada}
       />
     </section>
   )

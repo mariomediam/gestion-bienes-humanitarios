@@ -42,7 +42,11 @@ export default function Formulario2ADetallePage() {
       {loading && <LoadingState />}
       {!loading && formulario && (
         <>
-          <Formulario2ACabeceraCard formulario={formulario} onSaved={reemplazarFormulario} />
+          <Formulario2ACabeceraCard
+            formulario={formulario}
+            onSaved={reemplazarFormulario}
+            onViviendaGuardada={cargarViviendas}
+          />
           <Formulario2AViviendas
             loading={cargandoViviendas}
             consultado={consultado}

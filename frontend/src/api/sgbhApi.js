@@ -110,6 +110,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  crearVivienda: async (data) => {
+    const response = await api.post('/api/sgbh/viviendas/', data)
+    return response.data
+  },
+
   buscarEvaluadores: async (params) => {
     const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
     return response.data
