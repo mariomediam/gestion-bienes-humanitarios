@@ -70,6 +70,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  actualizarFormulario2A: async (formulario2aId, data) => {
+    const response = await api.put(`/api/sgbh/formularios-2a/${formulario2aId}/`, data)
+    return response.data
+  },
+
   getFormulario2A: async (formulario2aId) => {
     const response = await api.get(`/api/sgbh/formularios-2a/${formulario2aId}/`)
     return response.data

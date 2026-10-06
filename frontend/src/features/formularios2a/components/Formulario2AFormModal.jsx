@@ -44,6 +44,56 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
+function textoCampo(value) {
+  if (value === null || value === undefined) return ''
+  return String(value)
+}
+
+function toTimeInput(hora) {
+  if (!hora) return ''
+  return String(hora).slice(0, 5)
+}
+
+function formFromFormulario(formulario) {
+  const codigoDistrito = `${formulario.departamento_id}${formulario.provincia_id}${formulario.distrito_id}`
+  return {
+    distrito: {
+      value: codigoDistrito,
+      label: formulario.distrito_nombre
+        ? `${formulario.distrito_nombre} (${codigoDistrito})`
+        : codigoDistrito,
+      departamento_id: formulario.departamento_id,
+      provincia_id: formulario.provincia_id,
+      distrito_id: formulario.distrito_id,
+    },
+    fecha_empadronamiento: formulario.fecha_empadronamiento
+      ? String(formulario.fecha_empadronamiento).slice(0, 10)
+      : '',
+    hora_empadronamiento: toTimeInput(formulario.hora_empadronamiento),
+    localidad: textoCampo(formulario.localidad),
+    barrio_sector_urbanizacion: textoCampo(formulario.barrio_sector_urbanizacion),
+    caserio: textoCampo(formulario.caserio),
+    anexo: textoCampo(formulario.anexo),
+    calle_manzana: textoCampo(formulario.calle_manzana),
+    edificio_piso_dpto: textoCampo(formulario.edificio_piso_dpto),
+    otros_ubicacion: textoCampo(formulario.otros_ubicacion),
+    numero_hoja:
+      formulario.numero_hoja === null || formulario.numero_hoja === undefined
+        ? ''
+        : String(formulario.numero_hoja),
+    total_hojas:
+      formulario.total_hojas === null || formulario.total_hojas === undefined
+        ? ''
+        : String(formulario.total_hojas),
+    evaluador: formulario.evaluador_id
+      ? {
+          value: formulario.evaluador_id,
+          label: formulario.evaluador_nombre ?? '',
+        }
+      : null,
+  }
+}
+
 function parseEnteroPositivo(value) {
   const text = String(value).trim()
   if (text === '') return { empty: true }
@@ -101,10 +151,14 @@ export default function Formulario2AFormModal({
   isOpen,
   emergenciaId,
   codigoSinpad,
+  formulario = null,
   onClose,
   onSaved,
 }) {
-  const [form, setForm] = useState(EMPTY_FORM)
+  const isEdit = formulario !== null
+  const [form, setForm] = useState(() =>
+    formulario ? formFromFormulario(formulario) : EMPTY_FORM,
+  )
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
@@ -146,14 +200,20 @@ export default function Formulario2AFormModal({
     if (Object.keys(nextErrors).length > 0) return
 
     const payload = {
-      emergencia_id: emergenciaId,
       departamento_id: form.distrito.departamento_id,
       provincia_id: form.distrito.provincia_id,
       distrito_id: form.distrito.distrito_id,
       fecha_empadronamiento: form.fecha_empadronamiento,
-      institucion: INSTITUCION,
       evaluador_id: form.evaluador.value,
-      estado_registro_id: ESTADO_REGISTRO_ID,
+      estado_registro_id: isEdit ? formulario.estado_registro_id : ESTADO_REGISTRO_ID,
+    }
+
+    if (isEdit) {
+      payload.institucion = formulario.institucion ?? null
+      payload.centro_poblado = formulario.centro_poblado ?? null
+    } else {
+      payload.emergencia_id = emergenciaId
+      payload.institucion = INSTITUCION
     }
 
     if (form.hora_empadronamiento) {
@@ -170,13 +230,26 @@ export default function Formulario2AFormModal({
 
     setLoading(true)
     try {
-      const saved = await sgbhApi.crearFormulario2A(payload)
-      toast.success('Formulario EDAN 2A registrado correctamente')
+      const saved = isEdit
+        ? await sgbhApi.actualizarFormulario2A(formulario.formulario_2a_id, payload)
+        : await sgbhApi.crearFormulario2A(payload)
+      toast.success(
+        isEdit
+          ? 'Formulario EDAN 2A modificado correctamente'
+          : 'Formulario EDAN 2A registrado correctamente',
+      )
       setForm(EMPTY_FORM)
       setErrors({})
       onSaved(saved)
     } catch (error) {
-      toast.error(getErrorMessage(error, 'No se pudo registrar el formulario EDAN 2A'))
+      toast.error(
+        getErrorMessage(
+          error,
+          isEdit
+            ? 'No se pudo modificar el formulario EDAN 2A'
+            : 'No se pudo registrar el formulario EDAN 2A',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -199,7 +272,7 @@ export default function Formulario2AFormModal({
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
           <h2 id="titulo-formulario-2a" className="text-lg font-semibold text-[#1e3064]">
-            Datos del formulario 2A
+            {isEdit ? 'Modificar formulario 2A' : 'Datos del formulario 2A'}
           </h2>
           <button
             type="button"

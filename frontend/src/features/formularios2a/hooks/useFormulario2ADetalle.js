@@ -33,5 +33,9 @@ export default function useFormulario2ADetalle(formulario2aId) {
     }
   }, [formulario2aId])
 
-  return { loading, formulario }
+  function reemplazarFormulario(data) {
+    setFormulario(data)
+  }
+
+  return { loading, formulario, reemplazarFormulario }
 }

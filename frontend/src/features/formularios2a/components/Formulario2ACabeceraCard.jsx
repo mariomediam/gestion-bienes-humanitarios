@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import PencilIcon from '@components/icons/PencilIcon'
+import Formulario2AFormModal from '@features/formularios2a/components/Formulario2AFormModal'
 import { formatFechaHora } from '@utils/dates'
 
 function texto(value) {
@@ -21,13 +23,21 @@ function Campo({ label, value }) {
   )
 }
 
-export default function Formulario2AEmergenciaCard({ formulario }) {
+export default function Formulario2ACabeceraCard({ formulario, onSaved }) {
+  const [edicionAbierta, setEdicionAbierta] = useState(false)
+
+  function handleSaved(saved) {
+    setEdicionAbierta(false)
+    onSaved?.(saved)
+  }
+
   return (
     <section className="bg-white rounded-lg border border-gray-200">
       <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-gray-200">
         <h1 className="text-base font-semibold text-[#1e3064]">Datos del formulario EDAN 2A</h1>
         <button
           type="button"
+          onClick={() => setEdicionAbierta(true)}
           className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
         >
           <PencilIcon className="w-4 h-4" />
@@ -59,6 +69,15 @@ export default function Formulario2AEmergenciaCard({ formulario }) {
         />
         <Campo label="Evaluador" value={texto(formulario.evaluador_nombre)} />
       </dl>
+
+      <Formulario2AFormModal
+        key={edicionAbierta ? formulario.formulario_2a_id : 'cerrado'}
+        isOpen={edicionAbierta}
+        formulario={edicionAbierta ? formulario : null}
+        codigoSinpad={formulario.codigo_sinpad ?? ''}
+        onClose={() => setEdicionAbierta(false)}
+        onSaved={handleSaved}
+      />
     </section>
   )
 }

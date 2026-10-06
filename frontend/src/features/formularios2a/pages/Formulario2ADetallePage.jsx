@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import Formulario2AEmergenciaCard from '@features/formularios2a/components/Formulario2AEmergenciaCard'
+import Formulario2ACabeceraCard from '@features/formularios2a/components/Formulario2ACabeceraCard'
 import useFormulario2ADetalle from '@features/formularios2a/hooks/useFormulario2ADetalle'
 
 function LoadingState() {
@@ -15,7 +15,7 @@ function LoadingState() {
 
 export default function Formulario2ADetallePage() {
   const { formulario2aId } = useParams()
-  const { loading, formulario } = useFormulario2ADetalle(formulario2aId)
+  const { loading, formulario, reemplazarFormulario } = useFormulario2ADetalle(formulario2aId)
 
   return (
     <div className="space-y-6">
@@ -27,7 +27,9 @@ export default function Formulario2ADetallePage() {
       </Link>
 
       {loading && <LoadingState />}
-      {!loading && formulario && <Formulario2AEmergenciaCard formulario={formulario} />}
+      {!loading && formulario && (
+        <Formulario2ACabeceraCard formulario={formulario} onSaved={reemplazarFormulario} />
+      )}
     </div>
   )
 }
