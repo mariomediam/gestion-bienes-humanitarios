@@ -246,6 +246,17 @@ class Formulario2ACreateSerializer(serializers.Serializer):
         return attrs
 
 
+class Formulario2AUpdateSerializer(Formulario2ACreateSerializer):
+    """Validate the body used to update S43edan_formulario_2a.
+
+    Same fields as create, except emergencia_id. That column stays as stored.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('emergencia_id', None)
+
+
 class Formulario2AUbicacionSerializer(serializers.Serializer):
     """Location fields of a Formulario 2A nested in an emergency."""
 

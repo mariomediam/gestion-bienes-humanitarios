@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import CharField, Count, OuterRef, Prefetch, Subquery
+from django.utils import timezone
 
 from ..db_router import DB_ALIAS
 from ..models import (
@@ -9,10 +10,13 @@ from ..models import (
     Formulario2A,
     Formulario2AVivienda,
     Personal,
+    PlanillaEntrega,
 )
 from ..text_search import filter_text_like
 
 _USUARIO_LOGIN_MAX_LENGTH = 20
+_ESTADO_REGISTRO_INACTIVO_ID = 2
+_CODIGO_PLANILLA_EMITIDA = 'EMITIDA'
 
 
 class Formulario2AServiceError(Exception):
@@ -177,6 +181,78 @@ class Formulario2AService:
             stored = _formularios_busqueda().get(pk=formulario.pk)
         return stored
 
+    @staticmethod
+    def update(
+        formulario_2a_id,
+        *,
+        departamento_id,
+        provincia_id,
+        distrito_id,
+        fecha_empadronamiento,
+        evaluador_id,
+        estado_registro_id,
+        hora_empadronamiento=None,
+        localidad=None,
+        barrio_sector_urbanizacion=None,
+        centro_poblado=None,
+        caserio=None,
+        anexo=None,
+        calle_manzana=None,
+        edificio_piso_dpto=None,
+        otros_ubicacion=None,
+        numero_hoja=1,
+        total_hojas=None,
+        institucion=None,
+    ):
+        """Update the editable columns of one S43edan_formulario_2a row.
+
+        The body matches create except emergencia_id, which stays as stored.
+        c_usuari_login and fecha_creacion stay as stored.
+        fecha_modificacion is set to the current time.
+        Rejected when the current estado_registro_id is inactive (2)
+        or a related Planilla BAH is in state EMITIDA.
+        """
+        _require_hojas(numero_hoja, total_hojas)
+
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                formulario = Formulario2A.objects.get(pk=formulario_2a_id)
+            except Formulario2A.DoesNotExist:
+                raise Formulario2AServiceError(
+                    'El formulario EDAN 2A indicado no existe',
+                    not_found=True,
+                )
+
+            _require_formulario_modificable(formulario)
+
+            _require_distrito(departamento_id, provincia_id, distrito_id)
+            _require_evaluador(evaluador_id)
+            _require_estado_registro(estado_registro_id)
+
+            formulario.departamento_id = departamento_id
+            formulario.provincia_id = provincia_id
+            formulario.distrito_id = distrito_id
+            formulario.fecha_empadronamiento = fecha_empadronamiento
+            formulario.hora_empadronamiento = hora_empadronamiento
+            formulario.localidad = localidad
+            formulario.barrio_sector_urbanizacion = barrio_sector_urbanizacion
+            formulario.centro_poblado = centro_poblado
+            formulario.caserio = caserio
+            formulario.anexo = anexo
+            formulario.calle_manzana = calle_manzana
+            formulario.edificio_piso_dpto = edificio_piso_dpto
+            formulario.otros_ubicacion = otros_ubicacion
+            formulario.numero_hoja = numero_hoja
+            formulario.total_hojas = total_hojas
+            formulario.institucion = institucion
+            formulario.evaluador_id = evaluador_id
+            formulario.estado_registro_id = estado_registro_id
+            formulario.fecha_modificacion = timezone.now()
+            formulario.save()
+
+            stored = _formularios_con_distrito().get(pk=formulario.pk)
+        return stored
+
 
 def _require_hojas(numero_hoja, total_hojas):
     if numero_hoja is None or numero_hoja < 1:
@@ -212,6 +288,33 @@ def _require_evaluador(evaluador_id):
         raise Formulario2AServiceError(
             'El personal indicado no puede registrarse como evaluador EDAN'
         )
+
+
+def _require_formulario_modificable(formulario):
+    """Reject updates of an inactive form or one with an issued BAH planilla."""
+    if formulario.estado_registro_id == _ESTADO_REGISTRO_INACTIVO_ID:
+        raise Formulario2AServiceError(
+            'No se puede modificar el formulario EDAN 2A porque su estado de registro es inactivo',
+            conflict=True,
+        )
+    if _tiene_planilla_emitida_activa(formulario.pk):
+        raise Formulario2AServiceError(
+            'No se puede modificar el formulario EDAN 2A porque tiene una planilla BAH emitida y activa',
+            conflict=True,
+        )
+
+
+def _tiene_planilla_emitida_activa(formulario_2a_id):
+    """True when a related planilla uses catalog code EMITIDA.
+
+    The link is Formulario 2A, vivienda, familia, integrante and
+    S43bah_planilla_entrega.integrante_receptor_id.
+    ANULADA and BORRADOR do not block the update.
+    """
+    return PlanillaEntrega.objects.filter(
+        integrante_receptor__familia__vivienda__formulario_2a_id=formulario_2a_id,
+        estado_planilla__codigo=_CODIGO_PLANILLA_EMITIDA,
+    ).exists()
 
 
 def _require_estado_registro(estado_registro_id):

@@ -20,6 +20,7 @@ from app_sgbh.serializers import (
     Formulario2ACreateSerializer,
     Formulario2ADetalleSerializer,
     Formulario2ATotalSerializer,
+    Formulario2AUpdateSerializer,
     first_error_message,
 )
 
@@ -82,6 +83,48 @@ class Formulario2ADetailView(APIView):
         except Exception:
             return Response(
                 {'error': 'No se pudo obtener el formulario EDAN 2A'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
+
+    def put(self, request, formulario_2a_id):
+        if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:
+            return Response(
+                {'error': 'El campo formulario_2a_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if 'emergencia_id' in request.data:
+            return Response(
+                {'error': 'El campo emergencia_id no puede modificarse'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = Formulario2AUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            updated = Formulario2AService.update(
+                formulario_2a_id,
+                **serializer.validated_data,
+            )
+            payload = Formulario2ADetalleSerializer(updated).data
+        except Formulario2AServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo modificar el formulario EDAN 2A'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
