@@ -25,6 +25,41 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
+function textoCampo(value) {
+  if (value === null || value === undefined) return ''
+  return String(value)
+}
+
+function opcionCatalogo(id, nombre) {
+  if (id === null || id === undefined) return null
+  return {
+    value: id,
+    label: nombre ?? '',
+  }
+}
+
+function formFromVivienda(vivienda) {
+  let tenenciaPropia = ''
+  if (vivienda.tenencia_propia === true) tenenciaPropia = '1'
+  if (vivienda.tenencia_propia === false) tenenciaPropia = '0'
+
+  return {
+    numero_lote: textoCampo(vivienda.numero_lote),
+    tenencia_propia: tenenciaPropia,
+    tipo_uso_instalacion: opcionCatalogo(
+      vivienda.tipo_uso_instalacion_id,
+      vivienda.tipo_uso_instalacion_nombre,
+    ),
+    condicion_vivienda: opcionCatalogo(
+      vivienda.condicion_vivienda_id,
+      vivienda.condicion_vivienda_nombre,
+    ),
+    material_techo: opcionCatalogo(vivienda.material_techo_id, vivienda.material_techo_nombre),
+    material_pared: opcionCatalogo(vivienda.material_pared_id, vivienda.material_pared_nombre),
+    material_piso: opcionCatalogo(vivienda.material_piso_id, vivienda.material_piso_nombre),
+  }
+}
+
 function validate(form) {
   const errors = {}
   const numeroLote = form.numero_lote.trim()
@@ -57,10 +92,14 @@ function Campo({ id, label, error, children, className = '' }) {
 export default function Formulario2AViviendaFormModal({
   isOpen,
   formulario2aId,
+  vivienda = null,
   onClose,
   onSaved,
 }) {
-  const [form, setForm] = useState(EMPTY_FORM)
+  const isEdit = vivienda !== null
+  const [form, setForm] = useState(() =>
+    vivienda ? formFromVivienda(vivienda) : EMPTY_FORM,
+  )
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
@@ -102,10 +141,11 @@ export default function Formulario2AViviendaFormModal({
     if (Object.keys(nextErrors).length > 0) return
 
     const payload = {
-      formulario_2a_id: formulario2aId,
       numero_lote: form.numero_lote.trim(),
       tipo_uso_instalacion_id: form.tipo_uso_instalacion.value,
     }
+
+    if (!isEdit) payload.formulario_2a_id = formulario2aId
 
     if (form.tenencia_propia === '1') payload.tenencia_propia = true
     if (form.tenencia_propia === '0') payload.tenencia_propia = false
@@ -118,13 +158,22 @@ export default function Formulario2AViviendaFormModal({
 
     setLoading(true)
     try {
-      const saved = await sgbhApi.crearVivienda(payload)
-      toast.success('Vivienda registrada correctamente')
+      const saved = isEdit
+        ? await sgbhApi.actualizarVivienda(vivienda.vivienda_id, payload)
+        : await sgbhApi.crearVivienda(payload)
+      toast.success(
+        isEdit ? 'Vivienda modificada correctamente' : 'Vivienda registrada correctamente',
+      )
       setForm(EMPTY_FORM)
       setErrors({})
       onSaved(saved)
     } catch (error) {
-      toast.error(getErrorMessage(error, 'No se pudo registrar la vivienda'))
+      toast.error(
+        getErrorMessage(
+          error,
+          isEdit ? 'No se pudo modificar la vivienda' : 'No se pudo registrar la vivienda',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -147,7 +196,7 @@ export default function Formulario2AViviendaFormModal({
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
           <h2 id="titulo-vivienda" className="text-lg font-semibold text-[#1e3064]">
-            Agregar vivienda
+            {isEdit ? 'Modificar vivienda' : 'Agregar vivienda'}
           </h2>
           <button
             type="button"

@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
+import { sgbhApi } from '@api/sgbhApi'
 import PencilIcon from '@components/icons/PencilIcon'
 import PlusIcon from '@components/icons/PlusIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import Formulario2AViviendaFormModal from '@features/formularios2a/components/Formulario2AViviendaFormModal'
 
 const buttonIconClassName = 'w-4 h-4'
 
@@ -60,10 +63,38 @@ function tituloVivienda(vivienda) {
   return `${titulo} (${vivienda.numero_lote})`
 }
 
-export default function Formulario2AViviendaCard({ vivienda }) {
+function getErrorMessage(error, fallback) {
+  return error?.response?.data?.error || fallback
+}
+
+export default function Formulario2AViviendaCard({ vivienda, onViviendaGuardada }) {
   const [abierta, setAbierta] = useState(true)
+  const [cargandoEdicion, setCargandoEdicion] = useState(false)
+  const [viviendaEdicion, setViviendaEdicion] = useState(null)
   const datosId = `vivienda-${vivienda.vivienda_id}-datos`
   const accion = abierta ? 'Minimizar' : 'Maximizar'
+
+  async function handleModificar() {
+    setCargandoEdicion(true)
+    try {
+      const rows = await sgbhApi.buscarViviendas({ vivienda_id: vivienda.vivienda_id })
+      const encontrada = Array.isArray(rows) ? rows[0] : null
+      if (!encontrada) {
+        toast.error('La vivienda indicada no existe')
+        return
+      }
+      setViviendaEdicion(encontrada)
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de viviendas'))
+    } finally {
+      setCargandoEdicion(false)
+    }
+  }
+
+  function handleViviendaGuardada(saved) {
+    setViviendaEdicion(null)
+    onViviendaGuardada?.(saved)
+  }
 
   return (
     <section className="min-w-0 bg-white rounded-lg border border-gray-200">
@@ -72,7 +103,12 @@ export default function Formulario2AViviendaCard({ vivienda }) {
           <h2 className="min-w-0 text-base font-semibold text-[#1e3064] wrap-break-word">
             {tituloVivienda(vivienda)}
           </h2>
-          <button type="button" className={secondaryButtonClassName}>
+          <button
+            type="button"
+            className={`${secondaryButtonClassName} disabled:opacity-50`}
+            onClick={handleModificar}
+            disabled={cargandoEdicion}
+          >
             <PencilIcon className={buttonIconClassName} />
             Modificar vivienda
           </button>
@@ -117,6 +153,16 @@ export default function Formulario2AViviendaCard({ vivienda }) {
             </dl>
           </div>
         </div>
+      )}
+
+      {viviendaEdicion && (
+        <Formulario2AViviendaFormModal
+          key={viviendaEdicion.vivienda_id}
+          isOpen
+          vivienda={viviendaEdicion}
+          onClose={() => setViviendaEdicion(null)}
+          onSaved={handleViviendaGuardada}
+        />
       )}
     </section>
   )

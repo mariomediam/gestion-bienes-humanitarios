@@ -115,6 +115,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  actualizarVivienda: async (viviendaId, data) => {
+    const response = await api.put(`/api/sgbh/viviendas/${viviendaId}/`, data)
+    return response.data
+  },
+
   buscarEvaluadores: async (params) => {
     const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
     return response.data

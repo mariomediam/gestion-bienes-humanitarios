@@ -19,7 +19,12 @@ function Mensaje({ children }) {
   )
 }
 
-export default function Formulario2AViviendas({ loading, consultado, viviendas }) {
+export default function Formulario2AViviendas({
+  loading,
+  consultado,
+  viviendas,
+  onViviendaGuardada,
+}) {
   if (loading && viviendas.length === 0) {
     return <LoadingState />
   }
@@ -36,7 +41,10 @@ export default function Formulario2AViviendas({ loading, consultado, viviendas }
     <ul className="space-y-4" aria-busy={loading}>
       {viviendas.map((vivienda) => (
         <li key={vivienda.vivienda_id}>
-          <Formulario2AViviendaCard vivienda={vivienda} />
+          <Formulario2AViviendaCard
+            vivienda={vivienda}
+            onViviendaGuardada={onViviendaGuardada}
+          />
         </li>
       ))}
     </ul>

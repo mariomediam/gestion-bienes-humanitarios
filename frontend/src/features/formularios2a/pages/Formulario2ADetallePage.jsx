@@ -51,6 +51,7 @@ export default function Formulario2ADetallePage() {
             loading={cargandoViviendas}
             consultado={consultado}
             viviendas={viviendas}
+            onViviendaGuardada={cargarViviendas}
           />
         </>
       )}
