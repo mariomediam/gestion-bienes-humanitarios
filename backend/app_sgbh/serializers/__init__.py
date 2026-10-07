@@ -17,6 +17,7 @@ from .formulario_2a_integrante import Formulario2AIntegranteTotalSerializer
 from .formulario_2a_vivienda import (
     ViviendaBusquedaSerializer,
     ViviendaCreateSerializer,
+    ViviendaUpdateSerializer,
 )
 from .material_pared import MaterialParedSerializer
 from .material_piso import MaterialPisoSerializer
@@ -49,5 +50,6 @@ __all__ = [
     'TipoUsoInstalacionSerializer',
     'ViviendaBusquedaSerializer',
     'ViviendaCreateSerializer',
+    'ViviendaUpdateSerializer',
     'first_error_message',
 ]

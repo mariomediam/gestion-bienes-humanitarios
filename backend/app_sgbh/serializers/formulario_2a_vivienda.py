@@ -77,6 +77,18 @@ class ViviendaCreateSerializer(serializers.Serializer):
     material_piso_id = _id_field('material_piso_id', required=False)
 
 
+class ViviendaUpdateSerializer(ViviendaCreateSerializer):
+    """Validate the body used to update S43edan_formulario_2a_viviendas.
+
+    Same fields as create, except formulario_2a_id. That column stays as
+    stored, the same as numero_orden and fecha_creacion.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('formulario_2a_id', None)
+
+
 class ViviendaBusquedaSerializer(serializers.Serializer):
     """One vivienda row returned by the search endpoint.
 

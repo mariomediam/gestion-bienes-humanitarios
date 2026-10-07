@@ -74,30 +74,12 @@ class Formulario2AViviendaService:
         with transaction.atomic(using=DB_ALIAS):
             formulario = _require_formulario(formulario_2a_id)
             _require_formulario_modificable(formulario)
-            _require_catalogo(
-                TipoUsoInstalacion,
-                tipo_uso_instalacion_id,
-                'El tipo de uso de instalación indicado no existe',
-            )
-            _require_catalogo_opcional(
-                CondicionVivienda,
-                condicion_vivienda_id,
-                'La condición de vivienda indicada no existe',
-            )
-            _require_catalogo_opcional(
-                MaterialTecho,
-                material_techo_id,
-                'El material de techo indicado no existe',
-            )
-            _require_catalogo_opcional(
-                MaterialPared,
-                material_pared_id,
-                'El material de pared indicado no existe',
-            )
-            _require_catalogo_opcional(
-                MaterialPiso,
-                material_piso_id,
-                'El material de piso indicado no existe',
+            _require_catalogos(
+                tipo_uso_instalacion_id=tipo_uso_instalacion_id,
+                condicion_vivienda_id=condicion_vivienda_id,
+                material_techo_id=material_techo_id,
+                material_pared_id=material_pared_id,
+                material_piso_id=material_piso_id,
             )
             numero_orden = _siguiente_numero_orden(formulario_2a_id)
 
@@ -113,13 +95,50 @@ class Formulario2AViviendaService:
                 material_piso_id=material_piso_id,
             )
             vivienda.save()
-            stored = Formulario2AVivienda.objects.select_related(
-                'tipo_uso_instalacion',
-                'condicion_vivienda',
-                'material_techo',
-                'material_pared',
-                'material_piso',
-            ).get(pk=vivienda.pk)
+            stored = _vivienda_guardada(vivienda.pk)
+        return stored
+
+    @staticmethod
+    def update(
+        vivienda_id,
+        *,
+        numero_lote,
+        tipo_uso_instalacion_id,
+        tenencia_propia=None,
+        condicion_vivienda_id=None,
+        material_techo_id=None,
+        material_pared_id=None,
+        material_piso_id=None,
+    ):
+        """Update the editable columns of one S43edan_formulario_2a_viviendas row.
+
+        The body matches create except formulario_2a_id. That column,
+        numero_orden and fecha_creacion stay as stored. Rejected when the
+        parent form is inactive or a related Planilla BAH is in state EMITIDA.
+        """
+        numero_lote = _require_numero_lote(numero_lote)
+
+        with transaction.atomic(using=DB_ALIAS):
+            vivienda = _require_vivienda(vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+            _require_catalogos(
+                tipo_uso_instalacion_id=tipo_uso_instalacion_id,
+                condicion_vivienda_id=condicion_vivienda_id,
+                material_techo_id=material_techo_id,
+                material_pared_id=material_pared_id,
+                material_piso_id=material_piso_id,
+            )
+
+            vivienda.numero_lote = numero_lote
+            vivienda.tenencia_propia = tenencia_propia
+            vivienda.tipo_uso_instalacion_id = tipo_uso_instalacion_id
+            vivienda.condicion_vivienda_id = condicion_vivienda_id
+            vivienda.material_techo_id = material_techo_id
+            vivienda.material_pared_id = material_pared_id
+            vivienda.material_piso_id = material_piso_id
+            vivienda.save()
+            stored = _vivienda_guardada(vivienda.pk)
         return stored
 
 
@@ -134,6 +153,16 @@ def _require_numero_lote(numero_lote):
             'El campo numero_lote no debe superar 50 caracteres'
         )
     return text
+
+
+def _require_vivienda(vivienda_id):
+    try:
+        return Formulario2AVivienda.objects.select_for_update().get(pk=vivienda_id)
+    except Formulario2AVivienda.DoesNotExist:
+        raise Formulario2AViviendaServiceError(
+            'La vivienda indicada no existe',
+            not_found=True,
+        ) from None
 
 
 def _require_formulario(formulario_2a_id):
@@ -157,6 +186,51 @@ def _require_formulario_modificable(formulario):
             conflict=exc.conflict,
             not_found=exc.not_found,
         ) from exc
+
+
+def _require_catalogos(
+    *,
+    tipo_uso_instalacion_id,
+    condicion_vivienda_id,
+    material_techo_id,
+    material_pared_id,
+    material_piso_id,
+):
+    _require_catalogo(
+        TipoUsoInstalacion,
+        tipo_uso_instalacion_id,
+        'El tipo de uso de instalación indicado no existe',
+    )
+    _require_catalogo_opcional(
+        CondicionVivienda,
+        condicion_vivienda_id,
+        'La condición de vivienda indicada no existe',
+    )
+    _require_catalogo_opcional(
+        MaterialTecho,
+        material_techo_id,
+        'El material de techo indicado no existe',
+    )
+    _require_catalogo_opcional(
+        MaterialPared,
+        material_pared_id,
+        'El material de pared indicado no existe',
+    )
+    _require_catalogo_opcional(
+        MaterialPiso,
+        material_piso_id,
+        'El material de piso indicado no existe',
+    )
+
+
+def _vivienda_guardada(vivienda_id):
+    return Formulario2AVivienda.objects.select_related(
+        'tipo_uso_instalacion',
+        'condicion_vivienda',
+        'material_techo',
+        'material_pared',
+        'material_piso',
+    ).get(pk=vivienda_id)
 
 
 def _require_catalogo(model, catalog_id, message):
