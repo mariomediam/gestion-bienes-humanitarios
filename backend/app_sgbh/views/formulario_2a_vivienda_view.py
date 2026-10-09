@@ -106,6 +106,25 @@ class Formulario2AViviendaDetailView(APIView):
 
         return Response(payload, status=status.HTTP_200_OK)
 
+    def delete(self, request, vivienda_id):
+        if vivienda_id < 1 or vivienda_id > _VIVIENDA_ID_MAX:
+            return Response(
+                {'error': 'El campo vivienda_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            Formulario2AViviendaService.delete(vivienda_id)
+        except Formulario2AViviendaServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar la vivienda'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class Formulario2AViviendaBuscarView(APIView):
     permission_classes = [IsAuthenticated]

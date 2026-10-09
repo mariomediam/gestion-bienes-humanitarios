@@ -1,10 +1,11 @@
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Max, ProtectedError
 
 from ..db_router import DB_ALIAS
 from ..models import (
     CondicionVivienda,
     Formulario2A,
+    Formulario2AIntegrante,
     Formulario2AVivienda,
     MaterialPared,
     MaterialPiso,
@@ -140,6 +141,39 @@ class Formulario2AViviendaService:
             vivienda.save()
             stored = _vivienda_guardada(vivienda.pk)
         return stored
+
+    @staticmethod
+    def delete(vivienda_id):
+        """Delete one S43edan_formulario_2a_viviendas row.
+
+        Uses the same guards as update: the vivienda and its parent form must
+        exist, and the form must still accept changes. Also rejected when at
+        least one integrante belongs to a familia of that vivienda.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            vivienda = _require_vivienda(vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+            if _tiene_integrantes(vivienda_id):
+                raise Formulario2AViviendaServiceError(
+                    'No se puede eliminar la vivienda. Primero debe eliminar los integrantes de la vivienda',
+                    conflict=True,
+                )
+
+            try:
+                vivienda.delete()
+            except ProtectedError:
+                raise Formulario2AViviendaServiceError(
+                    'No se puede eliminar la vivienda porque tiene registros asociados',
+                    conflict=True,
+                ) from None
+
+
+def _tiene_integrantes(vivienda_id):
+    """True when any integrante belongs to a familia of this vivienda."""
+    return Formulario2AIntegrante.objects.filter(
+        familia__vivienda_id=vivienda_id,
+    ).exists()
 
 
 def _require_numero_lote(numero_lote):
