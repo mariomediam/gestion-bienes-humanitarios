@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils import timezone
 
 from ..db_router import DB_ALIAS
 from ..models import Persona, TipoDocumento
@@ -89,6 +90,78 @@ class PersonaService:
             stored = Persona.objects.select_related('tipo_documento').get(pk=persona.pk)
         return stored
 
+    @staticmethod
+    def update(
+        persona_id,
+        *,
+        apellido_paterno,
+        apellido_materno,
+        nombres,
+        fecha_nacimiento,
+        sexo,
+        telefono,
+        correo,
+        tipo_documento_id=None,
+        numero_documento=None,
+        esta_activo=True,
+    ):
+        """Update the editable columns of one S43personas row.
+
+        The body matches create. The document pair and the identity
+        combination must not belong to another persona. c_usuari_login and
+        fecha_creacion stay as stored. fecha_modificacion is set to the
+        current time.
+        """
+        numero_documento = _require_documento(tipo_documento_id, numero_documento)
+        apellido_paterno = _require_text(apellido_paterno, 'apellido_paterno', 50)
+        apellido_materno = _require_text(apellido_materno, 'apellido_materno', 50)
+        nombres = _require_text(nombres, 'nombres', 150)
+        sexo = _require_sexo(sexo)
+        telefono = _require_text(telefono, 'telefono', 50)
+        correo = _require_text(correo, 'correo', 50)
+        if esta_activo is None:
+            esta_activo = True
+
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                persona = Persona.objects.get(pk=persona_id)
+            except Persona.DoesNotExist:
+                raise PersonaServiceError(
+                    'La persona indicada no existe',
+                    not_found=True,
+                ) from None
+
+            if tipo_documento_id is not None:
+                _require_tipo_documento(tipo_documento_id)
+                _require_documento_disponible(
+                    tipo_documento_id,
+                    numero_documento,
+                    exclude_id=persona_id,
+                )
+            _require_identidad_disponible(
+                apellido_paterno,
+                apellido_materno,
+                nombres,
+                fecha_nacimiento,
+                exclude_id=persona_id,
+            )
+
+            persona.tipo_documento_id = tipo_documento_id
+            persona.numero_documento = numero_documento
+            persona.apellido_paterno = apellido_paterno
+            persona.apellido_materno = apellido_materno
+            persona.nombres = nombres
+            persona.fecha_nacimiento = fecha_nacimiento
+            persona.sexo = sexo
+            persona.telefono = telefono
+            persona.correo = correo
+            persona.esta_activo = esta_activo
+            persona.fecha_modificacion = timezone.now()
+            persona.save()
+
+            stored = Persona.objects.select_related('tipo_documento').get(pk=persona.pk)
+        return stored
+
 
 def _require_text(value, field, max_length):
     text = str(value or '').strip()
@@ -129,12 +202,19 @@ def _require_tipo_documento(tipo_documento_id):
         raise PersonaServiceError('El tipo de documento indicado no existe')
 
 
-def _require_documento_disponible(tipo_documento_id, numero_documento):
+def _require_documento_disponible(
+    tipo_documento_id,
+    numero_documento,
+    exclude_id=None,
+):
     """Reject a document pair that another persona already uses."""
-    if Persona.objects.filter(
+    queryset = Persona.objects.filter(
         tipo_documento_id=tipo_documento_id,
         numero_documento__iexact=numero_documento,
-    ).exists():
+    )
+    if exclude_id is not None:
+        queryset = queryset.exclude(pk=exclude_id)
+    if queryset.exists():
         raise PersonaServiceError(
             'Ya existe una persona con el tipo y número de documento indicados',
             conflict=True,
@@ -146,14 +226,18 @@ def _require_identidad_disponible(
     apellido_materno,
     nombres,
     fecha_nacimiento,
+    exclude_id=None,
 ):
-    """Reject the same surnames, given names and birth date."""
-    if Persona.objects.filter(
+    """Reject the same surnames, given names and birth date on another persona."""
+    queryset = Persona.objects.filter(
         apellido_paterno__iexact=apellido_paterno,
         apellido_materno__iexact=apellido_materno,
         nombres__iexact=nombres,
         fecha_nacimiento=fecha_nacimiento,
-    ).exists():
+    )
+    if exclude_id is not None:
+        queryset = queryset.exclude(pk=exclude_id)
+    if queryset.exists():
         raise PersonaServiceError(
             'Ya existe una persona con los mismos apellidos, nombres y fecha de nacimiento',
             conflict=True,
