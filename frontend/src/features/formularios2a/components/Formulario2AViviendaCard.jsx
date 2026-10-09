@@ -4,6 +4,8 @@ import { sgbhApi } from '@api/sgbhApi'
 import PencilIcon from '@components/icons/PencilIcon'
 import PlusIcon from '@components/icons/PlusIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import Formulario2AFamiliaAgregarModal from '@features/formularios2a/components/Formulario2AFamiliaAgregarModal'
+import Formulario2AFamilias from '@features/formularios2a/components/Formulario2AFamilias'
 import Formulario2AViviendaEliminarModal from '@features/formularios2a/components/Formulario2AViviendaEliminarModal'
 import Formulario2AViviendaFormModal from '@features/formularios2a/components/Formulario2AViviendaFormModal'
 
@@ -77,6 +79,8 @@ export default function Formulario2AViviendaCard({
   const [cargandoEdicion, setCargandoEdicion] = useState(false)
   const [viviendaEdicion, setViviendaEdicion] = useState(null)
   const [confirmandoEliminacion, setConfirmandoEliminacion] = useState(false)
+  const [confirmandoFamilia, setConfirmandoFamilia] = useState(false)
+  const [familiasVersion, setFamiliasVersion] = useState(0)
   const datosId = `vivienda-${vivienda.vivienda_id}-datos`
   const accion = abierta ? 'Minimizar' : 'Maximizar'
 
@@ -126,7 +130,11 @@ export default function Formulario2AViviendaCard({
             <TrashIcon className={buttonIconClassName} />
             Eliminar vivienda
           </button>
-          <button type="button" className={secondaryButtonClassName}>
+          <button
+            type="button"
+            className={secondaryButtonClassName}
+            onClick={() => setConfirmandoFamilia(true)}
+          >
             <PlusIcon className={buttonIconClassName} />
             Agregar familia
           </button>
@@ -147,7 +155,7 @@ export default function Formulario2AViviendaCard({
       </div>
 
       {abierta && (
-        <div id={datosId} className="p-4">
+        <div id={datosId} className="space-y-4 p-4">
           <div className="rounded-lg border border-gray-200">
             <h3 className="px-5 py-3 text-sm font-semibold text-[#1e3064] border-b border-gray-200">
               Datos de la vivienda
@@ -162,6 +170,7 @@ export default function Formulario2AViviendaCard({
               <Campo label="Material de piso" value={texto(vivienda.material_piso_nombre)} />
             </dl>
           </div>
+          <Formulario2AFamilias viviendaId={vivienda.vivienda_id} version={familiasVersion} />
         </div>
       )}
 
@@ -180,6 +189,13 @@ export default function Formulario2AViviendaCard({
         vivienda={vivienda}
         onClose={() => setConfirmandoEliminacion(false)}
         onEliminada={onViviendaEliminada}
+      />
+
+      <Formulario2AFamiliaAgregarModal
+        isOpen={confirmandoFamilia}
+        vivienda={vivienda}
+        onClose={() => setConfirmandoFamilia(false)}
+        onAgregada={() => setFamiliasVersion((actual) => actual + 1)}
       />
     </section>
   )
