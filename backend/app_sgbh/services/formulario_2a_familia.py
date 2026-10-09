@@ -1,8 +1,13 @@
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Max, ProtectedError
 
 from ..db_router import DB_ALIAS
-from ..models import Formulario2A, Formulario2AFamilia, Formulario2AVivienda
+from ..models import (
+    Formulario2A,
+    Formulario2AFamilia,
+    Formulario2AIntegrante,
+    Formulario2AVivienda,
+)
 from .formulario_2a import Formulario2AService, Formulario2AServiceError
 
 _SMALLINT_MAX = 32767
@@ -41,6 +46,48 @@ class Formulario2AFamiliaService:
             familia.save()
             stored = Formulario2AFamilia.objects.get(pk=familia.pk)
         return stored
+
+    @staticmethod
+    def delete(familia_id):
+        """Delete one S43edan_formulario_2a_familias row.
+
+        The familia, its vivienda and the parent Formulario 2A must exist,
+        and the form must still accept changes. Also rejected when at least
+        one integrante belongs to that familia.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            familia = _require_familia(familia_id)
+            vivienda = _require_vivienda(familia.vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+            if _tiene_integrantes(familia_id):
+                raise Formulario2AFamiliaServiceError(
+                    'No se puede eliminar la familia. Primero debe eliminar los integrantes de la familia',
+                    conflict=True,
+                )
+
+            try:
+                familia.delete()
+            except ProtectedError:
+                raise Formulario2AFamiliaServiceError(
+                    'No se puede eliminar la familia porque tiene registros asociados',
+                    conflict=True,
+                ) from None
+
+
+def _require_familia(familia_id):
+    try:
+        return Formulario2AFamilia.objects.select_for_update().get(pk=familia_id)
+    except Formulario2AFamilia.DoesNotExist:
+        raise Formulario2AFamiliaServiceError(
+            'La familia indicada no existe',
+            not_found=True,
+        ) from None
+
+
+def _tiene_integrantes(familia_id):
+    """True when any integrante belongs to this familia."""
+    return Formulario2AIntegrante.objects.filter(familia_id=familia_id).exists()
 
 
 def _require_vivienda(vivienda_id):

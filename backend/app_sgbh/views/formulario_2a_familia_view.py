@@ -13,6 +13,8 @@ from app_sgbh.services.formulario_2a_familia import (
     Formulario2AFamiliaServiceError,
 )
 
+_FAMILIA_ID_MAX = 2147483647
+
 
 class Formulario2AFamiliaCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -49,6 +51,29 @@ class Formulario2AFamiliaCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class Formulario2AFamiliaDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, familia_id):
+        if familia_id < 1 or familia_id > _FAMILIA_ID_MAX:
+            return Response(
+                {'error': 'El campo familia_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            Formulario2AFamiliaService.delete(familia_id)
+        except Formulario2AFamiliaServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar la familia'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def _respuesta_error_servicio(exc):
