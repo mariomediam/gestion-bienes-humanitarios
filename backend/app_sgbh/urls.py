@@ -22,6 +22,7 @@ from .views import (
     MaterialParedListView,
     MaterialPisoListView,
     MaterialTechoListView,
+    PersonaCreateView,
     PersonalBuscarView,
     PersonalEncargadosAlmacenBuscarView,
     PersonalEvaluadoresBuscarView,
@@ -34,6 +35,7 @@ from .views import (
 app_name = 'sgbh'
 
 urlpatterns = [
+    path('personas/', PersonaCreateView.as_view(), name='personas'),
     path('personal/buscar/', PersonalBuscarView.as_view(), name='personal-buscar'),
     path(
         'personal/buscar/evaluadores/',

@@ -27,6 +27,7 @@ from .formulario_2a_vivienda_view import (
 from .material_pared_view import MaterialParedListView
 from .material_piso_view import MaterialPisoListView
 from .material_techo_view import MaterialTechoListView
+from .persona_view import PersonaCreateView
 from .personal_view import (
     PersonalBuscarView,
     PersonalEncargadosAlmacenBuscarView,
