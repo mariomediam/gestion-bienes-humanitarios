@@ -52,6 +52,7 @@ export default function Formulario2ADetallePage() {
             consultado={consultado}
             viviendas={viviendas}
             onViviendaGuardada={cargarViviendas}
+            onViviendaEliminada={cargarViviendas}
           />
         </>
       )}

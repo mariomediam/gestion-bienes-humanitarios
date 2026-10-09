@@ -120,6 +120,10 @@ export const sgbhApi = {
     return response.data
   },
 
+  eliminarVivienda: async (viviendaId) => {
+    await api.delete(`/api/sgbh/viviendas/${viviendaId}/`)
+  },
+
   buscarEvaluadores: async (params) => {
     const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
     return response.data

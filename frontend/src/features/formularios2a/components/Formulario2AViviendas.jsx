@@ -24,6 +24,7 @@ export default function Formulario2AViviendas({
   consultado,
   viviendas,
   onViviendaGuardada,
+  onViviendaEliminada,
 }) {
   if (loading && viviendas.length === 0) {
     return <LoadingState />
@@ -44,6 +45,7 @@ export default function Formulario2AViviendas({
           <Formulario2AViviendaCard
             vivienda={vivienda}
             onViviendaGuardada={onViviendaGuardada}
+            onViviendaEliminada={onViviendaEliminada}
           />
         </li>
       ))}

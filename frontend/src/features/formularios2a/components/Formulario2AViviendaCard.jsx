@@ -4,6 +4,7 @@ import { sgbhApi } from '@api/sgbhApi'
 import PencilIcon from '@components/icons/PencilIcon'
 import PlusIcon from '@components/icons/PlusIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import Formulario2AViviendaEliminarModal from '@features/formularios2a/components/Formulario2AViviendaEliminarModal'
 import Formulario2AViviendaFormModal from '@features/formularios2a/components/Formulario2AViviendaFormModal'
 
 const buttonIconClassName = 'w-4 h-4'
@@ -67,10 +68,15 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
-export default function Formulario2AViviendaCard({ vivienda, onViviendaGuardada }) {
+export default function Formulario2AViviendaCard({
+  vivienda,
+  onViviendaGuardada,
+  onViviendaEliminada,
+}) {
   const [abierta, setAbierta] = useState(true)
   const [cargandoEdicion, setCargandoEdicion] = useState(false)
   const [viviendaEdicion, setViviendaEdicion] = useState(null)
+  const [confirmandoEliminacion, setConfirmandoEliminacion] = useState(false)
   const datosId = `vivienda-${vivienda.vivienda_id}-datos`
   const accion = abierta ? 'Minimizar' : 'Maximizar'
 
@@ -112,7 +118,11 @@ export default function Formulario2AViviendaCard({ vivienda, onViviendaGuardada 
             <PencilIcon className={buttonIconClassName} />
             Modificar vivienda
           </button>
-          <button type="button" className={deleteButtonClassName}>
+          <button
+            type="button"
+            className={deleteButtonClassName}
+            onClick={() => setConfirmandoEliminacion(true)}
+          >
             <TrashIcon className={buttonIconClassName} />
             Eliminar vivienda
           </button>
@@ -164,6 +174,13 @@ export default function Formulario2AViviendaCard({ vivienda, onViviendaGuardada 
           onSaved={handleViviendaGuardada}
         />
       )}
+
+      <Formulario2AViviendaEliminarModal
+        isOpen={confirmandoEliminacion}
+        vivienda={vivienda}
+        onClose={() => setConfirmandoEliminacion(false)}
+        onEliminada={onViviendaEliminada}
+      />
     </section>
   )
 }
