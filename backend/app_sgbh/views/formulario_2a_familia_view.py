@@ -3,7 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app_sgbh.query_params import (
+    parse_familia_id,
+    parse_formulario_2a_id,
+    parse_vivienda_id,
+)
 from app_sgbh.serializers import (
+    FamiliaBusquedaSerializer,
     FamiliaCreateSerializer,
     FamiliaSerializer,
     first_error_message,
@@ -74,6 +80,40 @@ class Formulario2AFamiliaDetailView(APIView):
             )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class Formulario2AFamiliaBuscarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        familia_id, error = parse_familia_id(request.query_params.get('familia_id'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        vivienda_id, error = parse_vivienda_id(request.query_params.get('vivienda_id'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        formulario_2a_id, error = parse_formulario_2a_id(
+            request.query_params.get('formulario_2a_id')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rows = Formulario2AFamiliaService.search(
+                familia_id=familia_id,
+                vivienda_id=vivienda_id,
+                formulario_2a_id=formulario_2a_id,
+            )
+            payload = FamiliaBusquedaSerializer(rows, many=True).data
+        except Exception:
+            return Response(
+                {'error': 'No se pudo obtener la búsqueda de familias'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 def _respuesta_error_servicio(exc):

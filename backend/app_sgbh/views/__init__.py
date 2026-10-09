@@ -8,6 +8,7 @@ from .emergencia_view import (
     EmergenciaTotalView,
 )
 from .formulario_2a_familia_view import (
+    Formulario2AFamiliaBuscarView,
     Formulario2AFamiliaCreateView,
     Formulario2AFamiliaDetailView,
 )

@@ -5,7 +5,11 @@ from .emergencia import (
     EmergenciaSerializer,
     first_error_message,
 )
-from .formulario_2a_familia import FamiliaCreateSerializer, FamiliaSerializer
+from .formulario_2a_familia import (
+    FamiliaBusquedaSerializer,
+    FamiliaCreateSerializer,
+    FamiliaSerializer,
+)
 from .formulario_2a import (
     Formulario2ABusquedaSerializer,
     Formulario2ACreateSerializer,
@@ -34,6 +38,7 @@ __all__ = [
     'DistritoSerializer',
     'EmergenciaCreateSerializer',
     'EmergenciaSerializer',
+    'FamiliaBusquedaSerializer',
     'FamiliaCreateSerializer',
     'FamiliaSerializer',
     'Formulario2ABusquedaSerializer',

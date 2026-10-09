@@ -11,6 +11,7 @@ from .views import (
     Formulario2ABuscarView,
     Formulario2ACreateView,
     Formulario2ADetailView,
+    Formulario2AFamiliaBuscarView,
     Formulario2AFamiliaCreateView,
     Formulario2AFamiliaDetailView,
     Formulario2AIntegranteTotalView,
@@ -114,6 +115,11 @@ urlpatterns = [
         'familias/<int:familia_id>/',
         Formulario2AFamiliaDetailView.as_view(),
         name='familias-detalle',
+    ),
+    path(
+        'familias/buscar/',
+        Formulario2AFamiliaBuscarView.as_view(),
+        name='familias-buscar',
     ),
     path(
         'viviendas/',

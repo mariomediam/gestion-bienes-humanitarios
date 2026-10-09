@@ -25,6 +25,30 @@ class Formulario2AFamiliaServiceError(Exception):
 
 class Formulario2AFamiliaService:
     @staticmethod
+    def search(familia_id=None, vivienda_id=None, formulario_2a_id=None):
+        """Return familia rows using optional filters combined with AND.
+
+        Filters are exact. With no filters, every row is returned.
+        formulario_2a_id comes from the vivienda parent.
+        Ordered by the vivienda numero_orden and then the familia numero_orden.
+        The queryset is ready for FamiliaBusquedaSerializer.
+        """
+        queryset = Formulario2AFamilia.objects.select_related(
+            'vivienda',
+            'vivienda__formulario_2a',
+        )
+        if familia_id is not None:
+            queryset = queryset.filter(familia_id=familia_id)
+        if vivienda_id is not None:
+            queryset = queryset.filter(vivienda_id=vivienda_id)
+        if formulario_2a_id is not None:
+            queryset = queryset.filter(
+                vivienda__formulario_2a_id=formulario_2a_id,
+            )
+
+        return queryset.order_by('vivienda__numero_orden', 'numero_orden')
+
+    @staticmethod
     def create(*, vivienda_id):
         """Insert one row in S43edan_formulario_2a_familias.
 
