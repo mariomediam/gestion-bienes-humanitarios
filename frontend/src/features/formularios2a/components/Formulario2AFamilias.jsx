@@ -44,7 +44,7 @@ export default function Formulario2AFamilias({ viviendaId, version = 0 }) {
     <ul className="space-y-4" aria-busy={loading}>
       {familias.map((familia) => (
         <li key={familia.familia_id}>
-          <Formulario2AFamiliaCard familia={familia} />
+          <Formulario2AFamiliaCard familia={familia} onEliminada={cargarFamilias} />
         </li>
       ))}
     </ul>

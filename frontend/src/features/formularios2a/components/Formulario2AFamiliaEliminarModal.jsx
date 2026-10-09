@@ -1,0 +1,95 @@
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { toast } from 'sonner'
+import { sgbhApi } from '@api/sgbhApi'
+
+function getErrorMessage(error, fallback) {
+  return error?.response?.data?.error || fallback
+}
+
+export default function Formulario2AFamiliaEliminarModal({
+  isOpen,
+  familia,
+  onClose,
+  onEliminada,
+}) {
+  const [eliminando, setEliminando] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape' && !eliminando) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, eliminando, onClose])
+
+  if (!isOpen || !familia) return null
+
+  function handleClose() {
+    if (eliminando) return
+    onClose()
+  }
+
+  async function handleConfirmar() {
+    if (eliminando) return
+
+    setEliminando(true)
+    try {
+      await sgbhApi.eliminarFamilia(familia.familia_id)
+      toast.success('Familia eliminada correctamente')
+      onEliminada?.(familia.familia_id)
+      onClose()
+    } catch (error) {
+      console.error(error)
+      toast.error(getErrorMessage(error, 'No se pudo eliminar la familia'))
+    } finally {
+      setEliminando(false)
+    }
+  }
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-eliminar-familia"
+        className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4"
+      >
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 id="titulo-eliminar-familia" className="text-lg font-semibold text-[#1e3064]">
+            Eliminar familia
+          </h2>
+        </div>
+        <p className="px-6 py-4 text-sm text-gray-700">
+          ¿Confirma que desea eliminar la familia {familia.numero_orden}?
+        </p>
+        <div className="flex justify-end gap-3 px-6 py-4">
+          <button
+            type="button"
+            onClick={handleClose}
+            disabled={eliminando}
+            autoFocus
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirmar}
+            disabled={eliminando}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+          >
+            {eliminando ? 'Eliminando...' : 'Eliminar'}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
