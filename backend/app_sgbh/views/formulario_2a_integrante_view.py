@@ -3,20 +3,26 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app_sgbh.query_params import parse_condicion_persona_id
+from app_sgbh.query_params import (
+    parse_condicion_persona_id,
+    parse_familia_id,
+    parse_integrante_id,
+    parse_persona_id,
+)
 from app_sgbh.serializers import (
     Formulario2AIntegranteTotalSerializer,
     IntegranteBusquedaSerializer,
     IntegranteCreateSerializer,
+    IntegranteSerializer,
     IntegranteUpdateSerializer,
     first_error_message,
 )
-
-_INTEGRANTE_ID_MAX = 2147483647
 from app_sgbh.services.formulario_2a_integrante import (
     Formulario2AIntegranteService,
     Formulario2AIntegranteServiceError,
 )
+
+_INTEGRANTE_ID_MAX = 2147483647
 
 
 class Formulario2AIntegranteCreateView(APIView):
@@ -46,7 +52,7 @@ class Formulario2AIntegranteCreateView(APIView):
             created = Formulario2AIntegranteService.create(
                 **serializer.validated_data
             )
-            payload = IntegranteBusquedaSerializer(created).data
+            payload = IntegranteSerializer(created).data
         except Formulario2AIntegranteServiceError as exc:
             return _respuesta_error_servicio(exc)
         except Exception:
@@ -98,7 +104,7 @@ class Formulario2AIntegranteDetailView(APIView):
                 integrante_id,
                 **serializer.validated_data,
             )
-            payload = IntegranteBusquedaSerializer(updated).data
+            payload = IntegranteSerializer(updated).data
         except Formulario2AIntegranteServiceError as exc:
             return _respuesta_error_servicio(exc)
         except Exception:
@@ -127,6 +133,40 @@ class Formulario2AIntegranteDetailView(APIView):
             )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class Formulario2AIntegranteBuscarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        integrante_id, error = parse_integrante_id(
+            request.query_params.get('integrante_id')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        familia_id, error = parse_familia_id(request.query_params.get('familia_id'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        persona_id, error = parse_persona_id(request.query_params.get('persona_id'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rows = Formulario2AIntegranteService.search(
+                integrante_id=integrante_id,
+                familia_id=familia_id,
+                persona_id=persona_id,
+            )
+            payload = IntegranteBusquedaSerializer(rows, many=True).data
+        except Exception:
+            return Response(
+                {'error': 'No se pudo obtener la búsqueda de integrantes'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 class Formulario2AIntegranteTotalView(APIView):

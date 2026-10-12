@@ -90,7 +90,7 @@ class IntegranteUpdateSerializer(IntegranteCreateSerializer):
         self.fields.pop('familia_id', None)
 
 
-class IntegranteBusquedaSerializer(serializers.Serializer):
+class IntegranteSerializer(serializers.Serializer):
     """One integrante row returned after it is created or updated.
 
     Catalog names follow the related rows. A null foreign key yields a null name.
@@ -135,3 +135,80 @@ def _catalog_nombre(catalog):
     if catalog is None:
         return None
     return catalog.nombre
+
+
+class IntegranteBusquedaSerializer(serializers.Serializer):
+    """One integrante row returned by the search endpoint.
+
+    Columns follow the search query, including the person, catalog names
+    and the familia, vivienda, formulario and emergencia chain.
+    A null foreign key yields a null name or a null related column.
+    """
+
+    integrante_id = serializers.IntegerField()
+    familia_id = serializers.IntegerField()
+    persona_id = serializers.IntegerField()
+    rol_familiar_id = serializers.IntegerField()
+    numero_orden = serializers.IntegerField()
+    edad = serializers.IntegerField()
+    condicion_persona_id = serializers.IntegerField()
+    tipo_danio_personal_id = serializers.IntegerField(allow_null=True)
+    grado_lesion_id = serializers.IntegerField(allow_null=True)
+    gestante_semanas = serializers.IntegerField(allow_null=True)
+    tipo_discapacidad_id = serializers.IntegerField(allow_null=True)
+    enfermedad_cronica_id = serializers.IntegerField(allow_null=True)
+    fecha_creacion = serializers.DateTimeField()
+    tipo_documento_id = serializers.IntegerField(
+        source='persona.tipo_documento_id',
+        allow_null=True,
+    )
+    numero_documento = serializers.CharField(
+        source='persona.numero_documento',
+        allow_null=True,
+    )
+    apellido_paterno = serializers.CharField(source='persona.apellido_paterno')
+    apellido_materno = serializers.CharField(source='persona.apellido_materno')
+    nombres = serializers.CharField(source='persona.nombres')
+    fecha_nacimiento = serializers.DateField(source='persona.fecha_nacimiento')
+    sexo = serializers.CharField(source='persona.sexo')
+    telefono = serializers.CharField(source='persona.telefono')
+    correo = serializers.CharField(source='persona.correo')
+    persona_esta_activo = serializers.BooleanField(source='persona.esta_activo')
+    tipo_documento_codigo = serializers.SerializerMethodField()
+    rol_familiar_nombre = serializers.CharField(source='rol_familiar.nombre')
+    condicion_persona_nombre = serializers.CharField(
+        source='condicion_persona.nombre',
+    )
+    tipo_danio_personal_nombre = serializers.SerializerMethodField()
+    grado_lesion_nombre = serializers.SerializerMethodField()
+    tipo_discapacidad_nombre = serializers.SerializerMethodField()
+    enfermedad_cronica_nombre = serializers.SerializerMethodField()
+    vivienda_id = serializers.IntegerField(source='familia.vivienda_id')
+    formulario_2a_id = serializers.IntegerField(
+        source='familia.vivienda.formulario_2a_id',
+    )
+    emergencia_id = serializers.IntegerField(
+        source='familia.vivienda.formulario_2a.emergencia_id',
+    )
+    codigo_sinpad = serializers.CharField(
+        source='familia.vivienda.formulario_2a.emergencia.codigo_sinpad',
+        allow_null=True,
+    )
+
+    def get_tipo_documento_codigo(self, obj):
+        tipo_documento = getattr(obj.persona, 'tipo_documento', None)
+        if tipo_documento is None:
+            return None
+        return tipo_documento.codigo
+
+    def get_tipo_danio_personal_nombre(self, obj):
+        return _catalog_nombre(obj.tipo_danio_personal)
+
+    def get_grado_lesion_nombre(self, obj):
+        return _catalog_nombre(obj.grado_lesion)
+
+    def get_tipo_discapacidad_nombre(self, obj):
+        return _catalog_nombre(obj.tipo_discapacidad)
+
+    def get_enfermedad_cronica_nombre(self, obj):
+        return _catalog_nombre(obj.enfermedad_cronica)

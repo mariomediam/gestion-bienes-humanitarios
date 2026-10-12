@@ -395,7 +395,7 @@ def test_put_integrantes_returns_updated_integrante():
             return_value=instance,
         ) as update,
         patch(
-            'app_sgbh.views.formulario_2a_integrante_view.IntegranteBusquedaSerializer'
+            'app_sgbh.views.formulario_2a_integrante_view.IntegranteSerializer'
         ) as serializer_cls,
     ):
         serializer_cls.return_value.data = updated

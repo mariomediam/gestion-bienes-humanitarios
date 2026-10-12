@@ -631,7 +631,7 @@ def test_post_integrantes_returns_created_integrante():
             return_value=instance,
         ) as create,
         patch(
-            'app_sgbh.views.formulario_2a_integrante_view.IntegranteBusquedaSerializer'
+            'app_sgbh.views.formulario_2a_integrante_view.IntegranteSerializer'
         ) as serializer_cls,
     ):
         serializer_cls.return_value.data = created

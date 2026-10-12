@@ -39,6 +39,38 @@ class Formulario2AIntegranteServiceError(Exception):
 
 class Formulario2AIntegranteService:
     @staticmethod
+    def search(integrante_id=None, familia_id=None, persona_id=None):
+        """Return integrante rows using optional filters combined with AND.
+
+        Filters are exact. With no filters, every row is returned.
+        Ordered by integrante_id. Person columns, catalog names and the
+        familia chain come from the related rows. The queryset is ready
+        for IntegranteBusquedaSerializer.
+        """
+        queryset = Formulario2AIntegrante.objects.select_related(
+            'persona',
+            'persona__tipo_documento',
+            'rol_familiar',
+            'condicion_persona',
+            'tipo_danio_personal',
+            'grado_lesion',
+            'tipo_discapacidad',
+            'enfermedad_cronica',
+            'familia',
+            'familia__vivienda',
+            'familia__vivienda__formulario_2a',
+            'familia__vivienda__formulario_2a__emergencia',
+        )
+        if integrante_id is not None:
+            queryset = queryset.filter(integrante_id=integrante_id)
+        if familia_id is not None:
+            queryset = queryset.filter(familia_id=familia_id)
+        if persona_id is not None:
+            queryset = queryset.filter(persona_id=persona_id)
+
+        return queryset.order_by('integrante_id')
+
+    @staticmethod
     def count(condicion_persona_id=None):
         """Count rows in S43edan_formulario_2a_integrantes.
 
