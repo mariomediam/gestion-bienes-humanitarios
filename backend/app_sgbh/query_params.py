@@ -144,6 +144,16 @@ def parse_grado_lesion_id(raw_value):
     return _parse_optional_smallint(raw_value, 'grado_lesion_id')
 
 
+def parse_tipo_discapacidad_id(raw_value):
+    """Parse the optional tipo_discapacidad_id query param."""
+    return _parse_optional_smallint(raw_value, 'tipo_discapacidad_id')
+
+
+def parse_codigo_formulario_tipo_discapacidad(raw_value):
+    """Parse the optional codigo_formulario query param for S43cat_tipos_discapacidad."""
+    return _parse_optional_smallint(raw_value, 'codigo_formulario')
+
+
 def parse_fecha_desde(raw_value):
     """Parse the required fecha_desde query param as a date.
 
@@ -317,6 +327,11 @@ def parse_codigo_grado_lesion(raw_value):
 def parse_nombre_grado_lesion(raw_value):
     """Parse the optional nombre query param for S43cat_grados_lesion."""
     return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_nombre_tipo_discapacidad(raw_value):
+    """Parse the optional nombre query param for S43cat_tipos_discapacidad."""
+    return _parse_optional_text(raw_value, 'nombre', 150)
 
 
 def parse_codigo_rol_familiar(raw_value):
