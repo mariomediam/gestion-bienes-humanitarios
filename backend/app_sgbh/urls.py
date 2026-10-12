@@ -9,6 +9,7 @@ from .views import (
     EmergenciaListView,
     EmergenciaTotalPorTipoPeligroView,
     EmergenciaTotalView,
+    EnfermedadCronicaListView,
     Formulario2ABuscarView,
     Formulario2ACreateView,
     Formulario2ADetailView,
@@ -71,6 +72,11 @@ urlpatterns = [
         'tipos-discapacidad/',
         TipoDiscapacidadListView.as_view(),
         name='tipos-discapacidad',
+    ),
+    path(
+        'enfermedades-cronicas/',
+        EnfermedadCronicaListView.as_view(),
+        name='enfermedades-cronicas',
     ),
     path(
         'grados-lesion/',

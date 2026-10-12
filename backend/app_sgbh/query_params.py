@@ -154,6 +154,16 @@ def parse_codigo_formulario_tipo_discapacidad(raw_value):
     return _parse_optional_smallint(raw_value, 'codigo_formulario')
 
 
+def parse_enfermedad_cronica_id(raw_value):
+    """Parse the optional enfermedad_cronica_id query param."""
+    return _parse_optional_smallint(raw_value, 'enfermedad_cronica_id')
+
+
+def parse_codigo_formulario_enfermedad_cronica(raw_value):
+    """Parse the optional codigo_formulario query param for S43cat_enfermedades_cronicas."""
+    return _parse_optional_smallint(raw_value, 'codigo_formulario')
+
+
 def parse_fecha_desde(raw_value):
     """Parse the required fecha_desde query param as a date.
 
@@ -332,6 +342,11 @@ def parse_nombre_grado_lesion(raw_value):
 def parse_nombre_tipo_discapacidad(raw_value):
     """Parse the optional nombre query param for S43cat_tipos_discapacidad."""
     return _parse_optional_text(raw_value, 'nombre', 150)
+
+
+def parse_nombre_enfermedad_cronica(raw_value):
+    """Parse the optional nombre query param for S43cat_enfermedades_cronicas."""
+    return _parse_optional_text(raw_value, 'nombre', 200)
 
 
 def parse_codigo_rol_familiar(raw_value):

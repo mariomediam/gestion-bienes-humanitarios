@@ -1,6 +1,7 @@
 from .condicion_persona import CondicionPersonaSerializer
 from .condicion_vivienda import CondicionViviendaSerializer
 from .distrito import DistritoSerializer
+from .enfermedad_cronica import EnfermedadCronicaSerializer
 from .emergencia import (
     EmergenciaCreateSerializer,
     EmergenciaSerializer,
@@ -47,6 +48,7 @@ __all__ = [
     'CondicionPersonaSerializer',
     'CondicionViviendaSerializer',
     'DistritoSerializer',
+    'EnfermedadCronicaSerializer',
     'EmergenciaCreateSerializer',
     'EmergenciaSerializer',
     'FamiliaBusquedaSerializer',

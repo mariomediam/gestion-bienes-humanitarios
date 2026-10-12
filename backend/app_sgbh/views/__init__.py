@@ -1,6 +1,7 @@
 from .condicion_persona_view import CondicionPersonaListView
 from .condicion_vivienda_view import CondicionViviendaListView
 from .distrito_view import DistritoBuscarView
+from .enfermedad_cronica_view import EnfermedadCronicaListView
 from .emergencia_view import (
     EmergenciaBuscarView,
     EmergenciaDetailView,
