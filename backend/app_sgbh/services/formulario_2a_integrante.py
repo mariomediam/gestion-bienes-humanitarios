@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import Count, Max
+from django.db.models import Count, Max, ProtectedError
 
 from ..db_router import DB_ALIAS
 from ..models import (
@@ -11,6 +11,7 @@ from ..models import (
     Formulario2AVivienda,
     GradoLesion,
     Persona,
+    PlanillaEntrega,
     RolFamiliar,
     TipoDanioPersonal,
     TipoDiscapacidad,
@@ -169,6 +170,35 @@ class Formulario2AIntegranteService:
             stored = _integrante_guardado(integrante.pk)
         return stored
 
+    @staticmethod
+    def delete(integrante_id):
+        """Delete one S43edan_formulario_2a_integrantes row.
+
+        Uses the same guards as update: the integrante, its familia, the
+        vivienda and the parent Formulario 2A must exist, and the form must
+        still accept changes. Also rejected when a Planilla BAH references
+        this integrante.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            integrante = _require_integrante(integrante_id)
+            familia = _require_familia(integrante.familia_id)
+            vivienda = _require_vivienda(familia.vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+            if _tiene_planilla(integrante_id):
+                raise Formulario2AIntegranteServiceError(
+                    'No se puede eliminar el integrante porque tiene planillas de entrega asociadas',
+                    conflict=True,
+                )
+
+            try:
+                integrante.delete()
+            except ProtectedError:
+                raise Formulario2AIntegranteServiceError(
+                    'No se puede eliminar el integrante porque tiene registros asociados',
+                    conflict=True,
+                ) from None
+
 
 def _require_edad(edad):
     if isinstance(edad, bool) or not isinstance(edad, int):
@@ -253,6 +283,13 @@ def _require_formulario_modificable(formulario):
             conflict=exc.conflict,
             not_found=exc.not_found,
         ) from exc
+
+
+def _tiene_planilla(integrante_id):
+    """True when any Planilla BAH uses this integrante as receptor."""
+    return PlanillaEntrega.objects.filter(
+        integrante_receptor_id=integrante_id,
+    ).exists()
 
 
 def _require_persona(persona_id):
