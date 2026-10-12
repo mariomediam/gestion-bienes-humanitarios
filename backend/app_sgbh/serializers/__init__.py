@@ -27,7 +27,11 @@ from .formulario_2a_vivienda import (
 from .material_pared import MaterialParedSerializer
 from .material_piso import MaterialPisoSerializer
 from .material_techo import MaterialTechoSerializer
-from .persona import PersonaCreateSerializer, PersonaSerializer
+from .persona import (
+    PersonaBusquedaSerializer,
+    PersonaCreateSerializer,
+    PersonaSerializer,
+)
 from .personal import PersonalSerializer
 from .planilla_entrega import PlanillaEntregaTotalSerializer
 from .tipo_peligro import TipoPeligroSerializer
@@ -52,6 +56,7 @@ __all__ = [
     'MaterialParedSerializer',
     'MaterialPisoSerializer',
     'MaterialTechoSerializer',
+    'PersonaBusquedaSerializer',
     'PersonaCreateSerializer',
     'PersonaSerializer',
     'PersonalSerializer',

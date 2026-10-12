@@ -213,6 +213,16 @@ def parse_familia_id(raw_value):
     return _parse_optional_int(raw_value, 'familia_id')
 
 
+def parse_persona_id(raw_value):
+    """Parse the optional persona_id query param."""
+    return _parse_optional_int(raw_value, 'persona_id')
+
+
+def parse_tipo_documento_id(raw_value):
+    """Parse the optional tipo_documento_id query param."""
+    return _parse_optional_smallint(raw_value, 'tipo_documento_id')
+
+
 def _parse_optional_text(raw_value, field_name, max_length):
     """Parse an optional text query param.
 
@@ -317,3 +327,17 @@ def parse_provincia_id(raw_value):
 def parse_distrito_id(raw_value):
     """Parse the optional distrito_id query param (CHAR(2))."""
     return _parse_optional_text(raw_value, 'distrito_id', 2)
+
+
+def parse_numero_documento(raw_value):
+    """Parse the optional numero_documento query param."""
+    return _parse_optional_text(raw_value, 'numero_documento', 20)
+
+
+def parse_nombre_completo(raw_value):
+    """Parse the optional nombre_completo query param.
+
+    The stored length is apellido_paterno (50), one space, apellido_materno
+    (50), one space and nombres (150).
+    """
+    return _parse_optional_text(raw_value, 'nombre_completo', 252)

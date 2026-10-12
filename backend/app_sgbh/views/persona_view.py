@@ -3,7 +3,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app_sgbh.query_params import (
+    parse_nombre_completo,
+    parse_numero_documento,
+    parse_persona_id,
+    parse_tipo_documento_id,
+)
 from app_sgbh.serializers import (
+    PersonaBusquedaSerializer,
     PersonaCreateSerializer,
     PersonaSerializer,
     first_error_message,
@@ -43,6 +50,47 @@ class PersonaCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class PersonaBuscarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        parsed, error = _parse_busqueda(request.query_params)
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rows = PersonaService.search(**parsed)
+            payload = PersonaBusquedaSerializer(rows, many=True).data
+        except Exception:
+            return Response(
+                {'error': 'No se pudo obtener la búsqueda de personas'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
+
+
+def _parse_busqueda(params):
+    """Parse optional persona search filters.
+
+    Returns (values, error_message). values is None when a filter is invalid.
+    """
+    parsers = (
+        ('persona_id', parse_persona_id),
+        ('tipo_documento_id', parse_tipo_documento_id),
+        ('numero_documento', parse_numero_documento),
+        ('nombre_completo', parse_nombre_completo),
+    )
+    values = {}
+    for name, parser in parsers:
+        value, error = parser(params.get(name))
+        if error:
+            return None, error
+        values[name] = value
+
+    return values, None
 
 
 _PERSONA_ID_MAX = 2147483647

@@ -22,6 +22,7 @@ from .views import (
     MaterialParedListView,
     MaterialPisoListView,
     MaterialTechoListView,
+    PersonaBuscarView,
     PersonaCreateView,
     PersonaDetailView,
     PersonalBuscarView,
@@ -42,6 +43,7 @@ urlpatterns = [
         PersonaDetailView.as_view(),
         name='personas-detalle',
     ),
+    path('personas/buscar/', PersonaBuscarView.as_view(), name='personas-buscar'),
     path('personal/buscar/', PersonalBuscarView.as_view(), name='personal-buscar'),
     path(
         'personal/buscar/evaluadores/',

@@ -1,9 +1,10 @@
 from django.db import transaction
-from django.db.models import ProtectedError
+from django.db.models import CharField, Func, ProtectedError
 from django.utils import timezone
 
 from ..db_router import DB_ALIAS
 from ..models import Formulario2AIntegrante, Persona, TipoDocumento
+from ..text_search import text_like_pattern
 
 _USUARIO_LOGIN_MAX_LENGTH = 20
 _NUMERO_DOCUMENTO_MAX_LENGTH = 20
@@ -20,6 +21,45 @@ class PersonaServiceError(Exception):
 
 
 class PersonaService:
+    @staticmethod
+    def search(
+        persona_id=None,
+        tipo_documento_id=None,
+        numero_documento=None,
+        nombre_completo=None,
+    ):
+        """Return S43personas rows with the document type on the left.
+
+        Every filter is optional and combined with AND. When a filter is
+        omitted, that column is not restricted. With no filters, every row
+        is returned. persona_id, tipo_documento_id and numero_documento are
+        exact. nombre_completo matches
+        apellido_paterno + ' ' + apellido_materno + ' ' + nombres with a
+        case-insensitive LIKE. Spaces in the text become '%'.
+        Ordered by apellido_paterno, apellido_materno and nombres.
+        """
+        queryset = Persona.objects.select_related('tipo_documento')
+        if persona_id is not None:
+            queryset = queryset.filter(persona_id=persona_id)
+        if tipo_documento_id is not None:
+            queryset = queryset.filter(tipo_documento_id=tipo_documento_id)
+        if numero_documento is not None:
+            queryset = queryset.filter(numero_documento=numero_documento)
+        if nombre_completo is not None:
+            queryset = queryset.alias(
+                nombre_completo_busqueda=_NombreCompleto(),
+            ).filter(
+                nombre_completo_busqueda__ilike_pattern=text_like_pattern(
+                    nombre_completo
+                ),
+            )
+
+        return queryset.order_by(
+            'apellido_paterno',
+            'apellido_materno',
+            'nombres',
+        )
+
     @staticmethod
     def create(
         *,
@@ -192,6 +232,21 @@ class PersonaService:
                     'No se puede eliminar la persona porque tiene integrantes asociados',
                     conflict=True,
                 ) from None
+
+
+class _NombreCompleto(Func):
+    """apellido_paterno + ' ' + apellido_materno + ' ' + nombres.
+
+    The + operator stays compatible with SQL Server 2008 R2. CONCAT() does
+    not exist in that version.
+    """
+
+    template = '%(expressions)s'
+    arg_joiner = " + ' ' + "
+    output_field = CharField()
+
+    def __init__(self):
+        super().__init__('apellido_paterno', 'apellido_materno', 'nombres')
 
 
 def _require_text(value, field, max_length):

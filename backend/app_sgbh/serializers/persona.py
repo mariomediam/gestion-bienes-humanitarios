@@ -165,6 +165,50 @@ class PersonaCreateSerializer(serializers.Serializer):
         return attrs
 
 
+class PersonaBusquedaSerializer(serializers.Serializer):
+    """Person rows returned by the search endpoint.
+
+    Catalog columns come from the left join with S43cat_tipos_documento.
+    They are null when the person has no document type.
+    """
+
+    persona_id = serializers.IntegerField()
+    tipo_documento_id = serializers.IntegerField(allow_null=True)
+    numero_documento = serializers.CharField(allow_null=True)
+    apellido_paterno = serializers.CharField()
+    apellido_materno = serializers.CharField()
+    nombres = serializers.CharField()
+    fecha_nacimiento = serializers.DateField()
+    sexo = serializers.CharField()
+    telefono = serializers.CharField()
+    correo = serializers.CharField()
+    esta_activo = serializers.BooleanField()
+    fecha_creacion = serializers.DateTimeField()
+    c_usuari_login = serializers.CharField()
+    fecha_modificacion = serializers.DateTimeField(allow_null=True)
+    codigo_tipo_documento = serializers.SerializerMethodField()
+    nombre_tipo_documento = serializers.SerializerMethodField()
+    esta_activo_tipo_documento = serializers.SerializerMethodField()
+
+    def get_codigo_tipo_documento(self, obj):
+        tipo_documento = getattr(obj, 'tipo_documento', None)
+        if tipo_documento is None:
+            return None
+        return tipo_documento.codigo
+
+    def get_nombre_tipo_documento(self, obj):
+        tipo_documento = getattr(obj, 'tipo_documento', None)
+        if tipo_documento is None:
+            return None
+        return tipo_documento.nombre
+
+    def get_esta_activo_tipo_documento(self, obj):
+        tipo_documento = getattr(obj, 'tipo_documento', None)
+        if tipo_documento is None:
+            return None
+        return tipo_documento.esta_activo
+
+
 class PersonaSerializer(serializers.Serializer):
     """Person payload returned by the create endpoint."""
 
