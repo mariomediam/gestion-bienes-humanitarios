@@ -138,6 +138,11 @@ export const sgbhApi = {
     await api.delete(`/api/sgbh/familias/${familiaId}/`)
   },
 
+  buscarIntegrantes: async (params) => {
+    const response = await api.get('/api/sgbh/integrantes/buscar/', { params })
+    return response.data
+  },
+
   buscarEvaluadores: async (params) => {
     const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
     return response.data
