@@ -1,8 +1,9 @@
 from django.db import transaction
+from django.db.models import ProtectedError
 from django.utils import timezone
 
 from ..db_router import DB_ALIAS
-from ..models import Persona, TipoDocumento
+from ..models import Formulario2AIntegrante, Persona, TipoDocumento
 
 _USUARIO_LOGIN_MAX_LENGTH = 20
 _NUMERO_DOCUMENTO_MAX_LENGTH = 20
@@ -161,6 +162,36 @@ class PersonaService:
 
             stored = Persona.objects.select_related('tipo_documento').get(pk=persona.pk)
         return stored
+
+    @staticmethod
+    def delete(persona_id):
+        """Delete one S43personas row.
+
+        Rejected when S43edan_formulario_2a_integrantes already references
+        that persona_id. The check and the delete run in one transaction.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                persona = Persona.objects.get(pk=persona_id)
+            except Persona.DoesNotExist:
+                raise PersonaServiceError(
+                    'La persona indicada no existe',
+                    not_found=True,
+                ) from None
+
+            if Formulario2AIntegrante.objects.filter(persona_id=persona_id).exists():
+                raise PersonaServiceError(
+                    'No se puede eliminar la persona porque tiene integrantes asociados',
+                    conflict=True,
+                )
+
+            try:
+                persona.delete()
+            except ProtectedError:
+                raise PersonaServiceError(
+                    'No se puede eliminar la persona porque tiene integrantes asociados',
+                    conflict=True,
+                ) from None
 
 
 def _require_text(value, field, max_length):

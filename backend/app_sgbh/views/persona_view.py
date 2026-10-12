@@ -87,6 +87,25 @@ class PersonaDetailView(APIView):
 
         return Response(payload, status=status.HTTP_200_OK)
 
+    def delete(self, request, persona_id):
+        if persona_id < 1 or persona_id > _PERSONA_ID_MAX:
+            return Response(
+                {'error': 'El campo persona_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            PersonaService.delete(persona_id)
+        except PersonaServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar la persona'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 def _respuesta_error_servicio(exc):
     if exc.not_found:
