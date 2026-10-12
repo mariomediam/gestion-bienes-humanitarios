@@ -20,7 +20,11 @@ from .formulario_2a import (
     Formulario2ATotalSerializer,
     Formulario2AUbicacionSerializer,
 )
-from .formulario_2a_integrante import Formulario2AIntegranteTotalSerializer
+from .formulario_2a_integrante import (
+    Formulario2AIntegranteTotalSerializer,
+    IntegranteBusquedaSerializer,
+    IntegranteCreateSerializer,
+)
 from .formulario_2a_vivienda import (
     ViviendaBusquedaSerializer,
     ViviendaCreateSerializer,
@@ -59,6 +63,8 @@ __all__ = [
     'Formulario2AUpdateSerializer',
     'Formulario2ADetalleSerializer',
     'Formulario2AIntegranteTotalSerializer',
+    'IntegranteBusquedaSerializer',
+    'IntegranteCreateSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
     'GradoLesionSerializer',

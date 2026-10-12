@@ -16,6 +16,7 @@ from .views import (
     Formulario2AFamiliaBuscarView,
     Formulario2AFamiliaCreateView,
     Formulario2AFamiliaDetailView,
+    Formulario2AIntegranteCreateView,
     Formulario2AIntegranteTotalView,
     Formulario2ATotalView,
     Formulario2AViviendaBuscarView,
@@ -186,6 +187,11 @@ urlpatterns = [
         'planillas-bah/total/',
         PlanillaEntregaTotalView.as_view(),
         name='planillas-bah-total',
+    ),
+    path(
+        'integrantes/',
+        Formulario2AIntegranteCreateView.as_view(),
+        name='integrantes',
     ),
     path(
         'integrantes/total/',

@@ -1,6 +1,39 @@
-from django.db.models import Count
+from django.db import transaction
+from django.db.models import Count, Max
 
-from ..models import Formulario2AIntegrante
+from ..db_router import DB_ALIAS
+from ..models import (
+    CondicionPersona,
+    EnfermedadCronica,
+    Formulario2A,
+    Formulario2AFamilia,
+    Formulario2AIntegrante,
+    Formulario2AVivienda,
+    GradoLesion,
+    Persona,
+    RolFamiliar,
+    TipoDanioPersonal,
+    TipoDiscapacidad,
+)
+from .formulario_2a import Formulario2AService, Formulario2AServiceError
+
+_SMALLINT_MAX = 32767
+_EDAD_MIN = 0
+_EDAD_MAX = 130
+_GESTANTE_MIN = 1
+_GESTANTE_MAX = 45
+# DDL check CK_f2a_integrante_grado compares tipo_danio_personal_id to 1.
+_TIPO_DANIO_PERMITE_GRADO = 1
+
+
+class Formulario2AIntegranteServiceError(Exception):
+    """Business rule violation for an integrante operation."""
+
+    def __init__(self, message, *, conflict=False, not_found=False):
+        super().__init__(message)
+        self.message = message
+        self.conflict = conflict
+        self.not_found = not_found
 
 
 class Formulario2AIntegranteService:
@@ -15,3 +48,236 @@ class Formulario2AIntegranteService:
             queryset = queryset.filter(condicion_persona_id=condicion_persona_id)
         result = queryset.aggregate(total=Count('*'))
         return result['total']
+
+    @staticmethod
+    def create(
+        *,
+        familia_id,
+        persona_id,
+        rol_familiar_id,
+        edad,
+        condicion_persona_id,
+        tipo_danio_personal_id=None,
+        grado_lesion_id=None,
+        gestante_semanas=None,
+        tipo_discapacidad_id=None,
+        enfermedad_cronica_id=None,
+    ):
+        """Insert one row in S43edan_formulario_2a_integrantes.
+
+        The parent familia must exist and its Formulario 2A must still
+        accept changes. numero_orden is the next order of that familia:
+        one more than its current maximum, or 1 when it has no integrantes.
+        A persona cannot be repeated in the same familia. Catalog foreign
+        keys and the persona must exist when they are sent. fecha_creacion
+        uses the model default.
+        """
+        _require_edad(edad)
+        _require_gestante(gestante_semanas)
+        _require_grado(tipo_danio_personal_id, grado_lesion_id)
+
+        with transaction.atomic(using=DB_ALIAS):
+            familia = _require_familia(familia_id)
+            vivienda = _require_vivienda(familia.vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+            _require_persona(persona_id)
+            _require_persona_unica(familia_id, persona_id)
+            _require_catalogos(
+                rol_familiar_id=rol_familiar_id,
+                condicion_persona_id=condicion_persona_id,
+                tipo_danio_personal_id=tipo_danio_personal_id,
+                grado_lesion_id=grado_lesion_id,
+                tipo_discapacidad_id=tipo_discapacidad_id,
+                enfermedad_cronica_id=enfermedad_cronica_id,
+            )
+            numero_orden = _siguiente_numero_orden(familia_id)
+
+            integrante = Formulario2AIntegrante(
+                familia_id=familia_id,
+                persona_id=persona_id,
+                rol_familiar_id=rol_familiar_id,
+                numero_orden=numero_orden,
+                edad=edad,
+                condicion_persona_id=condicion_persona_id,
+                tipo_danio_personal_id=tipo_danio_personal_id,
+                grado_lesion_id=grado_lesion_id,
+                gestante_semanas=gestante_semanas,
+                tipo_discapacidad_id=tipo_discapacidad_id,
+                enfermedad_cronica_id=enfermedad_cronica_id,
+            )
+            integrante.save()
+            stored = _integrante_guardado(integrante.pk)
+        return stored
+
+
+def _require_edad(edad):
+    if isinstance(edad, bool) or not isinstance(edad, int):
+        raise Formulario2AIntegranteServiceError(
+            'El campo edad debe ser un número entero'
+        )
+    if edad < _EDAD_MIN or edad > _EDAD_MAX:
+        raise Formulario2AIntegranteServiceError(
+            'El campo edad debe estar entre 0 y 130'
+        )
+
+
+def _require_gestante(gestante_semanas):
+    if gestante_semanas is None:
+        return
+    if isinstance(gestante_semanas, bool) or not isinstance(gestante_semanas, int):
+        raise Formulario2AIntegranteServiceError(
+            'El campo gestante_semanas debe ser un número entero'
+        )
+    if gestante_semanas < _GESTANTE_MIN or gestante_semanas > _GESTANTE_MAX:
+        raise Formulario2AIntegranteServiceError(
+            'El campo gestante_semanas debe estar entre 1 y 45'
+        )
+
+
+def _require_grado(tipo_danio_personal_id, grado_lesion_id):
+    """Apply CK_f2a_integrante_grado without naming the catalog value."""
+    if grado_lesion_id is None:
+        return
+    if tipo_danio_personal_id != _TIPO_DANIO_PERMITE_GRADO:
+        raise Formulario2AIntegranteServiceError(
+            'El campo grado_lesion_id solo puede enviarse cuando tipo_danio_personal_id es 1'
+        )
+
+
+def _require_familia(familia_id):
+    try:
+        return Formulario2AFamilia.objects.select_for_update().get(pk=familia_id)
+    except Formulario2AFamilia.DoesNotExist:
+        raise Formulario2AIntegranteServiceError(
+            'La familia indicada no existe',
+            not_found=True,
+        ) from None
+
+
+def _require_vivienda(vivienda_id):
+    try:
+        return Formulario2AVivienda.objects.select_for_update().get(pk=vivienda_id)
+    except Formulario2AVivienda.DoesNotExist:
+        raise Formulario2AIntegranteServiceError(
+            'La vivienda indicada no existe',
+            not_found=True,
+        ) from None
+
+
+def _require_formulario(formulario_2a_id):
+    try:
+        return Formulario2A.objects.select_for_update().get(pk=formulario_2a_id)
+    except Formulario2A.DoesNotExist:
+        raise Formulario2AIntegranteServiceError(
+            'El formulario EDAN 2A indicado no existe',
+            not_found=True,
+        ) from None
+
+
+def _require_formulario_modificable(formulario):
+    try:
+        Formulario2AService.require_modificable(formulario)
+    except Formulario2AServiceError as exc:
+        raise Formulario2AIntegranteServiceError(
+            exc.message,
+            conflict=exc.conflict,
+            not_found=exc.not_found,
+        ) from exc
+
+
+def _require_persona(persona_id):
+    if not Persona.objects.filter(pk=persona_id).exists():
+        raise Formulario2AIntegranteServiceError('La persona indicada no existe')
+
+
+def _require_persona_unica(familia_id, persona_id):
+    if Formulario2AIntegrante.objects.filter(
+        familia_id=familia_id,
+        persona_id=persona_id,
+    ).exists():
+        raise Formulario2AIntegranteServiceError(
+            'La persona ya está registrada como integrante de esta familia',
+            conflict=True,
+        )
+
+
+def _require_catalogos(
+    *,
+    rol_familiar_id,
+    condicion_persona_id,
+    tipo_danio_personal_id,
+    grado_lesion_id,
+    tipo_discapacidad_id,
+    enfermedad_cronica_id,
+):
+    _require_catalogo(
+        RolFamiliar,
+        rol_familiar_id,
+        'El rol familiar indicado no existe',
+    )
+    _require_catalogo(
+        CondicionPersona,
+        condicion_persona_id,
+        'La condición de persona indicada no existe',
+    )
+    _require_catalogo_opcional(
+        TipoDanioPersonal,
+        tipo_danio_personal_id,
+        'El tipo de daño personal indicado no existe',
+    )
+    _require_catalogo_opcional(
+        GradoLesion,
+        grado_lesion_id,
+        'El grado de lesión indicado no existe',
+    )
+    _require_catalogo_opcional(
+        TipoDiscapacidad,
+        tipo_discapacidad_id,
+        'El tipo de discapacidad indicado no existe',
+    )
+    _require_catalogo_opcional(
+        EnfermedadCronica,
+        enfermedad_cronica_id,
+        'La enfermedad crónica indicada no existe',
+    )
+
+
+def _integrante_guardado(integrante_id):
+    return Formulario2AIntegrante.objects.select_related(
+        'rol_familiar',
+        'condicion_persona',
+        'tipo_danio_personal',
+        'grado_lesion',
+        'tipo_discapacidad',
+        'enfermedad_cronica',
+    ).get(pk=integrante_id)
+
+
+def _require_catalogo(model, catalog_id, message):
+    if not model.objects.filter(pk=catalog_id).exists():
+        raise Formulario2AIntegranteServiceError(message)
+
+
+def _require_catalogo_opcional(model, catalog_id, message):
+    if catalog_id is None:
+        return
+    _require_catalogo(model, catalog_id, message)
+
+
+def _siguiente_numero_orden(familia_id):
+    """Return the next numero_orden of one familia.
+
+    The caller must already hold the parent familia row lock so two inserts
+    of the same familia cannot take the same value.
+    """
+    max_orden = Formulario2AIntegrante.objects.filter(
+        familia_id=familia_id,
+    ).aggregate(maximo=Max('numero_orden'))['maximo']
+    numero_orden = 1 if max_orden is None else max_orden + 1
+    if numero_orden > _SMALLINT_MAX:
+        raise Formulario2AIntegranteServiceError(
+            'No se puede asignar otro número de orden en la familia',
+            conflict=True,
+        )
+    return numero_orden
