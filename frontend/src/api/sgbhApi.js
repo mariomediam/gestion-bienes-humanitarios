@@ -80,6 +80,36 @@ export const sgbhApi = {
     return response.data
   },
 
+  getRolesFamiliares: async (params) => {
+    const response = await api.get('/api/sgbh/roles-familiares/', { params })
+    return response.data
+  },
+
+  getCondicionesPersona: async (params) => {
+    const response = await api.get('/api/sgbh/condiciones-persona/', { params })
+    return response.data
+  },
+
+  getTiposDanioPersonal: async (params) => {
+    const response = await api.get('/api/sgbh/tipos-danio-personal/', { params })
+    return response.data
+  },
+
+  getGradosLesion: async (params) => {
+    const response = await api.get('/api/sgbh/grados-lesion/', { params })
+    return response.data
+  },
+
+  getTiposDiscapacidad: async (params) => {
+    const response = await api.get('/api/sgbh/tipos-discapacidad/', { params })
+    return response.data
+  },
+
+  getEnfermedadesCronicas: async (params) => {
+    const response = await api.get('/api/sgbh/enfermedades-cronicas/', { params })
+    return response.data
+  },
+
   buscarDistritos: async (params) => {
     const response = await api.get('/api/sgbh/distritos/buscar/', { params })
     return response.data
@@ -140,6 +170,16 @@ export const sgbhApi = {
 
   buscarIntegrantes: async (params) => {
     const response = await api.get('/api/sgbh/integrantes/buscar/', { params })
+    return response.data
+  },
+
+  crearIntegrante: async (data) => {
+    const response = await api.post('/api/sgbh/integrantes/', data)
+    return response.data
+  },
+
+  buscarPersonas: async (params) => {
+    const response = await api.get('/api/sgbh/personas/buscar/', { params })
     return response.data
   },
 

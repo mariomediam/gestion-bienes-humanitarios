@@ -21,12 +21,12 @@ function Mensaje({ children }) {
   )
 }
 
-export default function Formulario2AIntegrantes({ familiaId }) {
+export default function Formulario2AIntegrantes({ familiaId, version = 0 }) {
   const { loading, consultado, integrantes, cargarIntegrantes } = useIntegrantesFamilia(familiaId)
 
   useEffect(() => {
     cargarIntegrantes()
-  }, [cargarIntegrantes])
+  }, [cargarIntegrantes, version])
 
   if (loading && integrantes.length === 0) {
     return <LoadingState />

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import PlusIcon from '@components/icons/PlusIcon'
 import TrashIcon from '@components/icons/TrashIcon'
 import Formulario2AFamiliaEliminarModal from '@features/formularios2a/components/Formulario2AFamiliaEliminarModal'
+import Formulario2AIntegranteFormModal from '@features/formularios2a/components/Formulario2AIntegranteFormModal'
 import Formulario2AIntegrantes from '@features/formularios2a/components/Formulario2AIntegrantes'
 
 const buttonIconClassName = 'w-4 h-4'
@@ -14,6 +15,8 @@ const deleteButtonClassName =
 
 export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
   const [confirmandoEliminacion, setConfirmandoEliminacion] = useState(false)
+  const [agregandoIntegrante, setAgregandoIntegrante] = useState(false)
+  const [integrantesVersion, setIntegrantesVersion] = useState(0)
 
   return (
     <section className="min-w-0 rounded-lg border border-gray-200 bg-white">
@@ -33,14 +36,21 @@ export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
           <PlusIcon className={buttonIconClassName} />
           Agregar medio de vida
         </button>
-        <button type="button" className={secondaryButtonClassName}>
+        <button
+          type="button"
+          className={secondaryButtonClassName}
+          onClick={() => setAgregandoIntegrante(true)}
+        >
           <PlusIcon className={buttonIconClassName} />
           Agregar integrante
         </button>
       </div>
 
       <div className="p-4">
-        <Formulario2AIntegrantes familiaId={familia.familia_id} />
+        <Formulario2AIntegrantes
+          familiaId={familia.familia_id}
+          version={integrantesVersion}
+        />
       </div>
 
       <Formulario2AFamiliaEliminarModal
@@ -48,6 +58,17 @@ export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
         familia={familia}
         onClose={() => setConfirmandoEliminacion(false)}
         onEliminada={onEliminada}
+      />
+
+      <Formulario2AIntegranteFormModal
+        key={agregandoIntegrante ? 'abierta' : 'cerrada'}
+        isOpen={agregandoIntegrante}
+        familiaId={familia.familia_id}
+        onClose={() => setAgregandoIntegrante(false)}
+        onSaved={() => {
+          setAgregandoIntegrante(false)
+          setIntegrantesVersion((actual) => actual + 1)
+        }}
       />
     </section>
   )
