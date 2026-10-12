@@ -25,6 +25,7 @@ from .formulario_2a_vivienda import (
     ViviendaCreateSerializer,
     ViviendaUpdateSerializer,
 )
+from .grado_lesion import GradoLesionSerializer
 from .material_pared import MaterialParedSerializer
 from .material_piso import MaterialPisoSerializer
 from .material_techo import MaterialTechoSerializer
@@ -57,6 +58,7 @@ __all__ = [
     'Formulario2AIntegranteTotalSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
+    'GradoLesionSerializer',
     'MaterialParedSerializer',
     'MaterialPisoSerializer',
     'MaterialTechoSerializer',

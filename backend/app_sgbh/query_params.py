@@ -139,6 +139,11 @@ def parse_tipo_danio_personal_id(raw_value):
     return _parse_optional_smallint(raw_value, 'tipo_danio_personal_id')
 
 
+def parse_grado_lesion_id(raw_value):
+    """Parse the optional grado_lesion_id query param."""
+    return _parse_optional_smallint(raw_value, 'grado_lesion_id')
+
+
 def parse_fecha_desde(raw_value):
     """Parse the required fecha_desde query param as a date.
 
@@ -301,6 +306,16 @@ def parse_codigo_tipo_danio_personal(raw_value):
 
 def parse_nombre_tipo_danio_personal(raw_value):
     """Parse the optional nombre query param for S43cat_tipos_danio_personal."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_grado_lesion(raw_value):
+    """Parse the optional codigo query param for S43cat_grados_lesion."""
+    return _parse_optional_text(raw_value, 'codigo', 10)
+
+
+def parse_nombre_grado_lesion(raw_value):
+    """Parse the optional nombre query param for S43cat_grados_lesion."""
     return _parse_optional_text(raw_value, 'nombre', 100)
 
 

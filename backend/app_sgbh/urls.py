@@ -20,6 +20,7 @@ from .views import (
     Formulario2AViviendaBuscarView,
     Formulario2AViviendaCreateView,
     Formulario2AViviendaDetailView,
+    GradoLesionListView,
     MaterialParedListView,
     MaterialPisoListView,
     MaterialTechoListView,
@@ -64,6 +65,11 @@ urlpatterns = [
         'tipos-danio-personal/',
         TipoDanioPersonalListView.as_view(),
         name='tipos-danio-personal',
+    ),
+    path(
+        'grados-lesion/',
+        GradoLesionListView.as_view(),
+        name='grados-lesion',
     ),
     path(
         'tipos-uso-instalacion/',
