@@ -31,6 +31,7 @@ from .views import (
     PersonalEvaluadoresBuscarView,
     PlanillaEntregaTotalView,
     RolFamiliarListView,
+    TipoDanioPersonalListView,
     TipoPeligroListView,
     TipoSeguroView,
     TipoUsoInstalacionListView,
@@ -59,6 +60,11 @@ urlpatterns = [
     ),
     path('tipo-seguro/', TipoSeguroView.as_view(), name='tipo-seguro'),
     path('tipos-peligro/', TipoPeligroListView.as_view(), name='tipos-peligro'),
+    path(
+        'tipos-danio-personal/',
+        TipoDanioPersonalListView.as_view(),
+        name='tipos-danio-personal',
+    ),
     path(
         'tipos-uso-instalacion/',
         TipoUsoInstalacionListView.as_view(),

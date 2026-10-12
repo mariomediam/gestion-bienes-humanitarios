@@ -36,6 +36,7 @@ from .personal_view import (
 )
 from .planilla_entrega_view import PlanillaEntregaTotalView
 from .rol_familiar_view import RolFamiliarListView
+from .tipo_danio_personal_view import TipoDanioPersonalListView
 from .tipo_peligro_view import TipoPeligroListView
 from .tipo_seguro_view import TipoSeguroView
 from .tipo_uso_instalacion_view import TipoUsoInstalacionListView

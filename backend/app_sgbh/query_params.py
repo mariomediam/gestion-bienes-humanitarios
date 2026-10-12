@@ -134,6 +134,11 @@ def parse_personal_id(raw_value):
     return _parse_optional_smallint(raw_value, 'personal_id')
 
 
+def parse_tipo_danio_personal_id(raw_value):
+    """Parse the optional tipo_danio_personal_id query param."""
+    return _parse_optional_smallint(raw_value, 'tipo_danio_personal_id')
+
+
 def parse_fecha_desde(raw_value):
     """Parse the required fecha_desde query param as a date.
 
@@ -286,6 +291,16 @@ def parse_codigo_condicion_persona(raw_value):
 
 def parse_nombre_condicion_persona(raw_value):
     """Parse the optional nombre query param for S43cat_condiciones_persona."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_tipo_danio_personal(raw_value):
+    """Parse the optional codigo query param for S43cat_tipos_danio_personal."""
+    return _parse_optional_text(raw_value, 'codigo', 30)
+
+
+def parse_nombre_tipo_danio_personal(raw_value):
+    """Parse the optional nombre query param for S43cat_tipos_danio_personal."""
     return _parse_optional_text(raw_value, 'nombre', 100)
 
 
