@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    CondicionPersonaListView,
     CondicionViviendaListView,
     DistritoBuscarView,
     EmergenciaBuscarView,
@@ -29,6 +30,7 @@ from .views import (
     PersonalEncargadosAlmacenBuscarView,
     PersonalEvaluadoresBuscarView,
     PlanillaEntregaTotalView,
+    RolFamiliarListView,
     TipoPeligroListView,
     TipoSeguroView,
     TipoUsoInstalacionListView,
@@ -68,6 +70,11 @@ urlpatterns = [
         name='condiciones-vivienda',
     ),
     path(
+        'condiciones-persona/',
+        CondicionPersonaListView.as_view(),
+        name='condiciones-persona',
+    ),
+    path(
         'materiales-pared/',
         MaterialParedListView.as_view(),
         name='materiales-pared',
@@ -81,6 +88,11 @@ urlpatterns = [
         'materiales-techo/',
         MaterialTechoListView.as_view(),
         name='materiales-techo',
+    ),
+    path(
+        'roles-familiares/',
+        RolFamiliarListView.as_view(),
+        name='roles-familiares',
     ),
     path('distritos/buscar/', DistritoBuscarView.as_view(), name='distritos-buscar'),
     path('emergencias/', EmergenciaListView.as_view(), name='emergencias'),

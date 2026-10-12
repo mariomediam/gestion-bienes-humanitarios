@@ -1,3 +1,4 @@
+from .condicion_persona import CondicionPersonaSerializer
 from .condicion_vivienda import CondicionViviendaSerializer
 from .distrito import DistritoSerializer
 from .emergencia import (
@@ -34,11 +35,13 @@ from .persona import (
 )
 from .personal import PersonalSerializer
 from .planilla_entrega import PlanillaEntregaTotalSerializer
+from .rol_familiar import RolFamiliarSerializer
 from .tipo_peligro import TipoPeligroSerializer
 from .tipo_seguro import TipoSeguroSerializer
 from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
 
 __all__ = [
+    'CondicionPersonaSerializer',
     'CondicionViviendaSerializer',
     'DistritoSerializer',
     'EmergenciaCreateSerializer',
@@ -61,6 +64,7 @@ __all__ = [
     'PersonaSerializer',
     'PersonalSerializer',
     'PlanillaEntregaTotalSerializer',
+    'RolFamiliarSerializer',
     'TipoPeligroSerializer',
     'TipoSeguroSerializer',
     'TipoUsoInstalacionSerializer',

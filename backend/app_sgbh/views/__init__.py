@@ -1,3 +1,4 @@
+from .condicion_persona_view import CondicionPersonaListView
 from .condicion_vivienda_view import CondicionViviendaListView
 from .distrito_view import DistritoBuscarView
 from .emergencia_view import (
@@ -34,6 +35,7 @@ from .personal_view import (
     PersonalEvaluadoresBuscarView,
 )
 from .planilla_entrega_view import PlanillaEntregaTotalView
+from .rol_familiar_view import RolFamiliarListView
 from .tipo_peligro_view import TipoPeligroListView
 from .tipo_seguro_view import TipoSeguroView
 from .tipo_uso_instalacion_view import TipoUsoInstalacionListView

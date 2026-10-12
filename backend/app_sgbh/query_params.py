@@ -79,6 +79,11 @@ def parse_condicion_vivienda_id(raw_value):
     return _parse_optional_smallint(raw_value, 'condicion_vivienda_id')
 
 
+def parse_rol_familiar_id(raw_value):
+    """Parse the optional rol_familiar_id query param."""
+    return _parse_optional_smallint(raw_value, 'rol_familiar_id')
+
+
 def parse_material_techo_id(raw_value):
     """Parse the optional material_techo_id query param."""
     return _parse_optional_smallint(raw_value, 'material_techo_id')
@@ -271,6 +276,26 @@ def parse_codigo_condicion_vivienda(raw_value):
 
 def parse_nombre_condicion_vivienda(raw_value):
     """Parse the optional nombre query param for S43cat_condiciones_vivienda."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_condicion_persona(raw_value):
+    """Parse the optional codigo query param for S43cat_condiciones_persona."""
+    return _parse_optional_text(raw_value, 'codigo', 30)
+
+
+def parse_nombre_condicion_persona(raw_value):
+    """Parse the optional nombre query param for S43cat_condiciones_persona."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_rol_familiar(raw_value):
+    """Parse the optional codigo query param for S43cat_roles_familiares."""
+    return _parse_optional_text(raw_value, 'codigo', 30)
+
+
+def parse_nombre_rol_familiar(raw_value):
+    """Parse the optional nombre query param for S43cat_roles_familiares."""
     return _parse_optional_text(raw_value, 'nombre', 100)
 
 
