@@ -17,6 +17,7 @@ from .views import (
     Formulario2AFamiliaCreateView,
     Formulario2AFamiliaDetailView,
     Formulario2AIntegranteCreateView,
+    Formulario2AIntegranteDetailView,
     Formulario2AIntegranteTotalView,
     Formulario2ATotalView,
     Formulario2AViviendaBuscarView,
@@ -192,6 +193,11 @@ urlpatterns = [
         'integrantes/',
         Formulario2AIntegranteCreateView.as_view(),
         name='integrantes',
+    ),
+    path(
+        'integrantes/<int:integrante_id>/',
+        Formulario2AIntegranteDetailView.as_view(),
+        name='integrantes-detalle',
     ),
     path(
         'integrantes/total/',

@@ -8,8 +8,11 @@ from app_sgbh.serializers import (
     Formulario2AIntegranteTotalSerializer,
     IntegranteBusquedaSerializer,
     IntegranteCreateSerializer,
+    IntegranteUpdateSerializer,
     first_error_message,
 )
+
+_INTEGRANTE_ID_MAX = 2147483647
 from app_sgbh.services.formulario_2a_integrante import (
     Formulario2AIntegranteService,
     Formulario2AIntegranteServiceError,
@@ -53,6 +56,58 @@ class Formulario2AIntegranteCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class Formulario2AIntegranteDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, integrante_id):
+        if integrante_id < 1 or integrante_id > _INTEGRANTE_ID_MAX:
+            return Response(
+                {'error': 'El campo integrante_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if 'familia_id' in request.data:
+            return Response(
+                {'error': 'El campo familia_id no puede modificarse'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if 'numero_orden' in request.data:
+            return Response(
+                {'error': 'El campo numero_orden no puede modificarse'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = IntegranteUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            updated = Formulario2AIntegranteService.update(
+                integrante_id,
+                **serializer.validated_data,
+            )
+            payload = IntegranteBusquedaSerializer(updated).data
+        except Formulario2AIntegranteServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo modificar el integrante'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 class Formulario2AIntegranteTotalView(APIView):

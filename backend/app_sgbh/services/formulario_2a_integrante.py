@@ -110,6 +110,65 @@ class Formulario2AIntegranteService:
             stored = _integrante_guardado(integrante.pk)
         return stored
 
+    @staticmethod
+    def update(
+        integrante_id,
+        *,
+        persona_id,
+        rol_familiar_id,
+        edad,
+        condicion_persona_id,
+        tipo_danio_personal_id=None,
+        grado_lesion_id=None,
+        gestante_semanas=None,
+        tipo_discapacidad_id=None,
+        enfermedad_cronica_id=None,
+    ):
+        """Update the editable columns of one S43edan_formulario_2a_integrantes row.
+
+        The body matches create except familia_id. That column, numero_orden
+        and fecha_creacion stay as stored. Rejected when the parent form is
+        inactive, a related Planilla BAH is in state EMITIDA, or the persona
+        is already an integrante of the same familia.
+        """
+        _require_edad(edad)
+        _require_gestante(gestante_semanas)
+        _require_grado(tipo_danio_personal_id, grado_lesion_id)
+
+        with transaction.atomic(using=DB_ALIAS):
+            integrante = _require_integrante(integrante_id)
+            familia = _require_familia(integrante.familia_id)
+            vivienda = _require_vivienda(familia.vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+            _require_persona(persona_id)
+            _require_persona_unica(
+                integrante.familia_id,
+                persona_id,
+                exclude_integrante_id=integrante.pk,
+            )
+            _require_catalogos(
+                rol_familiar_id=rol_familiar_id,
+                condicion_persona_id=condicion_persona_id,
+                tipo_danio_personal_id=tipo_danio_personal_id,
+                grado_lesion_id=grado_lesion_id,
+                tipo_discapacidad_id=tipo_discapacidad_id,
+                enfermedad_cronica_id=enfermedad_cronica_id,
+            )
+
+            integrante.persona_id = persona_id
+            integrante.rol_familiar_id = rol_familiar_id
+            integrante.edad = edad
+            integrante.condicion_persona_id = condicion_persona_id
+            integrante.tipo_danio_personal_id = tipo_danio_personal_id
+            integrante.grado_lesion_id = grado_lesion_id
+            integrante.gestante_semanas = gestante_semanas
+            integrante.tipo_discapacidad_id = tipo_discapacidad_id
+            integrante.enfermedad_cronica_id = enfermedad_cronica_id
+            integrante.save()
+            stored = _integrante_guardado(integrante.pk)
+        return stored
+
 
 def _require_edad(edad):
     if isinstance(edad, bool) or not isinstance(edad, int):
@@ -143,6 +202,16 @@ def _require_grado(tipo_danio_personal_id, grado_lesion_id):
         raise Formulario2AIntegranteServiceError(
             'El campo grado_lesion_id solo puede enviarse cuando tipo_danio_personal_id es 1'
         )
+
+
+def _require_integrante(integrante_id):
+    try:
+        return Formulario2AIntegrante.objects.select_for_update().get(pk=integrante_id)
+    except Formulario2AIntegrante.DoesNotExist:
+        raise Formulario2AIntegranteServiceError(
+            'El integrante indicado no existe',
+            not_found=True,
+        ) from None
 
 
 def _require_familia(familia_id):
@@ -191,11 +260,14 @@ def _require_persona(persona_id):
         raise Formulario2AIntegranteServiceError('La persona indicada no existe')
 
 
-def _require_persona_unica(familia_id, persona_id):
-    if Formulario2AIntegrante.objects.filter(
+def _require_persona_unica(familia_id, persona_id, *, exclude_integrante_id=None):
+    queryset = Formulario2AIntegrante.objects.filter(
         familia_id=familia_id,
         persona_id=persona_id,
-    ).exists():
+    )
+    if exclude_integrante_id is not None:
+        queryset = queryset.exclude(pk=exclude_integrante_id)
+    if queryset.exists():
         raise Formulario2AIntegranteServiceError(
             'La persona ya está registrada como integrante de esta familia',
             conflict=True,

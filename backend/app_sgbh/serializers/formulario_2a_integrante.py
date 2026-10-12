@@ -78,8 +78,20 @@ class IntegranteCreateSerializer(serializers.Serializer):
     enfermedad_cronica_id = _id_field('enfermedad_cronica_id', required=False)
 
 
+class IntegranteUpdateSerializer(IntegranteCreateSerializer):
+    """Validate the body used to update S43edan_formulario_2a_integrantes.
+
+    Same fields as create, except familia_id. That column stays as stored,
+    the same as numero_orden and fecha_creacion.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('familia_id', None)
+
+
 class IntegranteBusquedaSerializer(serializers.Serializer):
-    """One integrante row returned after it is created.
+    """One integrante row returned after it is created or updated.
 
     Catalog names follow the related rows. A null foreign key yields a null name.
     """

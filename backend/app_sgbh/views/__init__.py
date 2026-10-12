@@ -16,6 +16,7 @@ from .formulario_2a_familia_view import (
 )
 from .formulario_2a_integrante_view import (
     Formulario2AIntegranteCreateView,
+    Formulario2AIntegranteDetailView,
     Formulario2AIntegranteTotalView,
 )
 from .formulario_2a_view import (
