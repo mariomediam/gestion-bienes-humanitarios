@@ -178,6 +178,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  actualizarIntegrante: async (integranteId, data) => {
+    const response = await api.put(`/api/sgbh/integrantes/${integranteId}/`, data)
+    return response.data
+  },
+
   buscarPersonas: async (params) => {
     const response = await api.get('/api/sgbh/personas/buscar/', { params })
     return response.data

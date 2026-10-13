@@ -35,7 +35,7 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
-function etiquetaPersona(row) {
+export function etiquetaPersona(row) {
   const nombre = [row.apellido_paterno, row.apellido_materno, row.nombres]
     .filter((parte) => parte !== null && parte !== undefined && parte !== '')
     .join(' ')

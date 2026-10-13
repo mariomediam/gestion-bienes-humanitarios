@@ -1,5 +1,9 @@
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { sgbhApi } from '@api/sgbhApi'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import Formulario2AIntegranteFormModal from '@features/formularios2a/components/Formulario2AIntegranteFormModal'
 
 const buttonIconClassName = 'w-4 h-4'
 
@@ -23,6 +27,10 @@ function Campo({ label, value }) {
   )
 }
 
+function getErrorMessage(error, fallback) {
+  return error?.response?.data?.error || fallback
+}
+
 function tituloIntegrante(integrante) {
   const nombre = [integrante.apellido_paterno, integrante.apellido_materno, integrante.nombres]
     .filter((parte) => parte !== null && parte !== undefined && parte !== '')
@@ -32,14 +40,44 @@ function tituloIntegrante(integrante) {
   return `${titulo} (${nombre})`
 }
 
-export default function Formulario2AIntegranteCard({ integrante }) {
+export default function Formulario2AIntegranteCard({ integrante, onModificado }) {
+  const [cargandoEdicion, setCargandoEdicion] = useState(false)
+  const [integranteEdicion, setIntegranteEdicion] = useState(null)
+
+  async function handleModificar() {
+    setCargandoEdicion(true)
+    try {
+      const rows = await sgbhApi.buscarIntegrantes({ integrante_id: integrante.integrante_id })
+      const encontrado = Array.isArray(rows) ? rows[0] : null
+      if (!encontrado) {
+        toast.error('El integrante indicado no existe')
+        return
+      }
+      setIntegranteEdicion(encontrado)
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de integrantes'))
+    } finally {
+      setCargandoEdicion(false)
+    }
+  }
+
+  function handleIntegranteGuardado() {
+    setIntegranteEdicion(null)
+    onModificado?.()
+  }
+
   return (
     <section className="min-w-0 rounded-lg border border-gray-200 bg-white">
       <div className="flex min-w-0 flex-wrap items-center gap-2 border-b border-gray-200 px-5 py-4">
         <h4 className="min-w-0 text-sm font-semibold text-[#1e3064] wrap-break-word">
           {tituloIntegrante(integrante)}
         </h4>
-        <button type="button" className={secondaryButtonClassName}>
+        <button
+          type="button"
+          className={`${secondaryButtonClassName} disabled:opacity-50`}
+          onClick={handleModificar}
+          disabled={cargandoEdicion}
+        >
           <PencilIcon className={buttonIconClassName} />
           Modificar integrante
         </button>
@@ -62,6 +100,16 @@ export default function Formulario2AIntegranteCard({ integrante }) {
           <Campo label="Enfermedad crónica" value={texto(integrante.enfermedad_cronica_nombre)} />
         </dl>
       </div>
+
+      {integranteEdicion && (
+        <Formulario2AIntegranteFormModal
+          key={integranteEdicion.integrante_id}
+          isOpen
+          integrante={integranteEdicion}
+          onClose={() => setIntegranteEdicion(null)}
+          onSaved={handleIntegranteGuardado}
+        />
+      )}
     </section>
   )
 }

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
 import CatalogoSelect from '@features/formularios2a/components/CatalogoSelect'
-import PersonaSelect from '@features/formularios2a/components/PersonaSelect'
+import PersonaSelect, { etiquetaPersona } from '@features/formularios2a/components/PersonaSelect'
 
 // DDL check CK_f2a_integrante_grado allows grado_lesion_id only for this id.
 const TIPO_DANIO_PERMITE_GRADO = 1
@@ -27,6 +27,48 @@ const labelClassName = 'block text-xs font-medium text-[#1e3064] mb-1'
 
 function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
+}
+
+function textoCampo(value) {
+  if (value === null || value === undefined) return ''
+  return String(value)
+}
+
+function opcionCatalogo(id, nombre) {
+  if (id === null || id === undefined) return null
+  return {
+    value: id,
+    label: nombre ?? '',
+  }
+}
+
+function formFromIntegrante(integrante) {
+  return {
+    persona: {
+      value: integrante.persona_id,
+      label: etiquetaPersona(integrante),
+    },
+    rol_familiar: opcionCatalogo(integrante.rol_familiar_id, integrante.rol_familiar_nombre),
+    edad: textoCampo(integrante.edad),
+    condicion_persona: opcionCatalogo(
+      integrante.condicion_persona_id,
+      integrante.condicion_persona_nombre,
+    ),
+    tipo_danio_personal: opcionCatalogo(
+      integrante.tipo_danio_personal_id,
+      integrante.tipo_danio_personal_nombre,
+    ),
+    grado_lesion: opcionCatalogo(integrante.grado_lesion_id, integrante.grado_lesion_nombre),
+    gestante_semanas: textoCampo(integrante.gestante_semanas),
+    tipo_discapacidad: opcionCatalogo(
+      integrante.tipo_discapacidad_id,
+      integrante.tipo_discapacidad_nombre,
+    ),
+    enfermedad_cronica: opcionCatalogo(
+      integrante.enfermedad_cronica_id,
+      integrante.enfermedad_cronica_nombre,
+    ),
+  }
 }
 
 function parseEntero(value) {
@@ -96,10 +138,14 @@ function Campo({ id, label, error, children, className = '' }) {
 export default function Formulario2AIntegranteFormModal({
   isOpen,
   familiaId,
+  integrante = null,
   onClose,
   onSaved,
 }) {
-  const [form, setForm] = useState(EMPTY_FORM)
+  const isEdit = integrante !== null
+  const [form, setForm] = useState(() =>
+    integrante ? formFromIntegrante(integrante) : EMPTY_FORM,
+  )
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
@@ -143,12 +189,13 @@ export default function Formulario2AIntegranteFormModal({
     if (Object.keys(nextErrors).length > 0) return
 
     const payload = {
-      familia_id: familiaId,
       persona_id: form.persona.value,
       rol_familiar_id: form.rol_familiar.value,
       edad: parseEntero(form.edad),
       condicion_persona_id: form.condicion_persona.value,
     }
+
+    if (!isEdit) payload.familia_id = familiaId
 
     if (form.tipo_danio_personal) {
       payload.tipo_danio_personal_id = form.tipo_danio_personal.value
@@ -169,13 +216,22 @@ export default function Formulario2AIntegranteFormModal({
 
     setLoading(true)
     try {
-      const saved = await sgbhApi.crearIntegrante(payload)
-      toast.success('Integrante registrado correctamente')
+      const saved = isEdit
+        ? await sgbhApi.actualizarIntegrante(integrante.integrante_id, payload)
+        : await sgbhApi.crearIntegrante(payload)
+      toast.success(
+        isEdit ? 'Integrante modificado correctamente' : 'Integrante registrado correctamente',
+      )
       setForm(EMPTY_FORM)
       setErrors({})
       onSaved(saved)
     } catch (error) {
-      toast.error(getErrorMessage(error, 'No se pudo registrar el integrante'))
+      toast.error(
+        getErrorMessage(
+          error,
+          isEdit ? 'No se pudo modificar el integrante' : 'No se pudo registrar el integrante',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -198,7 +254,7 @@ export default function Formulario2AIntegranteFormModal({
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
           <h2 id="titulo-integrante" className="text-lg font-semibold text-[#1e3064]">
-            Agregar integrante
+            {isEdit ? 'Modificar integrante' : 'Agregar integrante'}
           </h2>
           <button
             type="button"

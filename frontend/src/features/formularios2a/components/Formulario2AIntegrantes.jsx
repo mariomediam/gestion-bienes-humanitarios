@@ -44,7 +44,10 @@ export default function Formulario2AIntegrantes({ familiaId, version = 0 }) {
     <ul className="space-y-4" aria-busy={loading}>
       {integrantes.map((integrante) => (
         <li key={integrante.integrante_id}>
-          <Formulario2AIntegranteCard integrante={integrante} />
+          <Formulario2AIntegranteCard
+            integrante={integrante}
+            onModificado={cargarIntegrantes}
+          />
         </li>
       ))}
     </ul>
