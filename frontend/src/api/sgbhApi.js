@@ -183,6 +183,10 @@ export const sgbhApi = {
     return response.data
   },
 
+  eliminarIntegrante: async (integranteId) => {
+    await api.delete(`/api/sgbh/integrantes/${integranteId}/`)
+  },
+
   buscarPersonas: async (params) => {
     const response = await api.get('/api/sgbh/personas/buscar/', { params })
     return response.data

@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import Formulario2AIntegranteEliminarModal from '@features/formularios2a/components/Formulario2AIntegranteEliminarModal'
 import Formulario2AIntegranteFormModal from '@features/formularios2a/components/Formulario2AIntegranteFormModal'
 
 const buttonIconClassName = 'w-4 h-4'
@@ -43,6 +44,7 @@ function tituloIntegrante(integrante) {
 export default function Formulario2AIntegranteCard({ integrante, onModificado }) {
   const [cargandoEdicion, setCargandoEdicion] = useState(false)
   const [integranteEdicion, setIntegranteEdicion] = useState(null)
+  const [confirmandoEliminacion, setConfirmandoEliminacion] = useState(false)
 
   async function handleModificar() {
     setCargandoEdicion(true)
@@ -81,7 +83,11 @@ export default function Formulario2AIntegranteCard({ integrante, onModificado })
           <PencilIcon className={buttonIconClassName} />
           Modificar integrante
         </button>
-        <button type="button" className={deleteButtonClassName}>
+        <button
+          type="button"
+          className={deleteButtonClassName}
+          onClick={() => setConfirmandoEliminacion(true)}
+        >
           <TrashIcon className={buttonIconClassName} />
           Eliminar integrante
         </button>
@@ -110,6 +116,13 @@ export default function Formulario2AIntegranteCard({ integrante, onModificado })
           onSaved={handleIntegranteGuardado}
         />
       )}
+
+      <Formulario2AIntegranteEliminarModal
+        isOpen={confirmandoEliminacion}
+        integrante={integrante}
+        onClose={() => setConfirmandoEliminacion(false)}
+        onEliminado={onModificado}
+      />
     </section>
   )
 }
