@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
@@ -147,15 +147,62 @@ function Campo({ id, label, error, children, className = '' }) {
 
 export default function PersonaFormModal({
   isOpen,
-  persona = null,
+  personaId = null,
   onClose,
   onSaved,
 }) {
-  const isEdit = persona !== null
-  const [form, setForm] = useState(() => (persona ? formFromPersona(persona) : EMPTY_FORM))
+  const isEdit = personaId !== null && personaId !== undefined
+  const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
+  const [cargando, setCargando] = useState(false)
+  const [estaActivo, setEstaActivo] = useState(true)
   const [tiposDocumento, setTiposDocumento] = useState([])
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+
+  useEffect(() => {
+    if (!isOpen) {
+      setForm(EMPTY_FORM)
+      setErrors({})
+      setCargando(false)
+      setEstaActivo(true)
+      return undefined
+    }
+
+    if (!isEdit) return undefined
+
+    let active = true
+    setCargando(true)
+    setForm(EMPTY_FORM)
+    setErrors({})
+
+    sgbhApi
+      .buscarPersonas({ persona_id: personaId })
+      .then((rows) => {
+        if (!active) return
+        const persona = Array.isArray(rows) ? rows[0] : null
+        if (!persona) {
+          toast.error('La persona indicada no existe')
+          onCloseRef.current()
+          return
+        }
+        setForm(formFromPersona(persona))
+        setEstaActivo(persona.esta_activo)
+      })
+      .catch((error) => {
+        if (!active) return
+        toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de personas'))
+        onCloseRef.current()
+      })
+      .finally(() => {
+        if (active) setCargando(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [isOpen, isEdit, personaId])
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -211,13 +258,13 @@ export default function PersonaFormModal({
     }
 
     if (isEdit) {
-      payload.esta_activo = persona.esta_activo
+      payload.esta_activo = estaActivo
     }
 
     setLoading(true)
     try {
       const saved = isEdit
-        ? await sgbhApi.actualizarPersona(persona.persona_id, payload)
+        ? await sgbhApi.actualizarPersona(personaId, payload)
         : await sgbhApi.crearPersona(payload)
       toast.success(isEdit ? 'Persona modificada correctamente' : 'Persona registrada correctamente')
       setForm(EMPTY_FORM)
@@ -268,6 +315,9 @@ export default function PersonaFormModal({
           </button>
         </div>
 
+        {cargando ? (
+          <p className="px-6 py-8 text-center text-sm text-gray-600">Cargando persona...</p>
+        ) : (
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
             <Campo id="tipo-documento-persona" label="Tipo de documento" error={errors.tipo_documento}>
@@ -430,6 +480,7 @@ export default function PersonaFormModal({
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>,
     document.body,
