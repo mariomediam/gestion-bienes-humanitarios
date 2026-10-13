@@ -38,6 +38,7 @@ from .views import (
     RolFamiliarListView,
     TipoDanioPersonalListView,
     TipoDiscapacidadListView,
+    TipoDocumentoListView,
     TipoPeligroListView,
     TipoSeguroView,
     TipoUsoInstalacionListView,
@@ -75,6 +76,11 @@ urlpatterns = [
         'tipos-discapacidad/',
         TipoDiscapacidadListView.as_view(),
         name='tipos-discapacidad',
+    ),
+    path(
+        'tipos-documento/',
+        TipoDocumentoListView.as_view(),
+        name='tipos-documento',
     ),
     path(
         'enfermedades-cronicas/',

@@ -105,6 +105,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  getTiposDocumento: async (params) => {
+    const response = await api.get('/api/sgbh/tipos-documento/', { params })
+    return response.data
+  },
+
   getEnfermedadesCronicas: async (params) => {
     const response = await api.get('/api/sgbh/enfermedades-cronicas/', { params })
     return response.data

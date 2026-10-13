@@ -349,6 +349,16 @@ def parse_nombre_tipo_discapacidad(raw_value):
     return _parse_optional_text(raw_value, 'nombre', 150)
 
 
+def parse_codigo_tipo_documento(raw_value):
+    """Parse the optional codigo query param for S43cat_tipos_documento."""
+    return _parse_optional_text(raw_value, 'codigo', 30)
+
+
+def parse_nombre_tipo_documento(raw_value):
+    """Parse the optional nombre query param for S43cat_tipos_documento."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
 def parse_nombre_enfermedad_cronica(raw_value):
     """Parse the optional nombre query param for S43cat_enfermedades_cronicas."""
     return _parse_optional_text(raw_value, 'nombre', 200)
