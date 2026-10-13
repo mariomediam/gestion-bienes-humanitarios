@@ -73,6 +73,14 @@ def test_parse_crear_trims_text_and_reads_optional_fields():
     assert parsed['esta_activo'] is False
 
 
+def test_parse_crear_stores_blank_telefono_and_correo_as_empty_string():
+    parsed, error = _parse_crear(_body(telefono='   ', correo=None))
+
+    assert error is None
+    assert parsed['telefono'] == ''
+    assert parsed['correo'] == ''
+
+
 def test_parse_crear_treats_blank_document_as_empty():
     parsed, error = _parse_crear(
         _body(tipo_documento_id='', numero_documento='   ')
@@ -94,7 +102,6 @@ def test_parse_crear_treats_blank_document_as_empty():
         ('sexo', '', 'sexo es obligatorio'),
         ('sexo', 'MF', 'sexo debe tener 1 carácter'),
         ('telefono', 'T' * 51, 'telefono no debe superar 50'),
-        ('correo', '', 'correo es obligatorio'),
         ('numero_documento', 'D' * 21, 'numero_documento no debe superar 20'),
         ('tipo_documento_id', '2.5', 'tipo_documento_id debe ser un número entero'),
         ('tipo_documento_id', 40000, 'tipo_documento_id debe ser un número entero'),
@@ -189,6 +196,21 @@ def test_create_saves_without_document():
         c_usuari_login='mmedina',
     )
     persona.return_value.save.assert_called_once_with()
+
+
+def test_create_saves_blank_telefono_and_correo_as_empty_string():
+    with (
+        patch('app_sgbh.services.persona.transaction.atomic'),
+        patch('app_sgbh.services.persona.TipoDocumento'),
+        patch('app_sgbh.services.persona.Persona') as persona,
+    ):
+        persona.return_value.pk = 4
+        persona.objects.filter.return_value.exists.return_value = False
+
+        PersonaService.create(**_service_kwargs(telefono='  ', correo=None))
+
+    assert persona.call_args.kwargs['telefono'] == ''
+    assert persona.call_args.kwargs['correo'] == ''
 
 
 def test_create_saves_with_document():

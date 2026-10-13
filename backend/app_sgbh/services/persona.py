@@ -87,6 +87,8 @@ class PersonaService:
         document pair.
         c_usuari_login comes from the authenticated user.
         esta_activo defaults to true. fecha_modificacion stays empty.
+        telefono and correo are optional. A blank value is stored as an
+        empty string.
         """
         login = str(c_usuari_login or '').strip()
         if login == '' or len(login) > _USUARIO_LOGIN_MAX_LENGTH:
@@ -97,8 +99,8 @@ class PersonaService:
         apellido_materno = _require_text(apellido_materno, 'apellido_materno', 50)
         nombres = _require_text(nombres, 'nombres', 150)
         sexo = _require_sexo(sexo)
-        telefono = _require_text(telefono, 'telefono', 50)
-        correo = _require_text(correo, 'correo', 50)
+        telefono = _optional_text(telefono, 'telefono', 50)
+        correo = _optional_text(correo, 'correo', 50)
         if esta_activo is None:
             esta_activo = True
 
@@ -158,8 +160,8 @@ class PersonaService:
         apellido_materno = _require_text(apellido_materno, 'apellido_materno', 50)
         nombres = _require_text(nombres, 'nombres', 150)
         sexo = _require_sexo(sexo)
-        telefono = _require_text(telefono, 'telefono', 50)
-        correo = _require_text(correo, 'correo', 50)
+        telefono = _optional_text(telefono, 'telefono', 50)
+        correo = _optional_text(correo, 'correo', 50)
         if esta_activo is None:
             esta_activo = True
 
@@ -247,6 +249,16 @@ class _NombreCompleto(Func):
 
     def __init__(self):
         super().__init__('apellido_paterno', 'apellido_materno', 'nombres')
+
+
+def _optional_text(value, field, max_length):
+    """Return a trimmed string. Blank and null become an empty string."""
+    text = '' if value is None else str(value).strip()
+    if len(text) > max_length:
+        raise PersonaServiceError(
+            f'El campo {field} no debe superar {max_length} caracteres'
+        )
+    return text
 
 
 def _require_text(value, field, max_length):

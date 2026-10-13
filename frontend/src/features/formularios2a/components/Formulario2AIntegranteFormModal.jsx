@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
 import CatalogoSelect from '@features/formularios2a/components/CatalogoSelect'
+import PersonaFormModal from '@features/formularios2a/components/PersonaFormModal'
 import PersonaSelect, { etiquetaPersona } from '@features/formularios2a/components/PersonaSelect'
 
 // DDL check CK_f2a_integrante_grado allows grado_lesion_id only for this id.
@@ -23,7 +24,10 @@ const EMPTY_FORM = {
 const inputClassName =
   'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500'
 
-const labelClassName = 'block text-xs font-medium text-[#1e3064] mb-1'
+const labelClassName = 'text-xs font-medium text-[#1e3064]'
+
+const accionLabelClassName =
+  'shrink-0 text-xs font-medium text-[#1e3064] underline decoration-[#1e3064]/40 underline-offset-2 hover:decoration-[#1e3064] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e3064] rounded-sm disabled:cursor-not-allowed disabled:opacity-50'
 
 function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
@@ -69,6 +73,24 @@ function formFromIntegrante(integrante) {
       integrante.enfermedad_cronica_nombre,
     ),
   }
+}
+
+function edadEnAnios(fechaNacimiento, hoy = new Date()) {
+  if (!fechaNacimiento) return null
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(fechaNacimiento))
+  if (!match) return null
+
+  const anio = Number(match[1])
+  const mes = Number(match[2])
+  const dia = Number(match[3])
+  let edad = hoy.getFullYear() - anio
+  const mesHoy = hoy.getMonth() + 1
+  const diaHoy = hoy.getDate()
+  if (mesHoy < mes || (mesHoy === mes && diaHoy < dia)) {
+    edad -= 1
+  }
+  if (edad < 0 || !Number.isSafeInteger(edad)) return null
+  return edad
 }
 
 function parseEntero(value) {
@@ -123,12 +145,15 @@ function validate(form) {
   return errors
 }
 
-function Campo({ id, label, error, children, className = '' }) {
+function Campo({ id, label, error, children, className = '', accion = null }) {
   return (
     <div className={`min-w-0 ${className}`}>
-      <label htmlFor={id} className={labelClassName}>
-        {label}
-      </label>
+      <div className="mb-1 flex items-center justify-between gap-3">
+        <label htmlFor={id} className={labelClassName}>
+          {label}
+        </label>
+        {accion}
+      </div>
       {children}
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
@@ -148,12 +173,13 @@ export default function Formulario2AIntegranteFormModal({
   )
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
+  const [crearPersonaAbierto, setCrearPersonaAbierto] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return undefined
 
     function handleKeyDown(event) {
-      if (event.key === 'Escape' && !loading) {
+      if (event.key === 'Escape' && !loading && !crearPersonaAbierto) {
         setForm(EMPTY_FORM)
         setErrors({})
         onClose()
@@ -162,7 +188,7 @@ export default function Formulario2AIntegranteFormModal({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, loading, onClose])
+  }, [isOpen, loading, crearPersonaAbierto, onClose])
 
   if (!isOpen) return null
 
@@ -175,8 +201,30 @@ export default function Formulario2AIntegranteFormModal({
     }))
   }
 
+  function handlePersonaChange(option) {
+    const edad = option ? edadEnAnios(option.fecha_nacimiento) : null
+    setForm((current) => ({
+      ...current,
+      persona: option,
+      ...(edad === null ? {} : { edad: String(edad) }),
+    }))
+    setErrors((current) => ({
+      ...current,
+      persona: '',
+      ...(edad === null ? {} : { edad: '' }),
+    }))
+  }
+
   function handleClose() {
     if (loading) return
+    setCrearPersonaAbierto(false)
+    setForm(EMPTY_FORM)
+    setErrors({})
+    onClose()
+  }
+
+  function cerrarTrasPersona() {
+    setCrearPersonaAbierto(false)
     setForm(EMPTY_FORM)
     setErrors({})
     onClose()
@@ -237,7 +285,9 @@ export default function Formulario2AIntegranteFormModal({
     }
   }
 
-  return createPortal(
+  return (
+    <>
+      {!crearPersonaAbierto && createPortal(
     <div
       className="fixed inset-0 z-50 grid p-4"
       style={{ gridTemplateRows: 'minmax(0, 1fr)', alignItems: 'center', justifyItems: 'center' }}
@@ -277,11 +327,21 @@ export default function Formulario2AIntegranteFormModal({
               label="Persona"
               error={errors.persona}
               className="sm:col-span-2"
+              accion={
+                <button
+                  type="button"
+                  onClick={() => setCrearPersonaAbierto(true)}
+                  disabled={loading}
+                  className={accionLabelClassName}
+                >
+                  Crear persona
+                </button>
+              }
             >
               <PersonaSelect
                 inputId="persona-integrante"
                 value={form.persona}
-                onChange={(option) => handleChange('persona', option)}
+                onChange={handlePersonaChange}
                 disabled={loading}
               />
             </Campo>
@@ -440,5 +500,13 @@ export default function Formulario2AIntegranteFormModal({
       </div>
     </div>,
     document.body,
+      )}
+
+      <PersonaFormModal
+        isOpen={crearPersonaAbierto}
+        onClose={cerrarTrasPersona}
+        onSaved={cerrarTrasPersona}
+      />
+    </>
   )
 }

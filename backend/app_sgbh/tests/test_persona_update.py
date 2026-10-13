@@ -143,6 +143,21 @@ def test_update_keeps_creator_and_sets_modification_date():
     assert persona.objects.filter.return_value.exclude.call_count == 2
 
 
+def test_update_stores_blank_telefono_and_correo_as_empty_string():
+    patches = _patch_update()
+    with patches[0], patches[1] as tipo_documento, patches[2] as persona, patches[3]:
+        row = _Row()
+        persona.DoesNotExist = _DoesNotExist
+        persona.objects.get.return_value = row
+        tipo_documento.objects.filter.return_value.exists.return_value = True
+        persona.objects.filter.return_value.exclude.return_value.exists.return_value = False
+
+        PersonaService.update(4, **_service_kwargs(telefono='', correo='   '))
+
+    assert row.telefono == ''
+    assert row.correo == ''
+
+
 def test_update_allows_clearing_the_document():
     patches = _patch_update()
     with patches[0], patches[1] as tipo_documento, patches[2] as persona, patches[3]:

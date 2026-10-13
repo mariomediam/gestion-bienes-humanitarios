@@ -96,6 +96,7 @@ export default function PersonaSelect({ inputId, value, onChange, disabled }) {
             rows.map((row) => ({
               value: row.persona_id,
               label: etiquetaPersona(row),
+              fecha_nacimiento: row.fecha_nacimiento,
             })),
           )
         } catch (error) {

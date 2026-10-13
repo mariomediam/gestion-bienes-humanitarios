@@ -120,23 +120,25 @@ class PersonaCreateSerializer(serializers.Serializer):
         },
     )
     telefono = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        default='',
         max_length=50,
         trim_whitespace=True,
         error_messages={
-            'required': 'El campo telefono es obligatorio',
-            'blank': 'El campo telefono es obligatorio',
-            'null': 'El campo telefono es obligatorio',
             'invalid': 'El campo telefono debe ser texto',
             'max_length': 'El campo telefono no debe superar 50 caracteres',
         },
     )
     correo = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        default='',
         max_length=50,
         trim_whitespace=True,
         error_messages={
-            'required': 'El campo correo es obligatorio',
-            'blank': 'El campo correo es obligatorio',
-            'null': 'El campo correo es obligatorio',
             'invalid': 'El campo correo debe ser texto',
             'max_length': 'El campo correo no debe superar 50 caracteres',
         },
@@ -153,6 +155,16 @@ class PersonaCreateSerializer(serializers.Serializer):
     def validate_esta_activo(self, value):
         if value is None:
             return True
+        return value
+
+    def validate_telefono(self, value):
+        if value is None:
+            return ''
+        return value
+
+    def validate_correo(self, value):
+        if value is None:
+            return ''
         return value
 
     def validate(self, attrs):

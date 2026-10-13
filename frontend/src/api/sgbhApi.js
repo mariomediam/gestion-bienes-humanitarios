@@ -197,6 +197,16 @@ export const sgbhApi = {
     return response.data
   },
 
+  crearPersona: async (data) => {
+    const response = await api.post('/api/sgbh/personas/', data)
+    return response.data
+  },
+
+  actualizarPersona: async (personaId, data) => {
+    const response = await api.put(`/api/sgbh/personas/${personaId}/`, data)
+    return response.data
+  },
+
   buscarEvaluadores: async (params) => {
     const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
     return response.data

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Select from 'react-select'
 import { toast } from 'sonner'
 
@@ -42,9 +42,12 @@ export default function CatalogoSelect({
   placeholder,
   mensajeVacio,
   mensajeError,
+  onFilas,
 }) {
   const [options, setOptions] = useState([])
   const [loading, setLoading] = useState(true)
+  const onFilasRef = useRef(onFilas)
+  onFilasRef.current = onFilas
 
   useEffect(() => {
     let active = true
@@ -52,10 +55,12 @@ export default function CatalogoSelect({
     cargar({ esta_activo: true })
       .then((rows) => {
         if (!active) return
+        onFilasRef.current?.(rows)
         setOptions(
           rows.map((row) => ({
             value: row[idKey],
             label: row.nombre,
+            codigo: row.codigo,
           })),
         )
       })
