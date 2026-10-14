@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
 import { partesUbicacion } from '@features/formularios2a/ubicacion'
@@ -39,6 +40,8 @@ function UbicacionCell({ formulario }) {
 }
 
 export default function Formularios2AResultados({ formularios }) {
+  const navigate = useNavigate()
+
   return (
     <section className="bg-white rounded-lg border border-gray-200">
       <div className="px-5 py-4 border-b border-gray-200">
@@ -80,6 +83,7 @@ export default function Formularios2AResultados({ formularios }) {
                         type="button"
                         aria-label="Modificar"
                         className={actionButtonClassName}
+                        onClick={() => navigate(`/formularios-2A/${formulario.formulario_2a_id}`)}
                       >
                         <PencilIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
