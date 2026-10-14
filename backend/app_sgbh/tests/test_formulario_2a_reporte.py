@@ -220,7 +220,7 @@ def test_filas_no_marcan_tenencia_cuando_es_nula_ni_codigos_desconocidos():
         tenencia_propia=None,
         uso='OTRO_USO',
         condicion='OTRA',
-        familias=[_familia([_integrante(edad=20, sexo='X', danio='OTRO')])],
+        familias=[_familia([_integrante(edad=20, sexo='X', danio='OTRO', condicion='OTRA')])],
     )
 
     fila = filas_reporte([vivienda])[0]
@@ -232,6 +232,8 @@ def test_filas_no_marcan_tenencia_cuando_es_nula_ni_codigos_desconocidos():
     assert fila['condicion_afectada'] is False
     assert fila['condicion_destruida'] is False
     assert fila['sexo'] is None
+    assert fila['condicion_damnificado'] is None
+    assert fila['condicion_afectado'] is None
     assert fila['danio_fallecido'] is None
     assert fila['danio_lesionado'] is None
     assert fila['danio_desaparecido'] is None
@@ -247,7 +249,12 @@ def test_filas_ubican_edad_sexo_y_danos():
                             _integrante(edad=0, sexo='M', danio='FALLECIDO'),
                             _integrante(edad=4, sexo='F', danio='LESIONADO'),
                             _integrante(edad=17, sexo='M', danio='DESAPARECIDO'),
-                            _integrante(edad=60, sexo='F', gestante_semanas=12),
+                            _integrante(
+                                edad=60,
+                                sexo='F',
+                                gestante_semanas=12,
+                                condicion='DAMNIFICADO',
+                            ),
                         ]
                     )
                 ]
@@ -257,13 +264,18 @@ def test_filas_ubican_edad_sexo_y_danos():
 
     assert filas[0]['grupo_etario'] == 'menor_1'
     assert filas[0]['sexo'] == 'M'
+    assert filas[0]['condicion_afectado'] == 1
+    assert filas[0]['condicion_damnificado'] is None
     assert filas[0]['danio_fallecido'] == 1
     assert filas[1]['grupo_etario'] == '01_04'
+    assert filas[1]['condicion_afectado'] == 1
     assert filas[1]['danio_lesionado'] == 1
     assert filas[2]['grupo_etario'] == '15_17'
     assert filas[2]['danio_desaparecido'] == 1
     assert filas[3]['grupo_etario'] == '60_mas'
     assert filas[3]['gestante_semanas'] == 12
+    assert filas[3]['condicion_damnificado'] == 1
+    assert filas[3]['condicion_afectado'] is None
 
 
 def test_filas_ponen_medios_de_vida_en_el_primer_integrante():

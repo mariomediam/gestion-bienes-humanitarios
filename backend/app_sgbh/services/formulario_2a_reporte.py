@@ -18,6 +18,8 @@ _USO_MEDIO_VIDA = 'MEDIO_VIDA'
 _CONDICION_AFECTADA = 'AFECTADA'
 _CONDICION_INHABITABLE = 'INHABITABLE'
 _CONDICION_DESTRUIDA = 'DESTRUIDA'
+_CONDICION_DAMNIFICADO = 'DAMNIFICADO'
+_CONDICION_AFECTADO = 'AFECTADO'
 _DANIO_FALLECIDO = 'FALLECIDO'
 _DANIO_LESIONADO = 'LESIONADO'
 _DANIO_DESAPARECIDO = 'DESAPARECIDO'
@@ -184,7 +186,8 @@ def _fila(
     edad=None,
     tipo_documento=None,
     numero_documento=None,
-    condicion_persona=None,
+    condicion_damnificado=None,
+    condicion_afectado=None,
     danio_fallecido=None,
     danio_lesionado=None,
     danio_desaparecido=None,
@@ -215,7 +218,8 @@ def _fila(
         'edad': edad,
         'tipo_documento': tipo_documento,
         'numero_documento': numero_documento,
-        'condicion_persona': condicion_persona,
+        'condicion_damnificado': condicion_damnificado,
+        'condicion_afectado': condicion_afectado,
         'danio_fallecido': danio_fallecido,
         'danio_lesionado': danio_lesionado,
         'danio_desaparecido': danio_desaparecido,
@@ -268,6 +272,16 @@ def _persona_campos(integrante):
     }.get(_codigo(integrante.tipo_danio_personal))
     if campo_danio:
         danios[campo_danio] = _MARCA_NUMERO
+    condiciones = {
+        'condicion_damnificado': None,
+        'condicion_afectado': None,
+    }
+    campo_condicion = {
+        _CONDICION_DAMNIFICADO: 'condicion_damnificado',
+        _CONDICION_AFECTADO: 'condicion_afectado',
+    }.get(_codigo(integrante.condicion_persona))
+    if campo_condicion:
+        condiciones[campo_condicion] = _MARCA_NUMERO
     return {
         'apellidos_nombres': _nombre_partes(
             persona.apellido_paterno,
@@ -278,12 +292,12 @@ def _persona_campos(integrante):
         'edad': integrante.edad,
         'tipo_documento': _codigo(persona.tipo_documento),
         'numero_documento': _texto(persona.numero_documento),
-        'condicion_persona': _codigo(integrante.condicion_persona),
         'grupo_etario': _grupo_etario(integrante.edad),
         'sexo': sexo,
         'gestante_semanas': integrante.gestante_semanas,
         'discapacidad': _codigo_formulario(integrante.tipo_discapacidad),
         'enfermedad_cronica': _codigo_formulario(integrante.enfermedad_cronica),
+        **condiciones,
         **danios,
     }
 

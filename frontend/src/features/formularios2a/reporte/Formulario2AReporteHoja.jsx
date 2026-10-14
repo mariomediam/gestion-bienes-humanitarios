@@ -25,10 +25,11 @@ const ANCHOS = [
   '2.4%',
   '3.2%',
   '6.2%',
-  '5.2%',
-  '2%',
-  '2%',
-  '2%',
+  '2.24%',
+  '2.24%',
+  '2.24%',
+  '2.24%',
+  '2.24%',
   ...Array(16).fill('1.35%'),
   '2.4%',
   '2.6%',
@@ -97,10 +98,11 @@ function FilaDatos({ fila }) {
       <td>{texto(fila?.edad)}</td>
       <td>{texto(fila?.tipo_documento)}</td>
       <td>{texto(fila?.numero_documento)}</td>
-      <td>{texto(fila?.condicion_persona)}</td>
-      <td>{texto(fila?.danio_fallecido)}</td>
+      <td>{texto(fila?.condicion_damnificado)}</td>
+      <td>{texto(fila?.condicion_afectado)}</td>
       <td>{texto(fila?.danio_lesionado)}</td>
       <td>{texto(fila?.danio_desaparecido)}</td>
+      <td>{texto(fila?.danio_fallecido)}</td>
       {GRUPOS_ETARIOS.map(([grupo]) => (
         ['M', 'F'].map((sexo) => (
           <td key={`${grupo}-${sexo}`}>{marcaEtaria(fila, grupo, sexo)}</td>
@@ -181,7 +183,7 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
         <thead>
           <tr>
             <th className="viv" colSpan={11} scope="colgroup">I. INFORMACIÓN DE VIVIENDA</th>
-            <th className="fam" colSpan={24} scope="colgroup">II. INFORMACIÓN POR FAMILIA</th>
+            <th className="fam" colSpan={25} scope="colgroup">II. INFORMACIÓN POR FAMILIA</th>
             <th className="sal" colSpan={3} scope="colgroup">
               III. INFORMACIÓN ADICIONAL POR FAMILIA (Salud)
             </th>
@@ -202,7 +204,7 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
             <th className="fam" colSpan={4} scope="colgroup">
               JEFE (A) DE FAMILIA O PERSONA QUE RESPONDE (Empadronar al total de los miembros de la familia)
             </th>
-            <th className="fam" colSpan={4} scope="colgroup">VIDA Y SALUD (indicar con números)</th>
+            <th className="fam" colSpan={5} scope="colgroup">VIDA Y SALUD (Indicar con números)</th>
             <th className="fam" colSpan={16} scope="colgroup">
               COMPOSICIÓN FAMILIAR POR GRUPOS ETARIOS / AÑOS (Indicar con números)
             </th>
@@ -226,7 +228,7 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
             <th className="fam" rowSpan={2} scope="col">APELLIDOS, NOMBRES</th>
             <th className="fam" rowSpan={2} scope="col">EDAD</th>
             <th className="fam" colSpan={2} scope="colgroup">DOCUMENTO DE IDENTIDAD</th>
-            <th className="fam" rowSpan={2} scope="col"><Vertical>Condición</Vertical></th>
+            <th className="fam" colSpan={2} scope="colgroup">Condición</th>
             <th className="fam" colSpan={3} scope="colgroup">Daños Personales</th>
             {GRUPOS_ETARIOS.map(([grupo, etiqueta]) => (
               <th key={grupo} className="fam" colSpan={2} scope="colgroup">{etiqueta}</th>
@@ -270,9 +272,11 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
             <th className="viv" scope="col">NO</th>
             <th className="fam" scope="col">TIPO</th>
             <th className="fam" scope="col">NÚMERO</th>
-            <th className="fam" scope="col"><Vertical>Fallecido (*)</Vertical></th>
+            <th className="fam" scope="col"><Vertical>Damnificado</Vertical></th>
+            <th className="fam" scope="col"><Vertical>Afectado</Vertical></th>
             <th className="fam" scope="col"><Vertical>Lesionado (Herido)</Vertical></th>
             <th className="fam" scope="col"><Vertical>Desaparecido</Vertical></th>
+            <th className="fam" scope="col"><Vertical>Fallecido (*)</Vertical></th>
             {GRUPOS_ETARIOS.map(([grupo]) => (
               ['M', 'F'].map((sexo) => (
                 <th key={`${grupo}-${sexo}`} className="fam" scope="col">{sexo}</th>
