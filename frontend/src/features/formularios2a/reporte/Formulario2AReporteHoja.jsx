@@ -21,10 +21,10 @@ const ANCHOS = [
   '2.2%',
   '2.2%',
   '2.2%',
-  '12.8%',
+  '11.2%',
   '2.4%',
   '3.2%',
-  '6.2%',
+  '5.2%',
   '2.24%',
   '2.24%',
   '2.24%',
@@ -34,11 +34,11 @@ const ANCHOS = [
   '2.4%',
   '2.6%',
   '2.6%',
-  '2.3%',
-  '2%',
-  '2.3%',
-  '2%',
-  '2.8%',
+  '2.5%',
+  '3.2%',
+  '2.5%',
+  '3.2%',
+  '2.6%',
 ]
 
 function formatFecha(fecha) {
@@ -187,7 +187,7 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
             <th className="sal" colSpan={3} scope="colgroup">
               III. INFORMACIÓN ADICIONAL POR FAMILIA (Salud)
             </th>
-            <th className="med" colSpan={5} scope="colgroup">IV. Medio de VIDA local</th>
+            <th className="med" colSpan={5} scope="colgroup">IV. Medio de VIDA Local</th>
           </tr>
           <tr>
             <th className="viv" rowSpan={3} scope="col">Nº Lote</th>
@@ -209,11 +209,9 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
               COMPOSICIÓN FAMILIAR POR GRUPOS ETARIOS / AÑOS (Indicar con números)
             </th>
             <th className="sal" colSpan={3} scope="colgroup">GRUPOS VULNERABLES</th>
-            <th className="med" colSpan={2} scope="colgroup">COMERCIO</th>
-            <th className="med" colSpan={2} scope="colgroup">TURISMO</th>
-            <th className="med" rowSpan={3} scope="col">
-              <Vertical>Otros tipos de actividad</Vertical>
-            </th>
+            <th className="med" colSpan={2} scope="colgroup"><Vertical>COMERCIO</Vertical></th>
+            <th className="med" colSpan={2} scope="colgroup"><Vertical>TURISMO</Vertical></th>
+            <th className="med" scope="col"><Vertical>OTROS</Vertical></th>
           </tr>
           <tr>
             <th className="viv" colSpan={2}>Propia</th>
@@ -250,22 +248,23 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
                 (Especificar el Número de la Tabla de Referencia)
               </Vertical>
             </th>
-            <th className="med" rowSpan={2} scope="col">
+            <th className="med" colSpan={2} scope="colgroup">
               <Vertical>
                 Tipo de actividad de comercio
                 <br />
                 (ver tabla de detalle)
               </Vertical>
             </th>
-            <th className="med" rowSpan={2} scope="col"><Vertical>Tipo (Unid)</Vertical></th>
-            <th className="med" rowSpan={2} scope="col">
+            <th className="med" colSpan={2} scope="colgroup">
               <Vertical>
                 Tipo de actividad Turística
                 <br />
                 (ver tabla de detalle)
               </Vertical>
             </th>
-            <th className="med" rowSpan={2} scope="col"><Vertical>Tipo (Unid)</Vertical></th>
+            <th className="med" rowSpan={2} scope="col">
+              <Vertical>Otros Tipos de actividad</Vertical>
+            </th>
           </tr>
           <tr>
             <th className="viv" scope="col">SI</th>
@@ -282,6 +281,10 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
                 <th key={`${grupo}-${sexo}`} className="fam" scope="col">{sexo}</th>
               ))
             ))}
+            <th className="med" scope="col">Tipo</th>
+            <th className="med" scope="col">(Unid)</th>
+            <th className="med" scope="col">Tipo</th>
+            <th className="med" scope="col">(Unid)</th>
           </tr>
         </thead>
         <tbody>
