@@ -32,6 +32,14 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
+function etiquetaOpcion(row, incluirCodigoFormulario) {
+  const nombre = row.nombre ?? ''
+  if (!incluirCodigoFormulario) return nombre
+  const codigo = row.codigo_formulario
+  if (codigo === null || codigo === undefined || codigo === '') return nombre
+  return `${codigo} - ${nombre}`
+}
+
 export default function CatalogoSelect({
   inputId,
   value,
@@ -45,6 +53,7 @@ export default function CatalogoSelect({
   onFilas,
   filtros,
   habilitado = true,
+  incluirCodigoFormulario = false,
 }) {
   const [options, setOptions] = useState([])
   const [loading, setLoading] = useState(habilitado)
@@ -74,7 +83,7 @@ export default function CatalogoSelect({
         setOptions(
           rows.map((row) => ({
             value: row[idKey],
-            label: row.nombre,
+            label: etiquetaOpcion(row, incluirCodigoFormulario),
             codigo: row.codigo,
           })),
         )
@@ -93,13 +102,18 @@ export default function CatalogoSelect({
     return () => {
       active = false
     }
-  }, [cargar, idKey, mensajeError, filtrosKey, habilitado])
+  }, [cargar, idKey, mensajeError, filtrosKey, habilitado, incluirCodigoFormulario])
+
+  const selected =
+    value == null
+      ? value
+      : (options.find((option) => option.value === value.value) ?? value)
 
   return (
     <Select
       inputId={inputId}
       instanceId={inputId}
-      value={value}
+      value={selected}
       onChange={onChange}
       options={options}
       isDisabled={disabled || loading || !habilitado}

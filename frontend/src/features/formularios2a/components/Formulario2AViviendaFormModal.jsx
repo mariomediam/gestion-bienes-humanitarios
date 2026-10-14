@@ -286,6 +286,7 @@ export default function Formulario2AViviendaFormModal({
                 disabled={loading}
                 cargar={sgbhApi.getMaterialesTecho}
                 idKey="material_techo_id"
+                incluirCodigoFormulario
                 placeholder="Seleccione un material de techo"
                 mensajeVacio="No se encontraron materiales de techo"
                 mensajeError="No se pudo obtener el catálogo de materiales de techo"
