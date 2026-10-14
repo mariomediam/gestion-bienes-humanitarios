@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import ProtectedError
 
 from ..db_router import DB_ALIAS
 from ..models import (
@@ -124,6 +125,29 @@ class Formulario2AMedioVidaService:
             medio_vida.save()
             stored = _medio_vida_guardado(medio_vida.pk)
         return stored
+
+    @staticmethod
+    def delete(medio_vida_id):
+        """Delete one S43edan_formulario_2a_medios_vida row.
+
+        Uses the same guards as update: the medio de vida, its familia, the
+        vivienda and the parent Formulario 2A must exist, and the form must
+        still accept changes.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            medio_vida = _require_medio_vida(medio_vida_id)
+            familia = _require_familia(medio_vida.familia_id)
+            vivienda = _require_vivienda(familia.vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+
+            try:
+                medio_vida.delete()
+            except ProtectedError:
+                raise Formulario2AMedioVidaServiceError(
+                    'No se puede eliminar el medio de vida porque tiene registros asociados',
+                    conflict=True,
+                ) from None
 
 
 def _require_cantidad(cantidad):

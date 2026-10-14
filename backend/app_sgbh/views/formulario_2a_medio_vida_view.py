@@ -101,6 +101,25 @@ class Formulario2AMedioVidaDetailView(APIView):
 
         return Response(payload, status=status.HTTP_200_OK)
 
+    def delete(self, request, medio_vida_id):
+        if medio_vida_id < 1 or medio_vida_id > _MEDIO_VIDA_ID_MAX:
+            return Response(
+                {'error': 'El campo medio_vida_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            Formulario2AMedioVidaService.delete(medio_vida_id)
+        except Formulario2AMedioVidaServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar el medio de vida'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class Formulario2AMedioVidaBuscarView(APIView):
     permission_classes = [IsAuthenticated]
