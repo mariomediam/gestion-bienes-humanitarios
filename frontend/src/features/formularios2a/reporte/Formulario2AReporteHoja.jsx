@@ -281,10 +281,10 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
                 <th key={`${grupo}-${sexo}`} className="fam" scope="col">{sexo}</th>
               ))
             ))}
-            <th className="med" scope="col">Tipo</th>
-            <th className="med" scope="col">(Unid)</th>
-            <th className="med" scope="col">Tipo</th>
-            <th className="med" scope="col">(Unid)</th>
+            <th className="med" scope="col"><Vertical>TIPO</Vertical></th>
+            <th className="med" scope="col"><Vertical>(Unid)</Vertical></th>
+            <th className="med" scope="col"><Vertical>TIPO</Vertical></th>
+            <th className="med" scope="col"><Vertical>(Unid)</Vertical></th>
           </tr>
         </thead>
         <tbody>
