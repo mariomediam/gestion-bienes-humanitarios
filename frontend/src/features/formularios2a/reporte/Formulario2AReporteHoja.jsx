@@ -129,7 +129,8 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
 
       <div className="reporte-cabecera">
         <Dato className="span-6" label="EVALUACIÓN N°:" valor={reporte.numero_evaluacion} />
-        <Dato className="span-6" label="CÓDIGO SINPAD N°:" valor={reporte.codigo_sinpad} />
+        <div className="span-3" aria-hidden="true" />
+        <Dato className="reporte-col-registro" label="CÓDIGO SINPAD N°:" valor={reporte.codigo_sinpad} />
         <Dato className="span-3" label="Tipo de Peligro:" valor={reporte.tipo_peligro} />
         <Dato className="span-3" label="Fecha de Emergencia:" valor={formatFecha(reporte.fecha_emergencia)} />
         <Dato
@@ -138,16 +139,16 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
           valor={formatHora(reporte.hora_ocurrencia_estimada)}
         />
         <Dato
-          className="span-3"
+          className="reporte-col-registro"
           label="Fecha del Empadronamiento:"
           valor={formatFecha(reporte.fecha_empadronamiento)}
         />
         <Dato className="span-2" label="Departamento:" valor={reporte.departamento} />
         <Dato className="span-2" label="Provincia:" valor={reporte.provincia} />
-        <Dato className="span-3" label="Distrito:" valor={reporte.distrito} />
+        <Dato className="span-2" label="Distrito:" valor={reporte.distrito} />
         <Dato className="span-3" label="Localidad:" valor={reporte.localidad} />
         <Dato
-          className="span-2"
+          className="reporte-col-registro"
           label="Hora del Empadronamiento:"
           valor={formatHora(reporte.hora_empadronamiento)}
         />

@@ -87,6 +87,19 @@
 .span-6 { grid-column: span 6; }
 .span-7 { grid-column: span 7; }
 
+.reporte-col-registro {
+  grid-column: 10 / span 3;
+  display: grid;
+  grid-template-columns: 33mm minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 1mm;
+}
+
+.reporte-col-registro .reporte-dato-label {
+  margin-right: 0;
+  white-space: nowrap;
+}
+
 .reporte-tabla {
   width: 100%;
   border-collapse: collapse;
