@@ -26,4 +26,4 @@ class MaterialParedService:
         if esta_activo is not None:
             queryset = queryset.filter(esta_activo=esta_activo)
 
-        return queryset.order_by('nombre')
+        return queryset.order_by('codigo_formulario')
