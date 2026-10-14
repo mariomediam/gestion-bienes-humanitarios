@@ -1,3 +1,4 @@
+from .categoria_medio_vida import CategoriaMedioVidaSerializer
 from .condicion_persona import CondicionPersonaSerializer
 from .condicion_vivienda import CondicionViviendaSerializer
 from .distrito import DistritoSerializer
@@ -52,6 +53,7 @@ from .tipo_seguro import TipoSeguroSerializer
 from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
 
 __all__ = [
+    'CategoriaMedioVidaSerializer',
     'CondicionPersonaSerializer',
     'CondicionViviendaSerializer',
     'DistritoSerializer',

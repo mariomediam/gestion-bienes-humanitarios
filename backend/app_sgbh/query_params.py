@@ -129,6 +129,11 @@ def parse_condicion_persona_id(raw_value):
     return _parse_optional_smallint(raw_value, 'condicion_persona_id')
 
 
+def parse_categoria_medio_vida_id(raw_value):
+    """Parse the optional categoria_medio_vida_id query param."""
+    return _parse_optional_smallint(raw_value, 'categoria_medio_vida_id')
+
+
 def parse_personal_id(raw_value):
     """Parse the optional personal_id query param."""
     return _parse_optional_smallint(raw_value, 'personal_id')
@@ -321,6 +326,16 @@ def parse_codigo_condicion_persona(raw_value):
 
 def parse_nombre_condicion_persona(raw_value):
     """Parse the optional nombre query param for S43cat_condiciones_persona."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_categoria_medio_vida(raw_value):
+    """Parse the optional codigo query param for S43cat_categorias_medios_vida."""
+    return _parse_optional_text(raw_value, 'codigo', 30)
+
+
+def parse_nombre_categoria_medio_vida(raw_value):
+    """Parse the optional nombre query param for S43cat_categorias_medios_vida."""
     return _parse_optional_text(raw_value, 'nombre', 100)
 
 

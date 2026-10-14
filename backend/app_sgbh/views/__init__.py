@@ -1,3 +1,4 @@
+from .categoria_medio_vida_view import CategoriaMedioVidaListView
 from .condicion_persona_view import CondicionPersonaListView
 from .condicion_vivienda_view import CondicionViviendaListView
 from .distrito_view import DistritoBuscarView
