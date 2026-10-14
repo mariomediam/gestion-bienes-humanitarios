@@ -189,9 +189,9 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
           </tr>
           <tr>
             <th className="viv" rowSpan={3} scope="col">Nº Lote</th>
-            <th className="viv" colSpan={2} scope="colgroup">TENENCIA</th>
+            <th className="viv" colSpan={2} scope="colgroup"><Vertical>TENENCIA</Vertical></th>
             <th className="viv" colSpan={2} scope="colgroup">
-              CONDICIÓN DE USO DE LA INSTALACIÓN
+              <Vertical>CONDICIÓN DE USO <br/>DE LA INSTALACIÓN</Vertical>
             </th>
             <th className="viv" colSpan={3} scope="colgroup">
               Condición de la vivienda post desastre
