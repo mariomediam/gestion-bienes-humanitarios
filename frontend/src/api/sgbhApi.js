@@ -202,9 +202,23 @@ export const sgbhApi = {
     await api.delete(`/api/sgbh/integrantes/${integranteId}/`)
   },
 
+  buscarMediosVida: async (params) => {
+    const response = await api.get('/api/sgbh/medios-vida/buscar/', { params })
+    return response.data
+  },
+
   crearMedioVida: async (data) => {
     const response = await api.post('/api/sgbh/medios-vida/', data)
     return response.data
+  },
+
+  actualizarMedioVida: async (medioVidaId, data) => {
+    const response = await api.put(`/api/sgbh/medios-vida/${medioVidaId}/`, data)
+    return response.data
+  },
+
+  eliminarMedioVida: async (medioVidaId) => {
+    await api.delete(`/api/sgbh/medios-vida/${medioVidaId}/`)
   },
 
   buscarPersonas: async (params) => {

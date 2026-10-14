@@ -23,6 +23,34 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
+function textoCampo(value) {
+  if (value === null || value === undefined) return ''
+  return String(value)
+}
+
+function opcionCatalogo(id, nombre) {
+  if (id === null || id === undefined) return null
+  return {
+    value: id,
+    label: nombre ?? '',
+  }
+}
+
+function formFromMedioVida(medioVida) {
+  return {
+    categoria: opcionCatalogo(
+      medioVida.categoria_medio_vida_id,
+      medioVida.categoria_medio_vida_nombre,
+    ),
+    tipo_medio_vida: opcionCatalogo(
+      medioVida.tipo_medio_vida_id,
+      medioVida.tipo_medio_vida_nombre,
+    ),
+    cantidad: textoCampo(medioVida.cantidad),
+    observacion: textoCampo(medioVida.observacion),
+  }
+}
+
 function parseEntero(value) {
   const texto = value.trim()
   if (!/^\d+$/.test(texto)) return null
@@ -75,10 +103,14 @@ function Campo({ id, label, error, children, className = '' }) {
 export default function Formulario2AMedioVidaFormModal({
   isOpen,
   familiaId,
+  medioVida = null,
   onClose,
   onSaved,
 }) {
-  const [form, setForm] = useState(EMPTY_FORM)
+  const isEdit = medioVida !== null
+  const [form, setForm] = useState(() =>
+    medioVida ? formFromMedioVida(medioVida) : EMPTY_FORM,
+  )
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
@@ -131,23 +163,37 @@ export default function Formulario2AMedioVidaFormModal({
     if (Object.keys(nextErrors).length > 0) return
 
     const payload = {
-      familia_id: familiaId,
       tipo_medio_vida_id: form.tipo_medio_vida.value,
       cantidad: parseEntero(form.cantidad),
     }
+
+    if (!isEdit) payload.familia_id = familiaId
 
     const observacion = form.observacion.trim()
     if (observacion) payload.observacion = observacion
 
     setLoading(true)
     try {
-      const saved = await sgbhApi.crearMedioVida(payload)
-      toast.success('Medio de vida registrado correctamente')
+      const saved = isEdit
+        ? await sgbhApi.actualizarMedioVida(medioVida.medio_vida_id, payload)
+        : await sgbhApi.crearMedioVida(payload)
+      toast.success(
+        isEdit
+          ? 'Medio de vida modificado correctamente'
+          : 'Medio de vida registrado correctamente',
+      )
       setForm(EMPTY_FORM)
       setErrors({})
       onSaved(saved)
     } catch (error) {
-      toast.error(getErrorMessage(error, 'No se pudo registrar el medio de vida'))
+      toast.error(
+        getErrorMessage(
+          error,
+          isEdit
+            ? 'No se pudo modificar el medio de vida'
+            : 'No se pudo registrar el medio de vida',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -174,7 +220,7 @@ export default function Formulario2AMedioVidaFormModal({
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
           <h2 id="titulo-medio-vida" className="text-lg font-semibold text-[#1e3064]">
-            Agregar medio de vida
+            {isEdit ? 'Modificar medio de vida' : 'Agregar medio de vida'}
           </h2>
           <button
             type="button"

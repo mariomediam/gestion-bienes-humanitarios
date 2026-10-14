@@ -5,6 +5,7 @@ import Formulario2AFamiliaEliminarModal from '@features/formularios2a/components
 import Formulario2AIntegranteFormModal from '@features/formularios2a/components/Formulario2AIntegranteFormModal'
 import Formulario2AIntegrantes from '@features/formularios2a/components/Formulario2AIntegrantes'
 import Formulario2AMedioVidaFormModal from '@features/formularios2a/components/Formulario2AMedioVidaFormModal'
+import Formulario2AMediosVida from '@features/formularios2a/components/Formulario2AMediosVida'
 
 const buttonIconClassName = 'w-4 h-4'
 
@@ -19,6 +20,7 @@ export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
   const [agregandoIntegrante, setAgregandoIntegrante] = useState(false)
   const [agregandoMedioVida, setAgregandoMedioVida] = useState(false)
   const [integrantesVersion, setIntegrantesVersion] = useState(0)
+  const [mediosVidaVersion, setMediosVidaVersion] = useState(0)
 
   return (
     <section className="min-w-0 rounded-lg border border-gray-200 bg-white">
@@ -52,10 +54,14 @@ export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
         </button>
       </div>
 
-      <div className="p-4">
+      <div className="space-y-4 p-4">
         <Formulario2AIntegrantes
           familiaId={familia.familia_id}
           version={integrantesVersion}
+        />
+        <Formulario2AMediosVida
+          familiaId={familia.familia_id}
+          version={mediosVidaVersion}
         />
       </div>
 
@@ -82,7 +88,10 @@ export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
         isOpen={agregandoMedioVida}
         familiaId={familia.familia_id}
         onClose={() => setAgregandoMedioVida(false)}
-        onSaved={() => setAgregandoMedioVida(false)}
+        onSaved={() => {
+          setAgregandoMedioVida(false)
+          setMediosVidaVersion((actual) => actual + 1)
+        }}
       />
     </section>
   )
