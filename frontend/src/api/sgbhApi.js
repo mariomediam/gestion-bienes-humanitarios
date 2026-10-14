@@ -150,6 +150,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  getFormulario2AReporte: async (formulario2aId) => {
+    const response = await api.get(`/api/sgbh/formularios-2a/${formulario2aId}/reporte/`)
+    return response.data
+  },
+
   buscarViviendas: async (params) => {
     const response = await api.get('/api/sgbh/viviendas/buscar/', { params })
     return response.data

@@ -26,6 +26,7 @@ from .formulario_2a_medio_vida_view import (
     Formulario2AMedioVidaCreateView,
     Formulario2AMedioVidaDetailView,
 )
+from .formulario_2a_reporte_view import Formulario2AReporteView
 from .formulario_2a_view import (
     Formulario2ABuscarView,
     Formulario2ACreateView,

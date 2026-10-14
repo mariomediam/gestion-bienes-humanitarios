@@ -1,0 +1,62 @@
+from rest_framework import serializers
+
+
+class Formulario2AReporteFilaSerializer(serializers.Serializer):
+    """One printed row of the Formulario 2A field sheet."""
+
+    numero_lote = serializers.CharField(allow_null=True)
+    tenencia_si = serializers.BooleanField()
+    tenencia_no = serializers.BooleanField()
+    uso_vivienda = serializers.BooleanField()
+    uso_medio_vida = serializers.BooleanField()
+    condicion_afectada = serializers.BooleanField()
+    condicion_inhabitable = serializers.BooleanField()
+    condicion_destruida = serializers.BooleanField()
+    material_techo = serializers.IntegerField(allow_null=True)
+    material_pared = serializers.IntegerField(allow_null=True)
+    material_piso = serializers.IntegerField(allow_null=True)
+    apellidos_nombres = serializers.CharField(allow_null=True)
+    edad = serializers.IntegerField(allow_null=True)
+    tipo_documento = serializers.CharField(allow_null=True)
+    numero_documento = serializers.CharField(allow_null=True)
+    condicion_persona = serializers.CharField(allow_null=True)
+    danio_fallecido = serializers.IntegerField(allow_null=True)
+    danio_lesionado = serializers.IntegerField(allow_null=True)
+    danio_desaparecido = serializers.IntegerField(allow_null=True)
+    grupo_etario = serializers.CharField(allow_null=True)
+    sexo = serializers.CharField(allow_null=True)
+    gestante_semanas = serializers.IntegerField(allow_null=True)
+    discapacidad = serializers.IntegerField(allow_null=True)
+    enfermedad_cronica = serializers.IntegerField(allow_null=True)
+    comercio_tipo = serializers.CharField(allow_null=True)
+    comercio_cantidad = serializers.CharField(allow_null=True)
+    turismo_tipo = serializers.CharField(allow_null=True)
+    turismo_cantidad = serializers.CharField(allow_null=True)
+    otros = serializers.CharField(allow_null=True)
+
+
+class Formulario2AReporteSerializer(serializers.Serializer):
+    """Printable Formulario 2A: header of the sheet and one row per person."""
+
+    numero_evaluacion = serializers.CharField(allow_null=True)
+    codigo_sinpad = serializers.CharField(allow_null=True)
+    tipo_peligro = serializers.CharField(allow_null=True)
+    fecha_emergencia = serializers.DateField()
+    hora_ocurrencia_estimada = serializers.TimeField(allow_null=True)
+    fecha_empadronamiento = serializers.DateField()
+    hora_empadronamiento = serializers.TimeField(allow_null=True)
+    departamento = serializers.CharField()
+    provincia = serializers.CharField()
+    distrito = serializers.CharField(allow_null=True)
+    localidad = serializers.CharField(allow_null=True)
+    barrio_sector_urbanizacion = serializers.CharField(allow_null=True)
+    calle_manzana = serializers.CharField(allow_null=True)
+    edificio_piso_dpto = serializers.CharField(allow_null=True)
+    numero_hoja = serializers.IntegerField()
+    centro_poblado = serializers.CharField(allow_null=True)
+    caserio = serializers.CharField(allow_null=True)
+    anexo = serializers.CharField(allow_null=True)
+    otros_ubicacion = serializers.CharField(allow_null=True)
+    institucion = serializers.CharField(allow_null=True)
+    evaluador_nombre = serializers.CharField(allow_null=True)
+    filas = Formulario2AReporteFilaSerializer(many=True)

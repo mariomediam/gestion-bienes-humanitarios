@@ -84,6 +84,7 @@ export default function Formularios2AResultados({ formularios }) {
                         type="button"
                         aria-label="Ver"
                         className={actionButtonClassName}
+                        onClick={() => navigate(`/formularios-2A/${formulario.formulario_2a_id}/reporte`)}
                       >
                         <EyeIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">

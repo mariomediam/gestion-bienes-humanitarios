@@ -7,6 +7,7 @@ import MainLayout from '@components/layout/MainLayout'
 import DashboardPage from '@features/home/pages/DashboardPage'
 import EmergenciasPage from '@features/emergencias/pages/EmergenciasPage'
 import Formulario2ADetallePage from '@features/formularios2a/pages/Formulario2ADetallePage'
+import Formulario2AReportePage from '@features/formularios2a/pages/Formulario2AReportePage'
 import Formularios2APage from '@features/formularios2a/pages/Formularios2APage'
 
 const ProtectedRoute = ({ children }) => {
@@ -80,6 +81,7 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="emergencias" element={<EmergenciasPage />} />
           <Route path="formularios-2A" element={<Formularios2APage />} />
+          <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
