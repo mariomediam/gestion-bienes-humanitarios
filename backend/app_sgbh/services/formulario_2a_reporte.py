@@ -201,6 +201,7 @@ def _fila(
     turismo_tipo=None,
     turismo_cantidad=None,
     otros=None,
+    otros_cantidad=None,
 ):
     return {
         'numero_lote': numero_lote,
@@ -233,6 +234,7 @@ def _fila(
         'turismo_tipo': turismo_tipo,
         'turismo_cantidad': turismo_cantidad,
         'otros': otros,
+        'otros_cantidad': otros_cantidad,
     }
 
 
@@ -318,6 +320,7 @@ def _medios_campos(medios):
         'turismo_tipo': _unir_codigos(grupos[_CATEGORIA_TURISMO]),
         'turismo_cantidad': _unir_cantidades(grupos[_CATEGORIA_TURISMO]),
         'otros': _unir_codigos(grupos[_CATEGORIA_OTROS]),
+        'otros_cantidad': _unir_cantidades(grupos[_CATEGORIA_OTROS]),
     }
 
 

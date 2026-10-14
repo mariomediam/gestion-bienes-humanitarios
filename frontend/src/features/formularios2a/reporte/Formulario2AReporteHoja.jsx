@@ -21,7 +21,7 @@ const ANCHOS = [
   '2.2%',
   '2.2%',
   '2.2%',
-  '11.2%',
+  '8.1%',
   '2.4%',
   '3.2%',
   '5.2%',
@@ -38,7 +38,8 @@ const ANCHOS = [
   '3.2%',
   '2.5%',
   '3.2%',
-  '2.6%',
+  '2.5%',
+  '3.2%',
 ]
 
 function formatFecha(fecha) {
@@ -116,6 +117,7 @@ function FilaDatos({ fila }) {
       <td>{texto(fila?.turismo_tipo)}</td>
       <td>{texto(fila?.turismo_cantidad)}</td>
       <td>{texto(fila?.otros)}</td>
+      <td>{texto(fila?.otros_cantidad)}</td>
     </tr>
   )
 }
@@ -187,7 +189,7 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
             <th className="sal" colSpan={3} scope="colgroup">
               III. INFORMACIÓN ADICIONAL POR FAMILIA (Salud)
             </th>
-            <th className="med" colSpan={5} scope="colgroup">IV. Medio de VIDA Local</th>
+            <th className="med" colSpan={6} scope="colgroup">IV. Medio de VIDA Local</th>
           </tr>
           <tr>
             <th className="viv" rowSpan={3} scope="col">Nº Lote</th>
@@ -211,7 +213,7 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
             <th className="sal" colSpan={3} scope="colgroup">GRUPOS VULNERABLES</th>
             <th className="med" colSpan={2} scope="colgroup"><Vertical>COMERCIO</Vertical></th>
             <th className="med" colSpan={2} scope="colgroup"><Vertical>TURISMO</Vertical></th>
-            <th className="med" scope="col"><Vertical>OTROS</Vertical></th>
+            <th className="med" colSpan={2} scope="colgroup"><Vertical>OTROS</Vertical></th>
           </tr>
           <tr>
             <th className="viv" colSpan={2}>Propia</th>
@@ -262,7 +264,7 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
                 (ver tabla de detalle)
               </Vertical>
             </th>
-            <th className="med" rowSpan={2} scope="col">
+            <th className="med" colSpan={2} scope="colgroup">
               <Vertical>Otros Tipos de actividad</Vertical>
             </th>
           </tr>
@@ -281,6 +283,8 @@ export default function Formulario2AReporteHoja({ reporte, filas }) {
                 <th key={`${grupo}-${sexo}`} className="fam" scope="col">{sexo}</th>
               ))
             ))}
+            <th className="med" scope="col"><Vertical>TIPO</Vertical></th>
+            <th className="med" scope="col"><Vertical>(Unid)</Vertical></th>
             <th className="med" scope="col"><Vertical>TIPO</Vertical></th>
             <th className="med" scope="col"><Vertical>(Unid)</Vertical></th>
             <th className="med" scope="col"><Vertical>TIPO</Vertical></th>

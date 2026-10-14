@@ -34,6 +34,7 @@ class Formulario2AReporteFilaSerializer(serializers.Serializer):
     turismo_tipo = serializers.CharField(allow_null=True)
     turismo_cantidad = serializers.CharField(allow_null=True)
     otros = serializers.CharField(allow_null=True)
+    otros_cantidad = serializers.CharField(allow_null=True)
 
 
 class Formulario2AReporteSerializer(serializers.Serializer):

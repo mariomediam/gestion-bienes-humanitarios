@@ -304,9 +304,11 @@ def test_filas_ponen_medios_de_vida_en_el_primer_integrante():
     assert filas[0]['turismo_tipo'] == '2'
     assert filas[0]['turismo_cantidad'] == '3'
     assert filas[0]['otros'] == '9'
+    assert filas[0]['otros_cantidad'] == '1'
     assert filas[1]['comercio_tipo'] is None
     assert filas[1]['turismo_cantidad'] is None
     assert filas[1]['otros'] is None
+    assert filas[1]['otros_cantidad'] is None
 
 
 def test_filas_conservan_vivienda_sin_integrantes_y_sus_medios():
