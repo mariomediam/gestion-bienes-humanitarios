@@ -95,6 +95,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  getTiposMediosVida: async (params) => {
+    const response = await api.get('/api/sgbh/tipos-medios-vida/', { params })
+    return response.data
+  },
+
   getTiposDanioPersonal: async (params) => {
     const response = await api.get('/api/sgbh/tipos-danio-personal/', { params })
     return response.data

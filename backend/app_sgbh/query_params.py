@@ -134,6 +134,16 @@ def parse_categoria_medio_vida_id(raw_value):
     return _parse_optional_smallint(raw_value, 'categoria_medio_vida_id')
 
 
+def parse_tipo_medio_vida_id(raw_value):
+    """Parse the optional tipo_medio_vida_id query param."""
+    return _parse_optional_smallint(raw_value, 'tipo_medio_vida_id')
+
+
+def parse_codigo_formulario_tipo_medio_vida(raw_value):
+    """Parse the optional codigo_formulario query param for S43cat_tipos_medios_vida."""
+    return _parse_optional_smallint(raw_value, 'codigo_formulario')
+
+
 def parse_personal_id(raw_value):
     """Parse the optional personal_id query param."""
     return _parse_optional_smallint(raw_value, 'personal_id')
@@ -372,6 +382,11 @@ def parse_codigo_tipo_documento(raw_value):
 def parse_nombre_tipo_documento(raw_value):
     """Parse the optional nombre query param for S43cat_tipos_documento."""
     return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_nombre_tipo_medio_vida(raw_value):
+    """Parse the optional nombre query param for S43cat_tipos_medios_vida."""
+    return _parse_optional_text(raw_value, 'nombre', 200)
 
 
 def parse_nombre_enfermedad_cronica(raw_value):

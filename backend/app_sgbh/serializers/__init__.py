@@ -48,6 +48,7 @@ from .rol_familiar import RolFamiliarSerializer
 from .tipo_danio_personal import TipoDanioPersonalSerializer
 from .tipo_discapacidad import TipoDiscapacidadSerializer
 from .tipo_documento import TipoDocumentoSerializer
+from .tipo_medio_vida import TipoMedioVidaSerializer
 from .tipo_peligro import TipoPeligroSerializer
 from .tipo_seguro import TipoSeguroSerializer
 from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
@@ -87,6 +88,7 @@ __all__ = [
     'TipoDanioPersonalSerializer',
     'TipoDiscapacidadSerializer',
     'TipoDocumentoSerializer',
+    'TipoMedioVidaSerializer',
     'TipoPeligroSerializer',
     'TipoSeguroSerializer',
     'TipoUsoInstalacionSerializer',

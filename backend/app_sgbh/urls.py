@@ -40,6 +40,7 @@ from .views import (
     TipoDanioPersonalListView,
     TipoDiscapacidadListView,
     TipoDocumentoListView,
+    TipoMedioVidaListView,
     TipoPeligroListView,
     TipoSeguroView,
     TipoUsoInstalacionListView,
@@ -112,6 +113,11 @@ urlpatterns = [
         'categorias-medios-vida/',
         CategoriaMedioVidaListView.as_view(),
         name='categorias-medios-vida',
+    ),
+    path(
+        'tipos-medios-vida/',
+        TipoMedioVidaListView.as_view(),
+        name='tipos-medios-vida',
     ),
     path(
         'materiales-pared/',
