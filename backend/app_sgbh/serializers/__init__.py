@@ -29,6 +29,7 @@ from .formulario_2a_integrante import (
     IntegranteUpdateSerializer,
 )
 from .formulario_2a_medio_vida import (
+    MedioVidaBusquedaSerializer,
     MedioVidaCreateSerializer,
     MedioVidaSerializer,
 )
@@ -77,6 +78,7 @@ __all__ = [
     'IntegranteCreateSerializer',
     'IntegranteSerializer',
     'IntegranteUpdateSerializer',
+    'MedioVidaBusquedaSerializer',
     'MedioVidaCreateSerializer',
     'MedioVidaSerializer',
     'Formulario2ATotalSerializer',

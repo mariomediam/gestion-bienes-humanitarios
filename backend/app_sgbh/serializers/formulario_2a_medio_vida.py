@@ -96,3 +96,42 @@ class MedioVidaSerializer(serializers.Serializer):
     categoria_medio_vida_nombre = serializers.CharField(
         source='tipo_medio_vida.categoria_medio_vida.nombre',
     )
+
+
+class MedioVidaBusquedaSerializer(serializers.Serializer):
+    """One medio de vida row returned by the search endpoint.
+
+    Columns follow the search query, including the tipo, its categoria
+    and the familia, vivienda, formulario and emergencia chain.
+    codigo_sinpad and observacion are null when the source column is null.
+    """
+
+    medio_vida_id = serializers.IntegerField()
+    familia_id = serializers.IntegerField()
+    tipo_medio_vida_id = serializers.IntegerField()
+    cantidad = serializers.IntegerField()
+    observacion = serializers.CharField(allow_null=True)
+    fecha_creacion = serializers.DateTimeField()
+    tipo_medio_vida_nombre = serializers.CharField(
+        source='tipo_medio_vida.nombre',
+    )
+    tipo_medio_vida_codigo_formulario = serializers.IntegerField(
+        source='tipo_medio_vida.codigo_formulario',
+    )
+    categoria_medio_vida_id = serializers.IntegerField(
+        source='tipo_medio_vida.categoria_medio_vida_id',
+    )
+    categoria_medio_vida_nombre = serializers.CharField(
+        source='tipo_medio_vida.categoria_medio_vida.nombre',
+    )
+    vivienda_id = serializers.IntegerField(source='familia.vivienda_id')
+    formulario_2a_id = serializers.IntegerField(
+        source='familia.vivienda.formulario_2a_id',
+    )
+    emergencia_id = serializers.IntegerField(
+        source='familia.vivienda.formulario_2a.emergencia_id',
+    )
+    codigo_sinpad = serializers.CharField(
+        source='familia.vivienda.formulario_2a.emergencia.codigo_sinpad',
+        allow_null=True,
+    )

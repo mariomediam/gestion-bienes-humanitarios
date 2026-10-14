@@ -21,7 +21,10 @@ from .formulario_2a_integrante_view import (
     Formulario2AIntegranteDetailView,
     Formulario2AIntegranteTotalView,
 )
-from .formulario_2a_medio_vida_view import Formulario2AMedioVidaCreateView
+from .formulario_2a_medio_vida_view import (
+    Formulario2AMedioVidaBuscarView,
+    Formulario2AMedioVidaCreateView,
+)
 from .formulario_2a_view import (
     Formulario2ABuscarView,
     Formulario2ACreateView,

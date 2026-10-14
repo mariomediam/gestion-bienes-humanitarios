@@ -26,6 +26,32 @@ class Formulario2AMedioVidaServiceError(Exception):
 
 class Formulario2AMedioVidaService:
     @staticmethod
+    def search(medio_vida_id=None, familia_id=None, tipo_medio_vida_id=None):
+        """Return medio de vida rows using optional filters combined with AND.
+
+        Filters are exact. With no filters, every row is returned.
+        Ordered by medio_vida_id. Catalog names and the familia chain
+        come from the related rows. The queryset is ready for
+        MedioVidaBusquedaSerializer.
+        """
+        queryset = Formulario2AMedioVida.objects.select_related(
+            'tipo_medio_vida',
+            'tipo_medio_vida__categoria_medio_vida',
+            'familia',
+            'familia__vivienda',
+            'familia__vivienda__formulario_2a',
+            'familia__vivienda__formulario_2a__emergencia',
+        )
+        if medio_vida_id is not None:
+            queryset = queryset.filter(medio_vida_id=medio_vida_id)
+        if familia_id is not None:
+            queryset = queryset.filter(familia_id=familia_id)
+        if tipo_medio_vida_id is not None:
+            queryset = queryset.filter(tipo_medio_vida_id=tipo_medio_vida_id)
+
+        return queryset.order_by('medio_vida_id')
+
+    @staticmethod
     def create(
         *,
         familia_id,

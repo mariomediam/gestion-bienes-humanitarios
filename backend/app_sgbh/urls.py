@@ -21,6 +21,7 @@ from .views import (
     Formulario2AIntegranteCreateView,
     Formulario2AIntegranteDetailView,
     Formulario2AIntegranteTotalView,
+    Formulario2AMedioVidaBuscarView,
     Formulario2AMedioVidaCreateView,
     Formulario2ATotalView,
     Formulario2AViviendaBuscarView,
@@ -233,6 +234,11 @@ urlpatterns = [
         'medios-vida/',
         Formulario2AMedioVidaCreateView.as_view(),
         name='medios-vida',
+    ),
+    path(
+        'medios-vida/buscar/',
+        Formulario2AMedioVidaBuscarView.as_view(),
+        name='medios-vida-buscar',
     ),
 ]
 

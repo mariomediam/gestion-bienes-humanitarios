@@ -3,7 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app_sgbh.query_params import (
+    parse_familia_id,
+    parse_medio_vida_id,
+    parse_tipo_medio_vida_id,
+)
 from app_sgbh.serializers import (
+    MedioVidaBusquedaSerializer,
     MedioVidaCreateSerializer,
     MedioVidaSerializer,
     first_error_message,
@@ -45,6 +51,42 @@ class Formulario2AMedioVidaCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class Formulario2AMedioVidaBuscarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        medio_vida_id, error = parse_medio_vida_id(
+            request.query_params.get('medio_vida_id')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        familia_id, error = parse_familia_id(request.query_params.get('familia_id'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        tipo_medio_vida_id, error = parse_tipo_medio_vida_id(
+            request.query_params.get('tipo_medio_vida_id')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rows = Formulario2AMedioVidaService.search(
+                medio_vida_id=medio_vida_id,
+                familia_id=familia_id,
+                tipo_medio_vida_id=tipo_medio_vida_id,
+            )
+            payload = MedioVidaBusquedaSerializer(rows, many=True).data
+        except Exception:
+            return Response(
+                {'error': 'No se pudo obtener la búsqueda de medios de vida'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 def _respuesta_error_servicio(exc):

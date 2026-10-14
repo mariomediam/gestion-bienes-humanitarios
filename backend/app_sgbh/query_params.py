@@ -273,6 +273,11 @@ def parse_integrante_id(raw_value):
     return _parse_optional_int(raw_value, 'integrante_id')
 
 
+def parse_medio_vida_id(raw_value):
+    """Parse the optional medio_vida_id query param."""
+    return _parse_optional_int(raw_value, 'medio_vida_id')
+
+
 def parse_tipo_documento_id(raw_value):
     """Parse the optional tipo_documento_id query param."""
     return _parse_optional_smallint(raw_value, 'tipo_documento_id')
