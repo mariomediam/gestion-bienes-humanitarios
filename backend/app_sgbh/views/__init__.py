@@ -24,6 +24,7 @@ from .formulario_2a_integrante_view import (
 from .formulario_2a_medio_vida_view import (
     Formulario2AMedioVidaBuscarView,
     Formulario2AMedioVidaCreateView,
+    Formulario2AMedioVidaDetailView,
 )
 from .formulario_2a_view import (
     Formulario2ABuscarView,

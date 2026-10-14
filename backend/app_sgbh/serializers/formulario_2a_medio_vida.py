@@ -75,8 +75,20 @@ class MedioVidaCreateSerializer(serializers.Serializer):
     )
 
 
+class MedioVidaUpdateSerializer(MedioVidaCreateSerializer):
+    """Validate the body used to update S43edan_formulario_2a_medios_vida.
+
+    Same fields as create, except familia_id. That column stays as stored,
+    the same as fecha_creacion.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('familia_id', None)
+
+
 class MedioVidaSerializer(serializers.Serializer):
-    """One medio de vida row returned after it is created.
+    """One medio de vida row returned after it is created or updated.
 
     Catalog names follow the related tipo and its categoria.
     """

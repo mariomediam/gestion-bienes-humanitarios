@@ -32,6 +32,7 @@ from .formulario_2a_medio_vida import (
     MedioVidaBusquedaSerializer,
     MedioVidaCreateSerializer,
     MedioVidaSerializer,
+    MedioVidaUpdateSerializer,
 )
 from .formulario_2a_vivienda import (
     ViviendaBusquedaSerializer,
@@ -81,6 +82,7 @@ __all__ = [
     'MedioVidaBusquedaSerializer',
     'MedioVidaCreateSerializer',
     'MedioVidaSerializer',
+    'MedioVidaUpdateSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
     'GradoLesionSerializer',

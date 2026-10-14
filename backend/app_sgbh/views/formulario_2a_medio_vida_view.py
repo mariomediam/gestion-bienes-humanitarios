@@ -12,8 +12,11 @@ from app_sgbh.serializers import (
     MedioVidaBusquedaSerializer,
     MedioVidaCreateSerializer,
     MedioVidaSerializer,
+    MedioVidaUpdateSerializer,
     first_error_message,
 )
+
+_MEDIO_VIDA_ID_MAX = 2147483647
 from app_sgbh.services.formulario_2a_medio_vida import (
     Formulario2AMedioVidaService,
     Formulario2AMedioVidaServiceError,
@@ -51,6 +54,52 @@ class Formulario2AMedioVidaCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class Formulario2AMedioVidaDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, medio_vida_id):
+        if medio_vida_id < 1 or medio_vida_id > _MEDIO_VIDA_ID_MAX:
+            return Response(
+                {'error': 'El campo medio_vida_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if 'familia_id' in request.data:
+            return Response(
+                {'error': 'El campo familia_id no puede modificarse'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = MedioVidaUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            updated = Formulario2AMedioVidaService.update(
+                medio_vida_id,
+                **serializer.validated_data,
+            )
+            payload = MedioVidaSerializer(updated).data
+        except Formulario2AMedioVidaServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo modificar el medio de vida'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 class Formulario2AMedioVidaBuscarView(APIView):

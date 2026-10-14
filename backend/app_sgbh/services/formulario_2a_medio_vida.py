@@ -87,6 +87,44 @@ class Formulario2AMedioVidaService:
             stored = _medio_vida_guardado(medio_vida.pk)
         return stored
 
+    @staticmethod
+    def update(
+        medio_vida_id,
+        *,
+        tipo_medio_vida_id,
+        cantidad,
+        observacion=None,
+    ):
+        """Update the editable columns of one S43edan_formulario_2a_medios_vida row.
+
+        The body matches create except familia_id. That column and
+        fecha_creacion stay as stored. Rejected when the parent form is
+        inactive, a related Planilla BAH is in state EMITIDA, or the tipo
+        is already registered for the same familia.
+        """
+        cantidad = _require_cantidad(cantidad)
+        observacion = _optional_observacion(observacion)
+
+        with transaction.atomic(using=DB_ALIAS):
+            medio_vida = _require_medio_vida(medio_vida_id)
+            familia = _require_familia(medio_vida.familia_id)
+            vivienda = _require_vivienda(familia.vivienda_id)
+            formulario = _require_formulario(vivienda.formulario_2a_id)
+            _require_formulario_modificable(formulario)
+            _require_tipo(tipo_medio_vida_id)
+            _require_tipo_unico(
+                medio_vida.familia_id,
+                tipo_medio_vida_id,
+                exclude_medio_vida_id=medio_vida.pk,
+            )
+
+            medio_vida.tipo_medio_vida_id = tipo_medio_vida_id
+            medio_vida.cantidad = cantidad
+            medio_vida.observacion = observacion
+            medio_vida.save()
+            stored = _medio_vida_guardado(medio_vida.pk)
+        return stored
+
 
 def _require_cantidad(cantidad):
     if isinstance(cantidad, bool) or not isinstance(cantidad, int):
@@ -120,6 +158,16 @@ def _optional_observacion(observacion):
             'El campo observacion no debe superar 500 caracteres'
         )
     return text
+
+
+def _require_medio_vida(medio_vida_id):
+    try:
+        return Formulario2AMedioVida.objects.select_for_update().get(pk=medio_vida_id)
+    except Formulario2AMedioVida.DoesNotExist:
+        raise Formulario2AMedioVidaServiceError(
+            'El medio de vida indicado no existe',
+            not_found=True,
+        ) from None
 
 
 def _require_familia(familia_id):
@@ -170,13 +218,20 @@ def _require_tipo(tipo_medio_vida_id):
         )
 
 
-def _require_tipo_unico(familia_id, tipo_medio_vida_id):
-    """Apply UQ_f2a_medio_vida_familia_tipo before the insert."""
-    exists = Formulario2AMedioVida.objects.filter(
+def _require_tipo_unico(
+    familia_id,
+    tipo_medio_vida_id,
+    *,
+    exclude_medio_vida_id=None,
+):
+    """Apply UQ_f2a_medio_vida_familia_tipo before insert or update."""
+    queryset = Formulario2AMedioVida.objects.filter(
         familia_id=familia_id,
         tipo_medio_vida_id=tipo_medio_vida_id,
-    ).exists()
-    if exists:
+    )
+    if exclude_medio_vida_id is not None:
+        queryset = queryset.exclude(pk=exclude_medio_vida_id)
+    if queryset.exists():
         raise Formulario2AMedioVidaServiceError(
             'La familia ya tiene registrado este tipo de medio de vida',
             conflict=True,
