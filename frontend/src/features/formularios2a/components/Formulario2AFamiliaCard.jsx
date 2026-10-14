@@ -4,6 +4,7 @@ import TrashIcon from '@components/icons/TrashIcon'
 import Formulario2AFamiliaEliminarModal from '@features/formularios2a/components/Formulario2AFamiliaEliminarModal'
 import Formulario2AIntegranteFormModal from '@features/formularios2a/components/Formulario2AIntegranteFormModal'
 import Formulario2AIntegrantes from '@features/formularios2a/components/Formulario2AIntegrantes'
+import Formulario2AMedioVidaFormModal from '@features/formularios2a/components/Formulario2AMedioVidaFormModal'
 
 const buttonIconClassName = 'w-4 h-4'
 
@@ -16,6 +17,7 @@ const deleteButtonClassName =
 export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
   const [confirmandoEliminacion, setConfirmandoEliminacion] = useState(false)
   const [agregandoIntegrante, setAgregandoIntegrante] = useState(false)
+  const [agregandoMedioVida, setAgregandoMedioVida] = useState(false)
   const [integrantesVersion, setIntegrantesVersion] = useState(0)
 
   return (
@@ -32,7 +34,11 @@ export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
           <TrashIcon className={buttonIconClassName} />
           Eliminar familia
         </button>
-        <button type="button" className={secondaryButtonClassName}>
+        <button
+          type="button"
+          className={secondaryButtonClassName}
+          onClick={() => setAgregandoMedioVida(true)}
+        >
           <PlusIcon className={buttonIconClassName} />
           Agregar medio de vida
         </button>
@@ -69,6 +75,14 @@ export default function Formulario2AFamiliaCard({ familia, onEliminada }) {
           setAgregandoIntegrante(false)
           setIntegrantesVersion((actual) => actual + 1)
         }}
+      />
+
+      <Formulario2AMedioVidaFormModal
+        key={agregandoMedioVida ? 'abierta' : 'cerrada'}
+        isOpen={agregandoMedioVida}
+        familiaId={familia.familia_id}
+        onClose={() => setAgregandoMedioVida(false)}
+        onSaved={() => setAgregandoMedioVida(false)}
       />
     </section>
   )

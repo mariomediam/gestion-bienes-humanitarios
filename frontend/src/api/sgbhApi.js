@@ -202,6 +202,11 @@ export const sgbhApi = {
     await api.delete(`/api/sgbh/integrantes/${integranteId}/`)
   },
 
+  crearMedioVida: async (data) => {
+    const response = await api.post('/api/sgbh/medios-vida/', data)
+    return response.data
+  },
+
   buscarPersonas: async (params) => {
     const response = await api.get('/api/sgbh/personas/buscar/', { params })
     return response.data

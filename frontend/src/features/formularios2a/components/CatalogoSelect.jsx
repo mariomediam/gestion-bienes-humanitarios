@@ -43,16 +43,31 @@ export default function CatalogoSelect({
   mensajeVacio,
   mensajeError,
   onFilas,
+  filtros,
+  habilitado = true,
 }) {
   const [options, setOptions] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(habilitado)
   const onFilasRef = useRef(onFilas)
   onFilasRef.current = onFilas
+  const filtrosKey = JSON.stringify(filtros ?? null)
 
   useEffect(() => {
-    let active = true
+    if (!habilitado) {
+      setOptions([])
+      setLoading(false)
+      return undefined
+    }
 
-    cargar({ esta_activo: true })
+    let active = true
+    setLoading(true)
+    setOptions([])
+
+    const extra = JSON.parse(filtrosKey)
+    const params = { esta_activo: true }
+    if (extra) Object.assign(params, extra)
+
+    cargar(params)
       .then((rows) => {
         if (!active) return
         onFilasRef.current?.(rows)
@@ -78,7 +93,7 @@ export default function CatalogoSelect({
     return () => {
       active = false
     }
-  }, [cargar, idKey, mensajeError])
+  }, [cargar, idKey, mensajeError, filtrosKey, habilitado])
 
   return (
     <Select
@@ -87,7 +102,7 @@ export default function CatalogoSelect({
       value={value}
       onChange={onChange}
       options={options}
-      isDisabled={disabled || loading}
+      isDisabled={disabled || loading || !habilitado}
       isLoading={loading}
       isClearable
       menuPortalTarget={document.body}
