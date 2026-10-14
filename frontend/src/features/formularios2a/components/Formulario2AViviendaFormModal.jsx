@@ -301,6 +301,7 @@ export default function Formulario2AViviendaFormModal({
                 disabled={loading}
                 cargar={sgbhApi.getMaterialesPared}
                 idKey="material_pared_id"
+                incluirCodigoFormulario
                 placeholder="Seleccione un material de pared"
                 mensajeVacio="No se encontraron materiales de pared"
                 mensajeError="No se pudo obtener el catálogo de materiales de pared"
@@ -315,6 +316,7 @@ export default function Formulario2AViviendaFormModal({
                 disabled={loading}
                 cargar={sgbhApi.getMaterialesPiso}
                 idKey="material_piso_id"
+                incluirCodigoFormulario
                 placeholder="Seleccione un material de piso"
                 mensajeVacio="No se encontraron materiales de piso"
                 mensajeError="No se pudo obtener el catálogo de materiales de piso"
