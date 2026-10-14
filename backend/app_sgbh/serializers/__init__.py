@@ -28,6 +28,10 @@ from .formulario_2a_integrante import (
     IntegranteSerializer,
     IntegranteUpdateSerializer,
 )
+from .formulario_2a_medio_vida import (
+    MedioVidaCreateSerializer,
+    MedioVidaSerializer,
+)
 from .formulario_2a_vivienda import (
     ViviendaBusquedaSerializer,
     ViviendaCreateSerializer,
@@ -73,6 +77,8 @@ __all__ = [
     'IntegranteCreateSerializer',
     'IntegranteSerializer',
     'IntegranteUpdateSerializer',
+    'MedioVidaCreateSerializer',
+    'MedioVidaSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
     'GradoLesionSerializer',
