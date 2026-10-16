@@ -59,6 +59,7 @@ from .tipo_medio_vida import TipoMedioVidaSerializer
 from .tipo_peligro import TipoPeligroSerializer
 from .tipo_seguro import TipoSeguroSerializer
 from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
+from .unidad_medida import UnidadMedidaSerializer
 
 __all__ = [
     'CategoriaBienSerializer',
@@ -104,6 +105,7 @@ __all__ = [
     'TipoPeligroSerializer',
     'TipoSeguroSerializer',
     'TipoUsoInstalacionSerializer',
+    'UnidadMedidaSerializer',
     'ViviendaBusquedaSerializer',
     'ViviendaCreateSerializer',
     'ViviendaUpdateSerializer',

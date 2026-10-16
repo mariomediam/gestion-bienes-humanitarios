@@ -58,3 +58,4 @@ from .tipo_medio_vida_view import TipoMedioVidaListView
 from .tipo_peligro_view import TipoPeligroListView
 from .tipo_seguro_view import TipoSeguroView
 from .tipo_uso_instalacion_view import TipoUsoInstalacionListView
+from .unidad_medida_view import UnidadMedidaListView

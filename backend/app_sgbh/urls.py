@@ -49,6 +49,7 @@ from .views import (
     TipoPeligroListView,
     TipoSeguroView,
     TipoUsoInstalacionListView,
+    UnidadMedidaListView,
 )
 
 app_name = 'sgbh'
@@ -113,6 +114,11 @@ urlpatterns = [
         'condiciones-persona/',
         CondicionPersonaListView.as_view(),
         name='condiciones-persona',
+    ),
+    path(
+        'unidades-medida/',
+        UnidadMedidaListView.as_view(),
+        name='unidades-medida',
     ),
     path(
         'categorias-bienes/',

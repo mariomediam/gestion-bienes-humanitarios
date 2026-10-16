@@ -129,6 +129,11 @@ def parse_condicion_persona_id(raw_value):
     return _parse_optional_smallint(raw_value, 'condicion_persona_id')
 
 
+def parse_unidad_medida_id(raw_value):
+    """Parse the optional unidad_medida_id query param."""
+    return _parse_optional_smallint(raw_value, 'unidad_medida_id')
+
+
 def parse_categoria_bien_id(raw_value):
     """Parse the optional categoria_bien_id query param."""
     return _parse_optional_smallint(raw_value, 'categoria_bien_id')
@@ -352,6 +357,21 @@ def parse_codigo_condicion_persona(raw_value):
 def parse_nombre_condicion_persona(raw_value):
     """Parse the optional nombre query param for S43cat_condiciones_persona."""
     return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_unidad_medida(raw_value):
+    """Parse the optional codigo query param for S43cat_bah_unidades_medida."""
+    return _parse_optional_text(raw_value, 'codigo', 20)
+
+
+def parse_nombre_unidad_medida(raw_value):
+    """Parse the optional nombre query param for S43cat_bah_unidades_medida."""
+    return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_abreviatura_unidad_medida(raw_value):
+    """Parse the optional abreviatura query param for S43cat_bah_unidades_medida."""
+    return _parse_optional_text(raw_value, 'abreviatura', 20)
 
 
 def parse_codigo_categoria_bien(raw_value):
