@@ -56,6 +56,7 @@ from .tipo_danio_personal_view import TipoDanioPersonalListView
 from .tipo_discapacidad_view import TipoDiscapacidadListView
 from .tipo_documento_view import TipoDocumentoListView
 from .tipo_medio_vida_view import TipoMedioVidaListView
+from .tipo_movimiento_view import TipoMovimientoListView
 from .tipo_peligro_view import TipoPeligroListView
 from .tipo_seguro_view import TipoSeguroView
 from .tipo_uso_instalacion_view import TipoUsoInstalacionListView

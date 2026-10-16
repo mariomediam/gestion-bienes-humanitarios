@@ -57,6 +57,7 @@ from .tipo_danio_personal import TipoDanioPersonalSerializer
 from .tipo_discapacidad import TipoDiscapacidadSerializer
 from .tipo_documento import TipoDocumentoSerializer
 from .tipo_medio_vida import TipoMedioVidaSerializer
+from .tipo_movimiento import TipoMovimientoSerializer
 from .tipo_peligro import TipoPeligroSerializer
 from .tipo_seguro import TipoSeguroSerializer
 from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
@@ -106,6 +107,7 @@ __all__ = [
     'TipoDiscapacidadSerializer',
     'TipoDocumentoSerializer',
     'TipoMedioVidaSerializer',
+    'TipoMovimientoSerializer',
     'TipoPeligroSerializer',
     'TipoSeguroSerializer',
     'TipoUsoInstalacionSerializer',

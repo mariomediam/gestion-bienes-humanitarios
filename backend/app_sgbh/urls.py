@@ -49,6 +49,7 @@ from .views import (
     TipoDiscapacidadListView,
     TipoDocumentoListView,
     TipoMedioVidaListView,
+    TipoMovimientoListView,
     TipoPeligroListView,
     TipoSeguroView,
     TipoUsoInstalacionListView,
@@ -140,6 +141,11 @@ urlpatterns = [
         'tipos-medios-vida/',
         TipoMedioVidaListView.as_view(),
         name='tipos-medios-vida',
+    ),
+    path(
+        'tipos-movimiento/',
+        TipoMovimientoListView.as_view(),
+        name='tipos-movimiento',
     ),
     path(
         'materiales-pared/',

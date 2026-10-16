@@ -44,6 +44,11 @@ def parse_es_encargado_almacen(raw_value):
     return parse_optional_bool(raw_value, 'es_encargado_almacen')
 
 
+def parse_requiere_movimiento_origen(raw_value):
+    """Parse the optional requiere_movimiento_origen query param."""
+    return parse_optional_bool(raw_value, 'requiere_movimiento_origen')
+
+
 _SMALLINT_MIN = -32768
 _SMALLINT_MAX = 32767
 
@@ -167,6 +172,11 @@ def parse_personal_id(raw_value):
 def parse_tipo_danio_personal_id(raw_value):
     """Parse the optional tipo_danio_personal_id query param."""
     return _parse_optional_smallint(raw_value, 'tipo_danio_personal_id')
+
+
+def parse_tipo_movimiento_id(raw_value):
+    """Parse the optional tipo_movimiento_id query param."""
+    return _parse_optional_smallint(raw_value, 'tipo_movimiento_id')
 
 
 def parse_grado_lesion_id(raw_value):
@@ -477,6 +487,34 @@ def parse_nombre_material_pared(raw_value):
 def parse_nombre_material_piso(raw_value):
     """Parse the optional nombre query param for S43cat_materiales_piso."""
     return _parse_optional_text(raw_value, 'nombre', 200)
+
+
+_NATURALEZA_TIPO_MOVIMIENTO = {'E', 'S', 'M'}
+
+
+def parse_codigo_tipo_movimiento(raw_value):
+    """Parse the optional codigo query param for S43cat_alm_tipos_movimiento."""
+    return _parse_optional_text(raw_value, 'codigo', 50)
+
+
+def parse_nombre_tipo_movimiento(raw_value):
+    """Parse the optional nombre query param for S43cat_alm_tipos_movimiento."""
+    return _parse_optional_text(raw_value, 'nombre', 150)
+
+
+def parse_naturaleza_tipo_movimiento(raw_value):
+    """Parse the optional naturaleza query param for S43cat_alm_tipos_movimiento.
+
+    Allowed values are E (entrada), S (salida) and M (mixto).
+    """
+    if raw_value is None or str(raw_value).strip() == '':
+        return None, None
+
+    normalized = str(raw_value).strip().upper()
+    if normalized not in _NATURALEZA_TIPO_MOVIMIENTO:
+        return None, 'El filtro naturaleza debe ser E, S o M'
+
+    return normalized, None
 
 
 def parse_codigo_sinpad(raw_value):
