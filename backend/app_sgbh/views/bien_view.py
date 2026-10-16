@@ -77,10 +77,31 @@ class BienDetailView(APIView):
 
         return Response(payload, status=status.HTTP_200_OK)
 
+    def delete(self, request, bien_id):
+        if bien_id < 1 or bien_id > _BIEN_ID_MAX:
+            return Response(
+                {'error': 'El campo bien_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            BienService.delete(bien_id)
+        except BienServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar el bien'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 def _respuesta_error_servicio(exc):
     if exc.not_found:
         http_status = status.HTTP_404_NOT_FOUND
+    elif exc.conflict:
+        http_status = status.HTTP_409_CONFLICT
     else:
         http_status = status.HTTP_400_BAD_REQUEST
     return Response({'error': exc.message}, status=http_status)

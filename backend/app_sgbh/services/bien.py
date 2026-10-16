@@ -1,7 +1,8 @@
 from django.db import transaction
+from django.db.models import ProtectedError
 
 from ..db_router import DB_ALIAS
-from ..models import Bien, CategoriaBien, UnidadMedida
+from ..models import Bien, CategoriaBien, MovimientoDetalle, ReglaEntrega, UnidadMedida
 from ..text_search import filter_text_like
 
 _NOMBRE_MAX_LENGTH = 250
@@ -22,10 +23,11 @@ _UPDATABLE_FIELDS = (
 class BienServiceError(Exception):
     """Business rule violation for a bien operation."""
 
-    def __init__(self, message, *, not_found=False):
+    def __init__(self, message, *, not_found=False, conflict=False):
         super().__init__(message)
         self.message = message
         self.not_found = not_found
+        self.conflict = conflict
 
 
 class BienService:
@@ -102,6 +104,35 @@ class BienService:
                 'unidad_medida',
             ).get(pk=bien_id)
         return stored
+
+    @staticmethod
+    def delete(bien_id):
+        """Delete one S43cat_bah_bienes row.
+
+        Rejected when S43alm_movimiento_detalle already references that
+        bien_id. Also rejected when S43cat_bah_reglas_entrega references
+        it, because FK_cat_bah_regla_bien does not allow the delete.
+        The check and the delete run in one transaction.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                bien = Bien.objects.get(pk=bien_id)
+            except Bien.DoesNotExist:
+                raise BienServiceError(
+                    'El bien indicado no existe',
+                    not_found=True,
+                ) from None
+
+            _reject_if_referenced(bien_id)
+
+            try:
+                bien.delete()
+            except ProtectedError:
+                _reject_if_referenced(bien_id)
+                raise BienServiceError(
+                    'No se puede eliminar el bien porque tiene registros asociados',
+                    conflict=True,
+                ) from None
 
 
 def _clean_changes(changes):
@@ -189,6 +220,19 @@ def _require_smallint_id(value, field_name):
             f'El campo {field_name} debe ser un número entero'
         )
     return value
+
+
+def _reject_if_referenced(bien_id):
+    if MovimientoDetalle.objects.filter(bien_id=bien_id).exists():
+        raise BienServiceError(
+            'No se puede eliminar el bien porque tiene movimientos de almacén asociados',
+            conflict=True,
+        )
+    if ReglaEntrega.objects.filter(bien_id=bien_id).exists():
+        raise BienServiceError(
+            'No se puede eliminar el bien porque tiene reglas de entrega asociadas',
+            conflict=True,
+        )
 
 
 def _require_categoria_bien(categoria_bien_id):
