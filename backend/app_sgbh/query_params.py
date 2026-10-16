@@ -268,6 +268,11 @@ def parse_formulario_2a_id(raw_value):
     return _parse_optional_int(raw_value, 'formulario_2a_id')
 
 
+def parse_bien_id(raw_value):
+    """Parse the optional bien_id query param."""
+    return _parse_optional_int(raw_value, 'bien_id')
+
+
 def parse_vivienda_id(raw_value):
     """Parse the optional vivienda_id query param."""
     return _parse_optional_int(raw_value, 'vivienda_id')
@@ -382,6 +387,16 @@ def parse_codigo_categoria_bien(raw_value):
 def parse_nombre_categoria_bien(raw_value):
     """Parse the optional nombre query param for S43cat_bah_categorias_bienes."""
     return _parse_optional_text(raw_value, 'nombre', 100)
+
+
+def parse_codigo_bien(raw_value):
+    """Parse the optional codigo query param for S43cat_bah_bienes."""
+    return _parse_optional_text(raw_value, 'codigo', 50)
+
+
+def parse_nombre_bien(raw_value):
+    """Parse the optional nombre query param for S43cat_bah_bienes."""
+    return _parse_optional_text(raw_value, 'nombre', 250)
 
 
 def parse_codigo_categoria_medio_vida(raw_value):

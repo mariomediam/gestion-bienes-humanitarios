@@ -100,6 +100,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  buscarBienes: async (params) => {
+    const response = await api.get('/api/sgbh/bienes/buscar/', { params })
+    return response.data
+  },
+
   getCategoriasMediosVida: async (params) => {
     const response = await api.get('/api/sgbh/categorias-medios-vida/', { params })
     return response.data

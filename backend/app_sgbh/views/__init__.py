@@ -1,3 +1,4 @@
+from .bien_view import BienBuscarView
 from .categoria_bien_view import CategoriaBienListView
 from .categoria_medio_vida_view import CategoriaMedioVidaListView
 from .condicion_persona_view import CondicionPersonaListView

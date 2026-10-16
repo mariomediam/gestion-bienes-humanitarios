@@ -1,3 +1,4 @@
+from .bien import BienBusquedaSerializer
 from .categoria_bien import CategoriaBienSerializer
 from .categoria_medio_vida import CategoriaMedioVidaSerializer
 from .condicion_persona import CondicionPersonaSerializer
@@ -62,6 +63,7 @@ from .tipo_uso_instalacion import TipoUsoInstalacionSerializer
 from .unidad_medida import UnidadMedidaSerializer
 
 __all__ = [
+    'BienBusquedaSerializer',
     'CategoriaBienSerializer',
     'CategoriaMedioVidaSerializer',
     'CondicionPersonaSerializer',
