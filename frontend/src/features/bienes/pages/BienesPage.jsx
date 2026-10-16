@@ -18,6 +18,7 @@ export default function BienesPage() {
     buscar,
     limpiarResultados,
     reemplazarBien,
+    quitarBien,
   } = useBienesBusqueda()
 
   function handleBuscar(event) {
@@ -98,7 +99,11 @@ export default function BienesPage() {
       />
 
       {searched && (
-        <BienesResultados bienes={bienes} onModificar={handleAbrirModificar} />
+        <BienesResultados
+          bienes={bienes}
+          onModificar={handleAbrirModificar}
+          onEliminado={quitarBien}
+        />
       )}
 
       <BienFormModal

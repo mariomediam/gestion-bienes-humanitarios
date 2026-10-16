@@ -36,6 +36,10 @@ export default function useBienesBusqueda() {
     )
   }
 
+  function quitarBien(bienId) {
+    setBienes((current) => current.filter((item) => item.bien_id !== bienId))
+  }
+
   return {
     loading,
     searched,
@@ -43,5 +47,6 @@ export default function useBienesBusqueda() {
     buscar,
     limpiarResultados,
     reemplazarBien,
+    quitarBien,
   }
 }

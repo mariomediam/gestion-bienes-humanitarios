@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import BienEliminarModal from '@features/bienes/components/BienEliminarModal'
 
 const actionButtonClassName =
   'group relative inline-flex items-center justify-center w-8 h-8 text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors'
@@ -17,7 +19,9 @@ function textoBooleano(value) {
   return value ? 'Sí' : 'No'
 }
 
-export default function BienesResultados({ bienes, onModificar }) {
+export default function BienesResultados({ bienes, onModificar, onEliminado }) {
+  const [bienAEliminar, setBienAEliminar] = useState(null)
+
   return (
     <section className="bg-white rounded-lg border border-gray-200">
       <div className="px-5 py-4 border-b border-gray-200">
@@ -66,7 +70,12 @@ export default function BienesResultados({ bienes, onModificar }) {
                           Modificar
                         </span>
                       </button>
-                      <button type="button" aria-label="Eliminar" className={deleteButtonClassName}>
+                      <button
+                        type="button"
+                        aria-label="Eliminar"
+                        onClick={() => setBienAEliminar(bien)}
+                        className={deleteButtonClassName}
+                      >
                         <TrashIcon className="w-4 h-4" />
                         <span className={deleteTooltipClassName} aria-hidden="true">
                           Eliminar
@@ -80,6 +89,13 @@ export default function BienesResultados({ bienes, onModificar }) {
           </tbody>
         </table>
       </div>
+
+      <BienEliminarModal
+        isOpen={bienAEliminar !== null}
+        bien={bienAEliminar}
+        onClose={() => setBienAEliminar(null)}
+        onEliminado={onEliminado}
+      />
     </section>
   )
 }

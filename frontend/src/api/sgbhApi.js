@@ -115,6 +115,10 @@ export const sgbhApi = {
     return response.data
   },
 
+  eliminarBien: async (bienId) => {
+    await api.delete(`/api/sgbh/bienes/${bienId}/`)
+  },
+
   getCategoriasMediosVida: async (params) => {
     const response = await api.get('/api/sgbh/categorias-medios-vida/', { params })
     return response.data
