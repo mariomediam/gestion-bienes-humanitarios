@@ -256,6 +256,42 @@ export default function BienFormModal({ isOpen, onClose, onSaved, bien = null })
 
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ <div>
+              <label htmlFor="codigo-bien" className={labelClassName}>
+                Código
+              </label>
+              <input
+                id="codigo-bien"
+                type="text"
+                value={form.codigo}
+                onChange={(event) => handleChange('codigo', event.target.value)}
+                maxLength={50}
+                disabled={loading || isEdit}
+                className={inputClassName}
+              />
+              {errors.codigo && (
+                <p className="mt-1 text-xs text-red-600">{errors.codigo}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="nombre-bien-formulario" className={labelClassName}>
+                Nombre
+              </label>
+              <input
+                id="nombre-bien-formulario"
+                type="text"
+                value={form.nombre}
+                onChange={(event) => handleChange('nombre', event.target.value)}
+                maxLength={250}
+                disabled={loading}
+                className={inputClassName}
+              />
+              {errors.nombre && (
+                <p className="mt-1 text-xs text-red-600">{errors.nombre}</p>
+              )}
+            </div>
+
             <div>
               <label htmlFor="categoria-bien" className={labelClassName}>
                 Categoría
@@ -307,41 +343,7 @@ export default function BienFormModal({ isOpen, onClose, onSaved, bien = null })
               )}
             </div>
 
-            <div>
-              <label htmlFor="codigo-bien" className={labelClassName}>
-                Código
-              </label>
-              <input
-                id="codigo-bien"
-                type="text"
-                value={form.codigo}
-                onChange={(event) => handleChange('codigo', event.target.value)}
-                maxLength={50}
-                disabled={loading || isEdit}
-                className={inputClassName}
-              />
-              {errors.codigo && (
-                <p className="mt-1 text-xs text-red-600">{errors.codigo}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="nombre-bien-formulario" className={labelClassName}>
-                Nombre
-              </label>
-              <input
-                id="nombre-bien-formulario"
-                type="text"
-                value={form.nombre}
-                onChange={(event) => handleChange('nombre', event.target.value)}
-                maxLength={250}
-                disabled={loading}
-                className={inputClassName}
-              />
-              {errors.nombre && (
-                <p className="mt-1 text-xs text-red-600">{errors.nombre}</p>
-              )}
-            </div>
+           
 
             <div>
               <label htmlFor="bien-esta-activo" className={labelClassName}>
