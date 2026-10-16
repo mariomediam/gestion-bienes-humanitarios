@@ -45,6 +45,7 @@ from .grado_lesion import GradoLesionSerializer
 from .material_pared import MaterialParedSerializer
 from .material_piso import MaterialPisoSerializer
 from .material_techo import MaterialTechoSerializer
+from .movimiento import MovimientoCreateSerializer, MovimientoSerializer
 from .persona import (
     PersonaBusquedaSerializer,
     PersonaCreateSerializer,
@@ -97,6 +98,8 @@ __all__ = [
     'MaterialParedSerializer',
     'MaterialPisoSerializer',
     'MaterialTechoSerializer',
+    'MovimientoCreateSerializer',
+    'MovimientoSerializer',
     'PersonaBusquedaSerializer',
     'PersonaCreateSerializer',
     'PersonaSerializer',
