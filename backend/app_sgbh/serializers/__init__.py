@@ -1,4 +1,4 @@
-from .bien import BienBusquedaSerializer
+from .bien import BienBusquedaSerializer, BienUpdateSerializer
 from .categoria_bien import CategoriaBienSerializer
 from .categoria_medio_vida import CategoriaMedioVidaSerializer
 from .condicion_persona import CondicionPersonaSerializer
@@ -64,6 +64,7 @@ from .unidad_medida import UnidadMedidaSerializer
 
 __all__ = [
     'BienBusquedaSerializer',
+    'BienUpdateSerializer',
     'CategoriaBienSerializer',
     'CategoriaMedioVidaSerializer',
     'CondicionPersonaSerializer',

@@ -10,8 +10,12 @@ from app_sgbh.query_params import (
     parse_nombre_bien,
     parse_unidad_medida_id,
 )
-from app_sgbh.serializers import BienBusquedaSerializer
-from app_sgbh.services.bien import BienService
+from app_sgbh.serializers import (
+    BienBusquedaSerializer,
+    BienUpdateSerializer,
+    first_error_message,
+)
+from app_sgbh.services.bien import BienService, BienServiceError
 
 
 class BienBuscarView(APIView):
@@ -32,6 +36,54 @@ class BienBuscarView(APIView):
             )
 
         return Response(payload, status=status.HTTP_200_OK)
+
+
+_BIEN_ID_MAX = 2147483647
+
+
+class BienDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, bien_id):
+        if bien_id < 1 or bien_id > _BIEN_ID_MAX:
+            return Response(
+                {'error': 'El campo bien_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = BienUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            updated = BienService.update(bien_id, **serializer.validated_data)
+            payload = BienBusquedaSerializer(updated).data
+        except BienServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo modificar el bien'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
+
+
+def _respuesta_error_servicio(exc):
+    if exc.not_found:
+        http_status = status.HTTP_404_NOT_FOUND
+    else:
+        http_status = status.HTTP_400_BAD_REQUEST
+    return Response({'error': exc.message}, status=http_status)
 
 
 def _parse_busqueda(params):
