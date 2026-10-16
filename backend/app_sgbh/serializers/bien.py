@@ -44,6 +44,75 @@ class _ClearableOrdenField(serializers.IntegerField):
         return super().validate_empty_values(data)
 
 
+class BienCreateSerializer(serializers.Serializer):
+    """Validate the body used to insert S43cat_bah_bienes.
+
+    descripcion is not accepted and is stored as null. orden_impresion is
+    not accepted: BienService sets it to the current maximum plus one.
+    Category and unit existence, and codigo uniqueness, are checked there.
+    An inactive category or unit is accepted.
+    """
+
+    categoria_bien_id = serializers.IntegerField(
+        min_value=_SMALLINT_MIN,
+        max_value=_SMALLINT_MAX,
+        error_messages={
+            'required': 'El campo categoria_bien_id es obligatorio',
+            'invalid': 'El campo categoria_bien_id debe ser un número entero',
+            'null': 'El campo categoria_bien_id es obligatorio',
+            'min_value': 'El campo categoria_bien_id debe ser un número entero',
+            'max_value': 'El campo categoria_bien_id debe ser un número entero',
+        },
+    )
+    unidad_medida_id = serializers.IntegerField(
+        min_value=_SMALLINT_MIN,
+        max_value=_SMALLINT_MAX,
+        error_messages={
+            'required': 'El campo unidad_medida_id es obligatorio',
+            'invalid': 'El campo unidad_medida_id debe ser un número entero',
+            'null': 'El campo unidad_medida_id es obligatorio',
+            'min_value': 'El campo unidad_medida_id debe ser un número entero',
+            'max_value': 'El campo unidad_medida_id debe ser un número entero',
+        },
+    )
+    codigo = serializers.CharField(
+        max_length=50,
+        trim_whitespace=True,
+        error_messages={
+            'required': 'El campo codigo es obligatorio',
+            'blank': 'El campo codigo es obligatorio',
+            'null': 'El campo codigo es obligatorio',
+            'invalid': 'El campo codigo debe ser texto',
+            'max_length': 'El campo codigo no debe superar 50 caracteres',
+        },
+    )
+    nombre = serializers.CharField(
+        max_length=250,
+        trim_whitespace=True,
+        error_messages={
+            'required': 'El campo nombre es obligatorio',
+            'blank': 'El campo nombre es obligatorio',
+            'null': 'El campo nombre es obligatorio',
+            'invalid': 'El campo nombre debe ser texto',
+            'max_length': 'El campo nombre no debe superar 250 caracteres',
+        },
+    )
+    esta_activo = serializers.BooleanField(
+        error_messages={
+            'required': 'El campo esta_activo es obligatorio',
+            'invalid': 'El campo esta_activo debe ser 1, 0, true o false',
+            'null': 'El campo esta_activo es obligatorio',
+        },
+    )
+    visible_planilla = serializers.BooleanField(
+        error_messages={
+            'required': 'El campo visible_planilla es obligatorio',
+            'invalid': 'El campo visible_planilla debe ser 1, 0, true o false',
+            'null': 'El campo visible_planilla es obligatorio',
+        },
+    )
+
+
 class BienUpdateSerializer(serializers.Serializer):
     """Validate a partial update of S43cat_bah_bienes.
 

@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     BienBuscarView,
+    BienCreateView,
     BienDetailView,
     CategoriaBienListView,
     CategoriaMedioVidaListView,
@@ -127,6 +128,7 @@ urlpatterns = [
         CategoriaBienListView.as_view(),
         name='categorias-bienes',
     ),
+    path('bienes/', BienCreateView.as_view(), name='bienes'),
     path('bienes/<int:bien_id>/', BienDetailView.as_view(), name='bienes-detalle'),
     path('bienes/buscar/', BienBuscarView.as_view(), name='bienes-buscar'),
     path(

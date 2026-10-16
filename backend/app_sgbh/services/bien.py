@@ -1,10 +1,11 @@
-from django.db import transaction
-from django.db.models import ProtectedError
+from django.db import IntegrityError, transaction
+from django.db.models import Max, ProtectedError
 
 from ..db_router import DB_ALIAS
 from ..models import Bien, CategoriaBien, MovimientoDetalle, ReglaEntrega, UnidadMedida
 from ..text_search import filter_text_like
 
+_CODIGO_MAX_LENGTH = 50
 _NOMBRE_MAX_LENGTH = 250
 _DESCRIPCION_MAX_LENGTH = 500
 _SMALLINT_MIN = -32768
@@ -61,6 +62,65 @@ class BienService:
             queryset = filter_text_like(queryset, 'nombre', nombre)
 
         return queryset.order_by('nombre')
+
+    @staticmethod
+    def create(
+        *,
+        categoria_bien_id,
+        unidad_medida_id,
+        codigo,
+        nombre,
+        esta_activo,
+        visible_planilla,
+    ):
+        """Insert one S43cat_bah_bienes row.
+
+        descripcion is stored as null. orden_impresion is the current
+        maximum plus one, or 1 when every stored value is null. An inactive
+        category or unit is accepted when it exists. codigo must be unique.
+        """
+        codigo = _require_codigo(codigo)
+        nombre = _require_nombre(nombre)
+        categoria_bien_id = _require_smallint_id(
+            categoria_bien_id,
+            'categoria_bien_id',
+        )
+        unidad_medida_id = _require_smallint_id(
+            unidad_medida_id,
+            'unidad_medida_id',
+        )
+        esta_activo = _require_bool(esta_activo, 'esta_activo')
+        visible_planilla = _require_bool(visible_planilla, 'visible_planilla')
+
+        with transaction.atomic(using=DB_ALIAS):
+            _require_categoria_bien(categoria_bien_id)
+            _require_unidad_medida(unidad_medida_id)
+            _require_codigo_disponible(codigo)
+            orden_impresion = _next_orden_impresion()
+
+            bien = Bien(
+                categoria_bien_id=categoria_bien_id,
+                unidad_medida_id=unidad_medida_id,
+                codigo=codigo,
+                nombre=nombre,
+                descripcion=None,
+                orden_impresion=orden_impresion,
+                esta_activo=esta_activo,
+                visible_planilla=visible_planilla,
+            )
+            try:
+                bien.save()
+            except IntegrityError:
+                raise BienServiceError(
+                    'Ya existe un bien con el código indicado',
+                    conflict=True,
+                ) from None
+
+            stored = Bien.objects.select_related(
+                'categoria_bien',
+                'unidad_medida',
+            ).get(pk=bien.pk)
+        return stored
 
     @staticmethod
     def update(bien_id, **changes):
@@ -155,6 +215,39 @@ def _clean_changes(changes):
             value = _require_smallint_id(value, 'unidad_medida_id')
         cleaned[field] = value
     return cleaned
+
+
+def _require_codigo(value):
+    if not isinstance(value, str):
+        raise BienServiceError('El campo codigo debe ser texto')
+    codigo = value.strip()
+    if codigo == '':
+        raise BienServiceError('El campo codigo es obligatorio')
+    if len(codigo) > _CODIGO_MAX_LENGTH:
+        raise BienServiceError(
+            'El campo codigo no debe superar 50 caracteres'
+        )
+    return codigo
+
+
+def _require_codigo_disponible(codigo):
+    if Bien.objects.filter(codigo=codigo).exists():
+        raise BienServiceError(
+            'Ya existe un bien con el código indicado',
+            conflict=True,
+        )
+
+
+def _next_orden_impresion():
+    max_orden = Bien.objects.aggregate(
+        max_orden=Max('orden_impresion'),
+    )['max_orden']
+    orden = 1 if max_orden is None else max_orden + 1
+    if orden > _SMALLINT_MAX:
+        raise BienServiceError(
+            'No se pudo calcular el orden de impresión del bien'
+        )
+    return orden
 
 
 def _require_nombre(value):

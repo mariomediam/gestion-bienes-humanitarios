@@ -105,6 +105,16 @@ export const sgbhApi = {
     return response.data
   },
 
+  crearBien: async (data) => {
+    const response = await api.post('/api/sgbh/bienes/', data)
+    return response.data
+  },
+
+  actualizarBien: async (bienId, data) => {
+    const response = await api.patch(`/api/sgbh/bienes/${bienId}/`, data)
+    return response.data
+  },
+
   getCategoriasMediosVida: async (params) => {
     const response = await api.get('/api/sgbh/categorias-medios-vida/', { params })
     return response.data

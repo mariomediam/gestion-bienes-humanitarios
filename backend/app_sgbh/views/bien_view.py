@@ -12,10 +12,42 @@ from app_sgbh.query_params import (
 )
 from app_sgbh.serializers import (
     BienBusquedaSerializer,
+    BienCreateSerializer,
     BienUpdateSerializer,
     first_error_message,
 )
 from app_sgbh.services.bien import BienService, BienServiceError
+
+
+class BienCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = BienCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            created = BienService.create(**serializer.validated_data)
+            payload = BienBusquedaSerializer(created).data
+        except BienServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo registrar el bien'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_201_CREATED)
 
 
 class BienBuscarView(APIView):

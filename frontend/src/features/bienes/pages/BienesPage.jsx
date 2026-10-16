@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import PlusIcon from '@components/icons/PlusIcon'
+import BienFormModal from '@features/bienes/components/BienFormModal'
 import BienesBusquedaForm from '@features/bienes/components/BienesBusquedaForm'
 import BienesResultados from '@features/bienes/components/BienesResultados'
 import { exportBienesExcel } from '@features/bienes/exportBienesExcel'
@@ -8,7 +9,16 @@ import useBienesBusqueda from '@features/bienes/hooks/useBienesBusqueda'
 
 export default function BienesPage() {
   const [nombre, setNombre] = useState('')
-  const { loading, searched, bienes, buscar, limpiarResultados } = useBienesBusqueda()
+  const [formularioAbierto, setFormularioAbierto] = useState(false)
+  const [bienEdicion, setBienEdicion] = useState(null)
+  const {
+    loading,
+    searched,
+    bienes,
+    buscar,
+    limpiarResultados,
+    reemplazarBien,
+  } = useBienesBusqueda()
 
   function handleBuscar(event) {
     event.preventDefault()
@@ -19,6 +29,32 @@ export default function BienesPage() {
   function handleLimpiar() {
     setNombre('')
     limpiarResultados()
+  }
+
+  function handleAbrirCrear() {
+    setBienEdicion(null)
+    setFormularioAbierto(true)
+  }
+
+  function handleAbrirModificar(bien) {
+    setBienEdicion(bien)
+    setFormularioAbierto(true)
+  }
+
+  function handleCerrarFormulario() {
+    setFormularioAbierto(false)
+    setBienEdicion(null)
+  }
+
+  function handleBienGuardado(bien) {
+    const eraEdicion = bienEdicion !== null
+    setFormularioAbierto(false)
+    setBienEdicion(null)
+    if (eraEdicion) {
+      reemplazarBien(bien)
+      return
+    }
+    buscar({ bien_id: bien.bien_id })
   }
 
   const hayResultados = searched && bienes.length > 0
@@ -34,6 +70,7 @@ export default function BienesPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
+            onClick={handleAbrirCrear}
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             <PlusIcon className="w-4 h-4" />
@@ -60,7 +97,17 @@ export default function BienesPage() {
         loading={loading}
       />
 
-      {searched && <BienesResultados bienes={bienes} />}
+      {searched && (
+        <BienesResultados bienes={bienes} onModificar={handleAbrirModificar} />
+      )}
+
+      <BienFormModal
+        key={bienEdicion ? bienEdicion.bien_id : 'nuevo'}
+        isOpen={formularioAbierto}
+        bien={bienEdicion}
+        onClose={handleCerrarFormulario}
+        onSaved={handleBienGuardado}
+      />
     </div>
   )
 }

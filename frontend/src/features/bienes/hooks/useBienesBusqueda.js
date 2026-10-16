@@ -30,11 +30,18 @@ export default function useBienesBusqueda() {
     setSearched(false)
   }
 
+  function reemplazarBien(bien) {
+    setBienes((current) =>
+      current.map((item) => (item.bien_id === bien.bien_id ? bien : item)),
+    )
+  }
+
   return {
     loading,
     searched,
     bienes,
     buscar,
     limpiarResultados,
+    reemplazarBien,
   }
 }

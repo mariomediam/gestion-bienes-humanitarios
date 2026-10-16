@@ -17,7 +17,7 @@ function textoBooleano(value) {
   return value ? 'Sí' : 'No'
 }
 
-export default function BienesResultados({ bienes }) {
+export default function BienesResultados({ bienes, onModificar }) {
   return (
     <section className="bg-white rounded-lg border border-gray-200">
       <div className="px-5 py-4 border-b border-gray-200">
@@ -55,7 +55,12 @@ export default function BienesResultados({ bienes }) {
                   <td className="px-5 py-3 text-gray-800">{textoBooleano(bien.visible_planilla)}</td>
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
                     <div className="flex gap-2">
-                      <button type="button" aria-label="Modificar" className={actionButtonClassName}>
+                      <button
+                        type="button"
+                        aria-label="Modificar"
+                        onClick={() => onModificar(bien)}
+                        className={actionButtonClassName}
+                      >
                         <PencilIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
                           Modificar
