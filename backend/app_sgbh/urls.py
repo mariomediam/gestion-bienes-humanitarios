@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    CategoriaBienListView,
     CategoriaMedioVidaListView,
     CondicionPersonaListView,
     CondicionViviendaListView,
@@ -112,6 +113,11 @@ urlpatterns = [
         'condiciones-persona/',
         CondicionPersonaListView.as_view(),
         name='condiciones-persona',
+    ),
+    path(
+        'categorias-bienes/',
+        CategoriaBienListView.as_view(),
+        name='categorias-bienes',
     ),
     path(
         'categorias-medios-vida/',
