@@ -28,7 +28,7 @@ export default function BienesResultados({ bienes, onModificar }) {
         <table className="min-w-full text-sm text-left">
           <thead className="bg-gray-50 text-gray-500">
             <tr>
-              <th scope="col" className="px-5 py-3 font-medium">Código</th>
+              {/* <th scope="col" className="px-5 py-3 font-medium">Código</th> */}
               <th scope="col" className="px-5 py-3 font-medium">Nombre</th>
               <th scope="col" className="px-5 py-3 font-medium">Categoría</th>
               <th scope="col" className="px-5 py-3 font-medium">Unidad de medida</th>
@@ -47,7 +47,7 @@ export default function BienesResultados({ bienes, onModificar }) {
             ) : (
               bienes.map((bien) => (
                 <tr key={bien.bien_id} className="border-t border-gray-100">
-                  <td className="px-5 py-3 text-gray-800">{bien.codigo}</td>
+                  {/* <td className="px-5 py-3 text-gray-800">{bien.codigo}</td> */}
                   <td className="px-5 py-3 text-gray-800">{bien.nombre}</td>
                   <td className="px-5 py-3 text-gray-800">{bien.categoria_bien_nombre}</td>
                   <td className="px-5 py-3 text-gray-800">{bien.unidad_medida_nombre}</td>

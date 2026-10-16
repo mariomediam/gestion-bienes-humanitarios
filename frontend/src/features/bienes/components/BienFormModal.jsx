@@ -6,7 +6,6 @@ import { sgbhApi } from '@api/sgbhApi'
 const EMPTY_FORM = {
   categoriaBien: null,
   unidadMedida: null,
-  codigo: '',
   nombre: '',
   esta_activo: true,
   visible_planilla: true,
@@ -62,11 +61,14 @@ function formFromBien(bien) {
           label: bien.unidad_medida_nombre ?? '',
         }
       : null,
-    codigo: bien.codigo ?? '',
     nombre: bien.nombre ?? '',
     esta_activo: bien.esta_activo,
     visible_planilla: bien.visible_planilla,
   }
+}
+
+function codigoDesdeNombre(nombre) {
+  return nombre.trim().toUpperCase().replaceAll(' ', '_')
 }
 
 function opcionSeleccionada(opciones, value) {
@@ -179,9 +181,6 @@ export default function BienFormModal({ isOpen, onClose, onSaved, bien = null })
     if (!form.unidadMedida) {
       nextErrors.unidadMedida = 'La unidad de medida es obligatoria'
     }
-    if (!isEdit && !form.codigo.trim()) {
-      nextErrors.codigo = 'El código es obligatorio'
-    }
     if (!form.nombre.trim()) {
       nextErrors.nombre = 'El nombre es obligatorio'
     }
@@ -194,15 +193,16 @@ export default function BienFormModal({ isOpen, onClose, onSaved, bien = null })
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
+    const nombre = form.nombre.trim()
     const payload = {
       categoria_bien_id: form.categoriaBien.value,
       unidad_medida_id: form.unidadMedida.value,
-      nombre: form.nombre.trim(),
+      nombre,
       esta_activo: form.esta_activo,
       visible_planilla: form.visible_planilla,
     }
     if (!isEdit) {
-      payload.codigo = form.codigo.trim()
+      payload.codigo = codigoDesdeNombre(nombre)
     }
 
     setLoading(true)
@@ -256,24 +256,6 @@ export default function BienFormModal({ isOpen, onClose, onSaved, bien = null })
 
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- <div>
-              <label htmlFor="codigo-bien" className={labelClassName}>
-                Código
-              </label>
-              <input
-                id="codigo-bien"
-                type="text"
-                value={form.codigo}
-                onChange={(event) => handleChange('codigo', event.target.value)}
-                maxLength={50}
-                disabled={loading || isEdit}
-                className={inputClassName}
-              />
-              {errors.codigo && (
-                <p className="mt-1 text-xs text-red-600">{errors.codigo}</p>
-              )}
-            </div>
-
             <div>
               <label htmlFor="nombre-bien-formulario" className={labelClassName}>
                 Nombre
@@ -342,8 +324,6 @@ export default function BienFormModal({ isOpen, onClose, onSaved, bien = null })
                 <p className="mt-1 text-xs text-red-600">{errors.unidadMedida}</p>
               )}
             </div>
-
-           
 
             <div>
               <label htmlFor="bien-esta-activo" className={labelClassName}>
