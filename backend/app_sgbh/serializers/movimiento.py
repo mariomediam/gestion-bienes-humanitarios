@@ -244,6 +244,50 @@ class MovimientoDetalleSerializer(serializers.Serializer):
     fecha_creacion = serializers.DateTimeField()
 
 
+class MovimientoBusquedaSerializer(serializers.Serializer):
+    """One S43alm_movimientos row returned by the search endpoint.
+
+    Almacén, tipo, estado and encargado columns come from the joins.
+    encargado_almacen_nombre is apellido paterno, apellido materno and nombres.
+    tipo_movimiento_origen is requiere_movimiento_origen.
+    """
+
+    movimiento_id = serializers.IntegerField()
+    almacen_id = serializers.IntegerField()
+    tipo_movimiento_id = serializers.IntegerField()
+    estado_movimiento_id = serializers.IntegerField()
+    movimiento_origen_id = serializers.IntegerField(allow_null=True)
+    fecha_movimiento = serializers.DateTimeField()
+    documento_referencia = serializers.CharField(allow_null=True)
+    fecha_documento = serializers.DateField(allow_null=True)
+    destinatario = serializers.CharField(allow_null=True)
+    observacion = serializers.CharField(allow_null=True)
+    fecha_confirmacion = serializers.DateTimeField(allow_null=True)
+    encargado_almacen_id = serializers.IntegerField()
+    c_usuari_login = serializers.CharField()
+    fecha_creacion = serializers.DateTimeField()
+    fecha_modificacion = serializers.DateTimeField(allow_null=True)
+    almacen_codigo = serializers.CharField(source='almacen.codigo')
+    almacen_nombre = serializers.CharField(source='almacen.nombre')
+    tipo_movimiento_codigo = serializers.CharField(source='tipo_movimiento.codigo')
+    tipo_movimiento_nombre = serializers.CharField(source='tipo_movimiento.nombre')
+    tipo_movimiento_naturaleza = serializers.CharField(
+        source='tipo_movimiento.naturaleza'
+    )
+    tipo_movimiento_origen = serializers.BooleanField(
+        source='tipo_movimiento.requiere_movimiento_origen'
+    )
+    estado_movimiento_codigo = serializers.CharField(source='estado_movimiento.codigo')
+    estado_movimiento_nombre = serializers.CharField(source='estado_movimiento.nombre')
+    encargado_almacen_nombre = serializers.SerializerMethodField()
+
+    def get_encargado_almacen_nombre(self, obj):
+        personal = obj.encargado_almacen
+        return (
+            f'{personal.apellido_paterno} {personal.apellido_materno} {personal.nombres}'
+        )
+
+
 class MovimientoSerializer(serializers.Serializer):
     """Stored S43alm_movimientos row with its details."""
 

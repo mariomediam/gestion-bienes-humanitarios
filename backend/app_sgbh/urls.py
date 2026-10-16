@@ -49,6 +49,7 @@ from .views import (
     TipoDiscapacidadListView,
     TipoDocumentoListView,
     TipoMedioVidaListView,
+    MovimientoBuscarView,
     MovimientoCreateView,
     TipoMovimientoListView,
     TipoPeligroListView,
@@ -152,6 +153,11 @@ urlpatterns = [
         'movimientos/',
         MovimientoCreateView.as_view(),
         name='movimientos',
+    ),
+    path(
+        'movimientos/buscar/',
+        MovimientoBuscarView.as_view(),
+        name='movimientos-buscar',
     ),
     path(
         'materiales-pared/',

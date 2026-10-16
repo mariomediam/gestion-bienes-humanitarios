@@ -169,6 +169,11 @@ def parse_personal_id(raw_value):
     return _parse_optional_smallint(raw_value, 'personal_id')
 
 
+def parse_encargado_almacen_id(raw_value):
+    """Parse the optional encargado_almacen_id query param."""
+    return _parse_optional_smallint(raw_value, 'encargado_almacen_id')
+
+
 def parse_tipo_danio_personal_id(raw_value):
     """Parse the optional tipo_danio_personal_id query param."""
     return _parse_optional_smallint(raw_value, 'tipo_danio_personal_id')
@@ -177,6 +182,11 @@ def parse_tipo_danio_personal_id(raw_value):
 def parse_tipo_movimiento_id(raw_value):
     """Parse the optional tipo_movimiento_id query param."""
     return _parse_optional_smallint(raw_value, 'tipo_movimiento_id')
+
+
+def parse_estado_movimiento_id(raw_value):
+    """Parse the optional estado_movimiento_id query param."""
+    return _parse_optional_smallint(raw_value, 'estado_movimiento_id')
 
 
 def parse_grado_lesion_id(raw_value):
@@ -306,6 +316,21 @@ def parse_integrante_id(raw_value):
 def parse_medio_vida_id(raw_value):
     """Parse the optional medio_vida_id query param."""
     return _parse_optional_int(raw_value, 'medio_vida_id')
+
+
+def parse_movimiento_id(raw_value):
+    """Parse the optional movimiento_id query param."""
+    return _parse_optional_int(raw_value, 'movimiento_id')
+
+
+def parse_almacen_id(raw_value):
+    """Parse the optional almacen_id query param."""
+    return _parse_optional_int(raw_value, 'almacen_id')
+
+
+def parse_movimiento_origen_id(raw_value):
+    """Parse the optional movimiento_origen_id query param."""
+    return _parse_optional_int(raw_value, 'movimiento_origen_id')
 
 
 def parse_tipo_documento_id(raw_value):
@@ -569,3 +594,18 @@ def parse_nombre_completo(raw_value):
     (50), one space and nombres (150).
     """
     return _parse_optional_text(raw_value, 'nombre_completo', 252)
+
+
+def parse_documento_referencia(raw_value):
+    """Parse the optional documento_referencia query param."""
+    return _parse_optional_text(raw_value, 'documento_referencia', 100)
+
+
+def parse_destinatario(raw_value):
+    """Parse the optional destinatario query param."""
+    return _parse_optional_text(raw_value, 'destinatario', 250)
+
+
+def parse_observacion(raw_value):
+    """Parse the optional observacion query param for S43alm_movimientos."""
+    return _parse_optional_text(raw_value, 'observacion', 1000)

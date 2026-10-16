@@ -3,7 +3,20 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app_sgbh.query_params import (
+    parse_almacen_id,
+    parse_destinatario,
+    parse_documento_referencia,
+    parse_encargado_almacen_id,
+    parse_estado_movimiento_id,
+    parse_movimiento_id,
+    parse_movimiento_origen_id,
+    parse_observacion,
+    parse_optional_date,
+    parse_tipo_movimiento_id,
+)
 from app_sgbh.serializers.movimiento import (
+    MovimientoBusquedaSerializer,
     MovimientoCreateSerializer,
     MovimientoSerializer,
 )
@@ -39,6 +52,74 @@ class MovimientoCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class MovimientoBuscarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        parsed, error = _parse_busqueda(request.query_params)
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        fecha_desde = parsed['fecha_desde']
+        fecha_hasta = parsed['fecha_hasta']
+        if (
+            fecha_desde is not None
+            and fecha_hasta is not None
+            and fecha_desde > fecha_hasta
+        ):
+            return Response(
+                {'error': 'El filtro fecha_desde no puede ser posterior a fecha_hasta'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            rows = MovimientoService.search(**parsed)
+            payload = MovimientoBusquedaSerializer(rows, many=True).data
+        except Exception:
+            return Response(
+                {'error': 'No se pudo obtener la búsqueda de movimientos de almacén'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
+
+
+def _parse_busqueda(params):
+    """Parse optional warehouse movement search filters.
+
+    Returns (values, error_message). values is None when a filter is invalid.
+    fecha_desde and fecha_hasta bound fecha_movimiento.
+    """
+    parsers = (
+        ('movimiento_id', parse_movimiento_id),
+        ('almacen_id', parse_almacen_id),
+        ('tipo_movimiento_id', parse_tipo_movimiento_id),
+        ('estado_movimiento_id', parse_estado_movimiento_id),
+        ('movimiento_origen_id', parse_movimiento_origen_id),
+        ('documento_referencia', parse_documento_referencia),
+        ('destinatario', parse_destinatario),
+        ('observacion', parse_observacion),
+        ('encargado_almacen_id', parse_encargado_almacen_id),
+    )
+    values = {}
+    for name, parser in parsers:
+        value, error = parser(params.get(name))
+        if error:
+            return None, error
+        values[name] = value
+
+    fecha_desde, error = parse_optional_date(params.get('fecha_desde'), 'fecha_desde')
+    if error:
+        return None, error
+    fecha_hasta, error = parse_optional_date(params.get('fecha_hasta'), 'fecha_hasta')
+    if error:
+        return None, error
+
+    values['fecha_desde'] = fecha_desde
+    values['fecha_hasta'] = fecha_hasta
+    return values, None
 
 
 def _respuesta_error_servicio(exc):

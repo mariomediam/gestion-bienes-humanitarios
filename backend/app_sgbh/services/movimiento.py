@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
 from django.db import IntegrityError, transaction
@@ -15,6 +15,7 @@ from ..models import (
     Personal,
     TipoMovimiento,
 )
+from ..text_search import filter_text_like
 
 _SMALLINT_MIN = -32768
 _SMALLINT_MAX = 32767
@@ -42,6 +43,68 @@ class MovimientoServiceError(Exception):
 
 
 class MovimientoService:
+    @staticmethod
+    def search(
+        movimiento_id=None,
+        almacen_id=None,
+        tipo_movimiento_id=None,
+        estado_movimiento_id=None,
+        movimiento_origen_id=None,
+        fecha_desde=None,
+        fecha_hasta=None,
+        documento_referencia=None,
+        destinatario=None,
+        observacion=None,
+        encargado_almacen_id=None,
+    ):
+        """Return S43alm_movimientos rows using optional filters combined with AND.
+
+        Joins almacén, tipo, estado and encargado. fecha_desde and fecha_hasta
+        bound fecha_movimiento by calendar day, inclusive, because the column
+        stores date and time. documento_referencia, destinatario and observacion
+        use a case-insensitive partial match. The other filters are exact.
+        Ordered by fecha_movimiento descending. With no filters, every row is
+        returned. The queryset is ready for MovimientoBusquedaSerializer.
+        """
+        queryset = Movimiento.objects.select_related(
+            'almacen',
+            'tipo_movimiento',
+            'estado_movimiento',
+            'encargado_almacen',
+        )
+        if movimiento_id is not None:
+            queryset = queryset.filter(movimiento_id=movimiento_id)
+        if almacen_id is not None:
+            queryset = queryset.filter(almacen_id=almacen_id)
+        if tipo_movimiento_id is not None:
+            queryset = queryset.filter(tipo_movimiento_id=tipo_movimiento_id)
+        if estado_movimiento_id is not None:
+            queryset = queryset.filter(estado_movimiento_id=estado_movimiento_id)
+        if movimiento_origen_id is not None:
+            queryset = queryset.filter(movimiento_origen_id=movimiento_origen_id)
+        if fecha_desde is not None:
+            queryset = queryset.filter(
+                fecha_movimiento__gte=_inicio_de_dia(fecha_desde)
+            )
+        if fecha_hasta is not None:
+            queryset = queryset.filter(
+                fecha_movimiento__lt=_inicio_de_dia(fecha_hasta + timedelta(days=1))
+            )
+        if documento_referencia is not None:
+            queryset = filter_text_like(
+                queryset,
+                'documento_referencia',
+                documento_referencia,
+            )
+        if destinatario is not None:
+            queryset = filter_text_like(queryset, 'destinatario', destinatario)
+        if observacion is not None:
+            queryset = filter_text_like(queryset, 'observacion', observacion)
+        if encargado_almacen_id is not None:
+            queryset = queryset.filter(encargado_almacen_id=encargado_almacen_id)
+
+        return queryset.order_by('-fecha_movimiento')
+
     @staticmethod
     def create(
         *,
@@ -390,6 +453,11 @@ def _check_int(value, field_name, minimum, maximum):
             f'El campo {field_name} debe ser un número entero'
         )
     return value
+
+
+def _inicio_de_dia(fecha):
+    """Aware midnight of fecha in the active timezone."""
+    return timezone.make_aware(datetime.combine(fecha, time.min))
 
 
 def _require_datetime(value, field_name):
