@@ -244,12 +244,41 @@ class MovimientoDetalleSerializer(serializers.Serializer):
     fecha_creacion = serializers.DateTimeField()
 
 
+class MovimientoDetalleBusquedaSerializer(serializers.Serializer):
+    """One S43alm_movimiento_detalle row nested in a movement search result.
+
+    Bien and unit columns come from S43cat_bah_bienes and
+    S43cat_bah_unidades_medida. movimiento_detalle_observacion is observacion.
+    """
+
+    movimiento_detalle_id = serializers.IntegerField()
+    bien_id = serializers.IntegerField()
+    cantidad = serializers.DecimalField(max_digits=18, decimal_places=6)
+    cantidad_texto = serializers.CharField(allow_null=True)
+    es_devolvible = serializers.BooleanField()
+    movimiento_detalle_observacion = serializers.CharField(
+        source='observacion',
+        allow_null=True,
+    )
+    categoria_bien_id = serializers.IntegerField(source='bien.categoria_bien_id')
+    unidad_medida_id = serializers.IntegerField(source='bien.unidad_medida_id')
+    bien_codigo = serializers.CharField(source='bien.codigo')
+    bien_nombre = serializers.CharField(source='bien.nombre')
+    unidad_medida_codigo = serializers.CharField(source='bien.unidad_medida.codigo')
+    unidad_medida_nombre = serializers.CharField(source='bien.unidad_medida.nombre')
+    unidad_medida_abreviatura = serializers.CharField(
+        source='bien.unidad_medida.abreviatura',
+        allow_null=True,
+    )
+
+
 class MovimientoBusquedaSerializer(serializers.Serializer):
     """One S43alm_movimientos row returned by the search endpoint.
 
     Almacén, tipo, estado and encargado columns come from the joins.
     encargado_almacen_nombre is apellido paterno, apellido materno and nombres.
-    tipo_movimiento_origen is requiere_movimiento_origen.
+    tipo_movimiento_origen is requiere_movimiento_origen. detalles lists the
+    movement lines without repeating the header.
     """
 
     movimiento_id = serializers.IntegerField()
@@ -280,6 +309,7 @@ class MovimientoBusquedaSerializer(serializers.Serializer):
     estado_movimiento_codigo = serializers.CharField(source='estado_movimiento.codigo')
     estado_movimiento_nombre = serializers.CharField(source='estado_movimiento.nombre')
     encargado_almacen_nombre = serializers.SerializerMethodField()
+    detalles = MovimientoDetalleBusquedaSerializer(many=True)
 
     def get_encargado_almacen_nombre(self, obj):
         personal = obj.encargado_almacen

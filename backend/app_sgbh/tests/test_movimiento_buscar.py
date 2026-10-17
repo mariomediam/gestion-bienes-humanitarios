@@ -1,8 +1,10 @@
 from datetime import date, datetime, timedelta
+from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.db.models import Prefetch
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -108,6 +110,7 @@ def test_parse_busqueda_rejects_invalid_filters(params, message):
 
 def test_search_returns_every_row_when_no_filter_is_sent():
     queryset = MagicMock()
+    queryset.prefetch_related.return_value = queryset
     queryset.order_by.return_value = 'rows'
 
     with patch('app_sgbh.services.movimiento.Movimiento') as movimiento:
@@ -125,8 +128,35 @@ def test_search_returns_every_row_when_no_filter_is_sent():
     queryset.order_by.assert_called_once_with('-fecha_movimiento')
 
 
+def test_search_prefetches_one_detail_list_per_movement():
+    queryset = MagicMock()
+    queryset.prefetch_related.return_value = queryset
+    queryset.order_by.return_value = 'rows'
+    detalle_qs = MagicMock()
+    detalle_qs.order_by.return_value = 'detalles'
+
+    with (
+        patch('app_sgbh.services.movimiento.Movimiento') as movimiento,
+        patch('app_sgbh.services.movimiento.MovimientoDetalle') as detalle,
+    ):
+        movimiento.objects.select_related.return_value = queryset
+        detalle.objects.select_related.return_value = detalle_qs
+        MovimientoService.search()
+
+    detalle.objects.select_related.assert_called_once_with(
+        'bien',
+        'bien__unidad_medida',
+    )
+    detalle_qs.order_by.assert_called_once_with('movimiento_detalle_id')
+    prefetch = queryset.prefetch_related.call_args.args[0]
+    assert isinstance(prefetch, Prefetch)
+    assert prefetch.prefetch_through == 'detalles'
+    assert prefetch.queryset == 'detalles'
+
+
 def test_search_combines_filters_with_and():
     queryset = MagicMock()
+    queryset.prefetch_related.return_value = queryset
     queryset.filter.return_value = queryset
     queryset.order_by.return_value = 'rows'
 
@@ -205,6 +235,46 @@ def test_serializer_returns_joined_columns():
             apellido_materno='Lopez',
             nombres='Ana',
         ),
+        detalles=[
+            SimpleNamespace(
+                movimiento_detalle_id=21,
+                bien_id=5,
+                cantidad=Decimal('-2.500000'),
+                cantidad_texto='2 1/2',
+                es_devolvible=True,
+                observacion='Prestado',
+                bien=SimpleNamespace(
+                    categoria_bien_id=1,
+                    unidad_medida_id=2,
+                    codigo='FRAZ-01',
+                    nombre='Frazada',
+                    unidad_medida=SimpleNamespace(
+                        codigo='UND',
+                        nombre='Unidad',
+                        abreviatura='und',
+                    ),
+                ),
+            ),
+            SimpleNamespace(
+                movimiento_detalle_id=22,
+                bien_id=6,
+                cantidad=Decimal('-1.000000'),
+                cantidad_texto=None,
+                es_devolvible=False,
+                observacion=None,
+                bien=SimpleNamespace(
+                    categoria_bien_id=3,
+                    unidad_medida_id=4,
+                    codigo='AGUA-01',
+                    nombre='Agua',
+                    unidad_medida=SimpleNamespace(
+                        codigo='LT',
+                        nombre='Litro',
+                        abreviatura=None,
+                    ),
+                ),
+            ),
+        ],
     )
 
     data = MovimientoBusquedaSerializer(movimiento).data
@@ -222,6 +292,38 @@ def test_serializer_returns_joined_columns():
     assert data['estado_movimiento_codigo'] == 'BORRADOR'
     assert data['estado_movimiento_nombre'] == 'Borrador'
     assert data['encargado_almacen_nombre'] == 'Perez Lopez Ana'
+    assert data['detalles'] == [
+        {
+            'movimiento_detalle_id': 21,
+            'bien_id': 5,
+            'cantidad': '-2.500000',
+            'cantidad_texto': '2 1/2',
+            'es_devolvible': True,
+            'movimiento_detalle_observacion': 'Prestado',
+            'categoria_bien_id': 1,
+            'unidad_medida_id': 2,
+            'bien_codigo': 'FRAZ-01',
+            'bien_nombre': 'Frazada',
+            'unidad_medida_codigo': 'UND',
+            'unidad_medida_nombre': 'Unidad',
+            'unidad_medida_abreviatura': 'und',
+        },
+        {
+            'movimiento_detalle_id': 22,
+            'bien_id': 6,
+            'cantidad': '-1.000000',
+            'cantidad_texto': None,
+            'es_devolvible': False,
+            'movimiento_detalle_observacion': None,
+            'categoria_bien_id': 3,
+            'unidad_medida_id': 4,
+            'bien_codigo': 'AGUA-01',
+            'bien_nombre': 'Agua',
+            'unidad_medida_codigo': 'LT',
+            'unidad_medida_nombre': 'Litro',
+            'unidad_medida_abreviatura': None,
+        },
+    ]
 
 
 def test_get_movimientos_buscar_returns_rows():

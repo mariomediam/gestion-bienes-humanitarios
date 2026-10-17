@@ -59,10 +59,12 @@ class MovimientoService:
     ):
         """Return S43alm_movimientos rows using optional filters combined with AND.
 
-        Joins almacén, tipo, estado and encargado. fecha_desde and fecha_hasta
-        bound fecha_movimiento by calendar day, inclusive, because the column
-        stores date and time. documento_referencia, destinatario and observacion
-        use a case-insensitive partial match. The other filters are exact.
+        Joins almacén, tipo, estado and encargado. Each row keeps its
+        S43alm_movimiento_detalle lines, with bien and unit of measure, under
+        detalles. fecha_desde and fecha_hasta bound fecha_movimiento by
+        calendar day, inclusive, because the column stores date and time.
+        documento_referencia, destinatario and observacion use a
+        case-insensitive partial match. The other filters are exact.
         Ordered by fecha_movimiento descending. With no filters, every row is
         returned. The queryset is ready for MovimientoBusquedaSerializer.
         """
@@ -71,7 +73,7 @@ class MovimientoService:
             'tipo_movimiento',
             'estado_movimiento',
             'encargado_almacen',
-        )
+        ).prefetch_related(Prefetch('detalles', queryset=_detalles_busqueda()))
         if movimiento_id is not None:
             queryset = queryset.filter(movimiento_id=movimiento_id)
         if almacen_id is not None:
@@ -453,6 +455,14 @@ def _check_int(value, field_name, minimum, maximum):
             f'El campo {field_name} debe ser un número entero'
         )
     return value
+
+
+def _detalles_busqueda():
+    """Detail rows with bien and unit of measure, ordered by primary key."""
+    return MovimientoDetalle.objects.select_related(
+        'bien',
+        'bien__unidad_medida',
+    ).order_by('movimiento_detalle_id')
 
 
 def _inicio_de_dia(fecha):
