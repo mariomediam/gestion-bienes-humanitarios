@@ -30,11 +30,16 @@ export default function useMovimientosBusqueda() {
     setSearched(false)
   }
 
+  function quitarMovimiento(movimientoId) {
+    setMovimientos((current) => current.filter((item) => item.movimiento_id !== movimientoId))
+  }
+
   return {
     loading,
     searched,
     movimientos,
     buscar,
     limpiarResultados,
+    quitarMovimiento,
   }
 }

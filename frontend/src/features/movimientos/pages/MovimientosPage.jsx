@@ -20,7 +20,14 @@ export default function MovimientosPage() {
   const [bienNombre, setBienNombre] = useState('')
   const [filtros, setFiltros] = useState(EMPTY_FILTROS)
   const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
-  const { loading, searched, movimientos, buscar, limpiarResultados } = useMovimientosBusqueda()
+  const {
+    loading,
+    searched,
+    movimientos,
+    buscar,
+    limpiarResultados,
+    quitarMovimiento,
+  } = useMovimientosBusqueda()
 
   function handleFiltroChange(name, value) {
     setFiltros((current) => ({ ...current, [name]: value }))
@@ -81,7 +88,9 @@ export default function MovimientosPage() {
         loading={loading}
       />
 
-      {searched && <MovimientosResultados movimientos={movimientos} />}
+      {searched && (
+        <MovimientosResultados movimientos={movimientos} onEliminado={quitarMovimiento} />
+      )}
     </div>
   )
 }

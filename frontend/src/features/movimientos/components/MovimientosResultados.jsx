@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import MovimientoEliminarModal from '@features/movimientos/components/MovimientoEliminarModal'
 import { formatFechaMovimiento } from '@utils/dates'
 
 const actionButtonClassName =
@@ -53,7 +55,9 @@ function BienesCell({ detalles }) {
   )
 }
 
-export default function MovimientosResultados({ movimientos }) {
+export default function MovimientosResultados({ movimientos, onEliminado }) {
+  const [movimientoAEliminar, setMovimientoAEliminar] = useState(null)
+
   return (
     <section className="bg-white rounded-lg border border-gray-200">
       <div className="px-5 py-4 border-b border-gray-200">
@@ -109,7 +113,12 @@ export default function MovimientosResultados({ movimientos }) {
                           Modificar
                         </span>
                       </Link>
-                      <button type="button" aria-label="Eliminar" className={deleteButtonClassName}>
+                      <button
+                        type="button"
+                        aria-label="Eliminar"
+                        onClick={() => setMovimientoAEliminar(movimiento)}
+                        className={deleteButtonClassName}
+                      >
                         <TrashIcon className="w-4 h-4" />
                         <span className={deleteTooltipClassName} aria-hidden="true">
                           Eliminar
@@ -123,6 +132,13 @@ export default function MovimientosResultados({ movimientos }) {
           </tbody>
         </table>
       </div>
+
+      <MovimientoEliminarModal
+        isOpen={movimientoAEliminar !== null}
+        movimiento={movimientoAEliminar}
+        onClose={() => setMovimientoAEliminar(null)}
+        onEliminado={onEliminado}
+      />
     </section>
   )
 }
