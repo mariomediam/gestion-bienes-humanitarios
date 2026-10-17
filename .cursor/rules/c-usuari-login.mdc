@@ -1,0 +1,25 @@
+---
+description: c_usuari_login se obtiene del token en las APIs que lo guardan
+alwaysApply: true
+---
+
+# Usuario de auditoría (`c_usuari_login`)
+
+Cuando un endpoint graba o reemplaza `c_usuari_login`, el valor sale del usuario autenticado. No se acepta en el cuerpo de la solicitud.
+
+```python
+# ✅ BIEN
+created = Servicio.create(
+    c_usuari_login=getattr(request.user, 'login', ''),
+    **serializer.validated_data,
+)
+
+# ❌ MAL
+# c_usuari_login obligatorio en el serializer del body
+```
+
+- El login del token está en `request.user.login` (`user_login` del JWT).
+- Si falta o supera 20 caracteres, responder `No se pudo identificar al usuario`.
+- En alta, ese login se guarda. En modificación, reemplaza el guardado solo cuando la operación ya reemplaza `c_usuari_login`. Si la regla de esa entidad es conservarlo, se conserva.
+- El frontend no envía `c_usuari_login`.
+- La respuesta puede devolver el valor guardado.

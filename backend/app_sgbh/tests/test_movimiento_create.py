@@ -304,7 +304,7 @@ def test_create_stores_optional_origen_when_the_type_does_not_require_it():
             None,
             None,
             None,
-            'El campo c_usuari_login es obligatorio',
+            'No se pudo identificar al usuario',
             False,
         ),
         (
@@ -312,7 +312,7 @@ def test_create_stores_optional_origen_when_the_type_does_not_require_it():
             None,
             None,
             None,
-            'El campo c_usuari_login no debe superar 20 caracteres',
+            'No se pudo identificar al usuario',
             False,
         ),
         (
@@ -483,7 +483,7 @@ def _body(**overrides):
         'destinatario': ' Municipalidad ',
         'observacion': ' Ingreso ',
         'encargado_almacen_id': 4,
-        'c_usuari_login': ' mmedina ',
+        'c_usuari_login': 'intruso',
         'detalles': [
             {
                 'bien_id': 8,
@@ -606,10 +606,6 @@ def test_post_movimientos_hides_unexpected_errors():
         (
             _body(fecha_movimiento='16/10/2026'),
             'El campo fecha_movimiento debe tener el formato AAAA-MM-DD HH:MM:SS',
-        ),
-        (
-            _body(c_usuari_login='   '),
-            'El campo c_usuari_login es obligatorio',
         ),
         ([], 'El cuerpo de la solicitud no es válido'),
     ],

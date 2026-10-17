@@ -5,7 +5,6 @@ import { sgbhApi } from '@api/sgbhApi'
 import EncargadoAlmacenSelect from '@features/movimientos/components/EncargadoAlmacenSelect'
 import MovimientoDetalleFilas from '@features/movimientos/components/MovimientoDetalleFilas'
 import TipoMovimientoSelect from '@features/movimientos/components/TipoMovimientoSelect'
-import useAuthStore from '@store/authStore'
 
 const ALMACEN_CENTRAL_ID = 1
 const ESTADO_MOVIMIENTO_CONFIRMADO_ID = 2
@@ -124,7 +123,6 @@ function validarFormulario(form, lineas) {
 
 export default function MovimientoFormPage() {
   const navigate = useNavigate()
-  const user = useAuthStore((state) => state.user)
   const lineaId = useRef(0)
   const [form, setForm] = useState(EMPTY_FORM)
   const [lineas, setLineas] = useState([])
@@ -199,12 +197,6 @@ export default function MovimientoFormPage() {
     setErrores(nextErrores)
     if (Object.keys(nextErrores).length > 0) return
 
-    const login = String(user?.login || '').trim()
-    if (!login) {
-      toast.error('No se pudo identificar el usuario de la sesión')
-      return
-    }
-
     const fechaMovimiento = fechaHoraApi(form.fecha_movimiento)
     const payload = {
       almacen_id: ALMACEN_CENTRAL_ID,
@@ -218,7 +210,6 @@ export default function MovimientoFormPage() {
       observacion: textoOpcional(form.observacion),
       fecha_confirmacion: fechaMovimiento,
       encargado_almacen_id: form.encargado.value,
-      c_usuari_login: login,
       detalles: lineas.map((linea) => ({
         bien_id: linea.bien.value,
         cantidad: cantidadParaApi(linea.cantidad, form.naturaleza),

@@ -20,7 +20,10 @@ from app_sgbh.serializers.movimiento import (
     MovimientoBusquedaSerializer,
     MovimientoCreateSerializer,
     MovimientoSerializer,
+    MovimientoUpdateSerializer,
 )
+
+_MOVIMIENTO_ID_MAX = 2147483647
 from app_sgbh.services.movimiento import MovimientoService, MovimientoServiceError
 
 
@@ -42,7 +45,10 @@ class MovimientoCreateView(APIView):
             )
 
         try:
-            created = MovimientoService.create(**serializer.validated_data)
+            created = MovimientoService.create(
+                c_usuari_login=getattr(request.user, 'login', ''),
+                **serializer.validated_data,
+            )
             payload = MovimientoSerializer(created).data
         except MovimientoServiceError as exc:
             return _respuesta_error_servicio(exc)
@@ -53,6 +59,47 @@ class MovimientoCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class MovimientoDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, movimiento_id):
+        if movimiento_id < 1 or movimiento_id > _MOVIMIENTO_ID_MAX:
+            return Response(
+                {'error': 'El campo movimiento_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = MovimientoUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': _first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            updated = MovimientoService.update(
+                movimiento_id,
+                c_usuari_login=getattr(request.user, 'login', ''),
+                **serializer.validated_data,
+            )
+            payload = MovimientoSerializer(updated).data
+        except MovimientoServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo modificar el movimiento de almacén'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 class MovimientoBuscarView(APIView):

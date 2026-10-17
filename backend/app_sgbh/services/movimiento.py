@@ -13,6 +13,7 @@ from ..models import (
     Movimiento,
     MovimientoDetalle,
     Personal,
+    PlanillaEntrega,
     TipoMovimiento,
 )
 from ..text_search import filter_text_like
@@ -145,69 +146,26 @@ class MovimientoService:
         be devolvible. When the type requires an origin, movimiento_origen_id
         must reference an existing movement. fecha_creacion is the current
         time and fecha_modificacion stays null. c_usuari_login comes from
-        the request body.
+        the authenticated user.
         """
-        header = {
-            'almacen_id': _require_int_id(almacen_id, 'almacen_id'),
-            'tipo_movimiento_id': _require_smallint_id(
-                tipo_movimiento_id,
-                'tipo_movimiento_id',
-            ),
-            'estado_movimiento_id': _require_smallint_id(
-                estado_movimiento_id,
-                'estado_movimiento_id',
-            ),
-            'movimiento_origen_id': _optional_int_id(
-                movimiento_origen_id,
-                'movimiento_origen_id',
-            ),
-            'fecha_movimiento': _require_datetime(
-                fecha_movimiento,
-                'fecha_movimiento',
-            ),
-            'documento_referencia': _optional_text(
-                documento_referencia,
-                'documento_referencia',
-                100,
-            ),
-            'fecha_documento': _optional_date(fecha_documento, 'fecha_documento'),
-            'destinatario': _optional_text(destinatario, 'destinatario', 250),
-            'observacion': _optional_text(observacion, 'observacion', 1000),
-            'fecha_confirmacion': _optional_datetime(
-                fecha_confirmacion,
-                'fecha_confirmacion',
-            ),
-            'encargado_almacen_id': _require_smallint_id(
-                encargado_almacen_id,
-                'encargado_almacen_id',
-            ),
-            'c_usuari_login': _require_login(c_usuari_login),
-        }
+        header = _clean_header(
+            almacen_id=almacen_id,
+            tipo_movimiento_id=tipo_movimiento_id,
+            estado_movimiento_id=estado_movimiento_id,
+            movimiento_origen_id=movimiento_origen_id,
+            fecha_movimiento=fecha_movimiento,
+            documento_referencia=documento_referencia,
+            fecha_documento=fecha_documento,
+            destinatario=destinatario,
+            observacion=observacion,
+            fecha_confirmacion=fecha_confirmacion,
+            encargado_almacen_id=encargado_almacen_id,
+        )
+        header['c_usuari_login'] = _require_token_login(c_usuari_login)
         lineas = _clean_detalles(detalles)
 
         with transaction.atomic(using=DB_ALIAS):
-            _require_activo(
-                Almacen,
-                header['almacen_id'],
-                missing_message='El almacén indicado no existe',
-                inactive_message='El almacén indicado no está activo',
-            )
-            tipo = _require_activo(
-                TipoMovimiento,
-                header['tipo_movimiento_id'],
-                missing_message='El tipo de movimiento indicado no existe',
-                inactive_message='El tipo de movimiento indicado no está activo',
-            )
-            _require_activo(
-                EstadoMovimiento,
-                header['estado_movimiento_id'],
-                missing_message='El estado de movimiento indicado no existe',
-                inactive_message='El estado de movimiento indicado no está activo',
-            )
-            _require_origen(tipo, header['movimiento_origen_id'])
-            _require_encargado(header['encargado_almacen_id'])
-            _require_bienes_activos(lineas)
-            _require_signos_y_unicidad(lineas, tipo.naturaleza)
+            _apply_header_rules(header, lineas)
 
             ahora = timezone.now()
             movimiento = Movimiento(
@@ -233,34 +191,210 @@ class MovimientoService:
                     'No se pudo registrar el movimiento de almacén'
                 ) from None
 
-            for linea in lineas:
-                detalle = MovimientoDetalle(
-                    movimiento_id=movimiento.pk,
-                    bien_id=linea['bien_id'],
-                    cantidad=linea['cantidad'],
-                    cantidad_texto=linea['cantidad_texto'],
-                    es_devolvible=linea['es_devolvible'],
-                    observacion=linea['observacion'],
-                    fecha_creacion=ahora,
-                )
-                try:
-                    detalle.save()
-                except IntegrityError:
-                    raise MovimientoServiceError(
-                        'El bien ya está registrado con la misma modalidad '
-                        'de devolución en este movimiento',
-                        conflict=True,
-                    ) from None
-
-            stored = Movimiento.objects.prefetch_related(
-                Prefetch(
-                    'detalles',
-                    queryset=MovimientoDetalle.objects.order_by(
-                        'movimiento_detalle_id'
-                    ),
-                )
-            ).get(pk=movimiento.pk)
+            _insert_detalles(movimiento.pk, lineas, ahora)
+            stored = _stored_movimiento(movimiento.pk)
         return stored
+
+    @staticmethod
+    def update(
+        movimiento_id,
+        *,
+        almacen_id,
+        tipo_movimiento_id,
+        estado_movimiento_id,
+        movimiento_origen_id,
+        fecha_movimiento,
+        documento_referencia,
+        fecha_documento,
+        destinatario,
+        observacion,
+        fecha_confirmacion,
+        encargado_almacen_id,
+        c_usuari_login,
+        detalles,
+    ):
+        """Replace one S43alm_movimientos row and all of its detail rows.
+
+        The writable columns match create. c_usuari_login comes from the
+        authenticated user and replaces the stored login. fecha_creacion
+        stays as stored. fecha_modificacion is the current time. Existing
+        detail rows are deleted and the sent lines are inserted with a new
+        primary key and fecha_creacion. Rejected when any planilla BAH
+        references this movement through movimiento_almacen_id.
+        """
+        header = _clean_header(
+            almacen_id=almacen_id,
+            tipo_movimiento_id=tipo_movimiento_id,
+            estado_movimiento_id=estado_movimiento_id,
+            movimiento_origen_id=movimiento_origen_id,
+            fecha_movimiento=fecha_movimiento,
+            documento_referencia=documento_referencia,
+            fecha_documento=fecha_documento,
+            destinatario=destinatario,
+            observacion=observacion,
+            fecha_confirmacion=fecha_confirmacion,
+            encargado_almacen_id=encargado_almacen_id,
+        )
+        header['c_usuari_login'] = _require_token_login(c_usuari_login)
+        lineas = _clean_detalles(detalles)
+
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                movimiento = Movimiento.objects.get(pk=movimiento_id)
+            except Movimiento.DoesNotExist:
+                raise MovimientoServiceError(
+                    'El movimiento de almacén indicado no existe',
+                    not_found=True,
+                ) from None
+
+            if PlanillaEntrega.objects.filter(
+                movimiento_almacen_id=movimiento.pk
+            ).exists():
+                raise MovimientoServiceError(
+                    'No se puede modificar el movimiento de almacén porque '
+                    'está vinculado a una planilla BAH',
+                    conflict=True,
+                )
+
+            _apply_header_rules(header, lineas, movimiento_id=movimiento.pk)
+
+            ahora = timezone.now()
+            for field, value in header.items():
+                setattr(movimiento, field, value)
+            movimiento.fecha_modificacion = ahora
+            try:
+                movimiento.save(
+                    update_fields=[*header.keys(), 'fecha_modificacion']
+                )
+            except IntegrityError:
+                raise MovimientoServiceError(
+                    'No se pudo modificar el movimiento de almacén'
+                ) from None
+
+            MovimientoDetalle.objects.filter(movimiento_id=movimiento.pk).delete()
+            _insert_detalles(movimiento.pk, lineas, ahora)
+            stored = _stored_movimiento(movimiento.pk)
+        return stored
+
+
+def _clean_header(
+    *,
+    almacen_id,
+    tipo_movimiento_id,
+    estado_movimiento_id,
+    movimiento_origen_id,
+    fecha_movimiento,
+    documento_referencia,
+    fecha_documento,
+    destinatario,
+    observacion,
+    fecha_confirmacion,
+    encargado_almacen_id,
+):
+    return {
+        'almacen_id': _require_int_id(almacen_id, 'almacen_id'),
+        'tipo_movimiento_id': _require_smallint_id(
+            tipo_movimiento_id,
+            'tipo_movimiento_id',
+        ),
+        'estado_movimiento_id': _require_smallint_id(
+            estado_movimiento_id,
+            'estado_movimiento_id',
+        ),
+        'movimiento_origen_id': _optional_int_id(
+            movimiento_origen_id,
+            'movimiento_origen_id',
+        ),
+        'fecha_movimiento': _require_datetime(
+            fecha_movimiento,
+            'fecha_movimiento',
+        ),
+        'documento_referencia': _optional_text(
+            documento_referencia,
+            'documento_referencia',
+            100,
+        ),
+        'fecha_documento': _optional_date(fecha_documento, 'fecha_documento'),
+        'destinatario': _optional_text(destinatario, 'destinatario', 250),
+        'observacion': _optional_text(observacion, 'observacion', 1000),
+        'fecha_confirmacion': _optional_datetime(
+            fecha_confirmacion,
+            'fecha_confirmacion',
+        ),
+        'encargado_almacen_id': _require_smallint_id(
+            encargado_almacen_id,
+            'encargado_almacen_id',
+        ),
+    }
+
+
+def _apply_header_rules(header, lineas, *, movimiento_id=None):
+    """Check catalogs, origin, encargado, goods and quantity signs."""
+    _require_activo(
+        Almacen,
+        header['almacen_id'],
+        missing_message='El almacén indicado no existe',
+        inactive_message='El almacén indicado no está activo',
+    )
+    tipo = _require_activo(
+        TipoMovimiento,
+        header['tipo_movimiento_id'],
+        missing_message='El tipo de movimiento indicado no existe',
+        inactive_message='El tipo de movimiento indicado no está activo',
+    )
+    _require_activo(
+        EstadoMovimiento,
+        header['estado_movimiento_id'],
+        missing_message='El estado de movimiento indicado no existe',
+        inactive_message='El estado de movimiento indicado no está activo',
+    )
+    origen_id = header['movimiento_origen_id']
+    if movimiento_id is not None and origen_id == movimiento_id:
+        raise MovimientoServiceError(
+            'El movimiento de origen debe ser distinto de este movimiento'
+        )
+    _require_origen(tipo, origen_id)
+    _require_encargado(header['encargado_almacen_id'])
+    _require_bienes_activos(lineas)
+    _require_signos_y_unicidad(lineas, tipo.naturaleza)
+
+
+def _insert_detalles(movimiento_id, lineas, ahora):
+    for linea in lineas:
+        detalle = MovimientoDetalle(
+            movimiento_id=movimiento_id,
+            bien_id=linea['bien_id'],
+            cantidad=linea['cantidad'],
+            cantidad_texto=linea['cantidad_texto'],
+            es_devolvible=linea['es_devolvible'],
+            observacion=linea['observacion'],
+            fecha_creacion=ahora,
+        )
+        try:
+            detalle.save()
+        except IntegrityError:
+            raise MovimientoServiceError(
+                'El bien ya está registrado con la misma modalidad '
+                'de devolución en este movimiento',
+                conflict=True,
+            ) from None
+
+
+def _stored_movimiento(movimiento_id):
+    return Movimiento.objects.prefetch_related(
+        Prefetch(
+            'detalles',
+            queryset=MovimientoDetalle.objects.order_by('movimiento_detalle_id'),
+        )
+    ).get(pk=movimiento_id)
+
+
+def _require_token_login(value):
+    """Login taken from the authenticated user, not from the request body."""
+    login = str(value or '').strip()
+    if login == '' or len(login) > 20:
+        raise MovimientoServiceError('No se pudo identificar al usuario')
+    return login
 
 
 def _clean_detalles(detalles):
@@ -388,19 +522,6 @@ def _require_activo(model, pk, *, missing_message, inactive_message):
     if not row.esta_activo:
         raise MovimientoServiceError(inactive_message)
     return row
-
-
-def _require_login(value):
-    if not isinstance(value, str):
-        raise MovimientoServiceError('El campo c_usuari_login debe ser texto')
-    login = value.strip()
-    if login == '':
-        raise MovimientoServiceError('El campo c_usuari_login es obligatorio')
-    if len(login) > 20:
-        raise MovimientoServiceError(
-            'El campo c_usuari_login no debe superar 20 caracteres'
-        )
-    return login
 
 
 def _require_cantidad(value):

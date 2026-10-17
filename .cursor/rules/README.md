@@ -7,6 +7,7 @@ Este directorio contiene las reglas que Cursor AI seguirá automáticamente al t
 ### Reglas globales (siempre activas)
 - **general-standards.mdc**: Estándares generales del proyecto (stack, idioma, convenciones)
 - **git-conventions.mdc**: Convenciones de Git y commits
+- **c-usuari-login.mdc**: `c_usuari_login` se obtiene del token, no del cuerpo de la API
 
 ### Reglas específicas por archivo
 - **react-conventions.mdc**: Se activa con archivos `frontend/**/*.{jsx,js}`

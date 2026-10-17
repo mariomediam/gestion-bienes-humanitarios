@@ -128,8 +128,9 @@ class MovimientoDetalleCreateSerializer(serializers.Serializer):
 class MovimientoCreateSerializer(serializers.Serializer):
     """Validate the body used to insert a warehouse movement and its details.
 
-    fecha_creacion and fecha_modificacion are not accepted. Existence,
-    active flags, quantity sign and movimiento_origen_id are checked by
+    fecha_creacion, fecha_modificacion and c_usuari_login are not accepted.
+    c_usuari_login comes from the authenticated user. Existence, active
+    flags, quantity sign and movimiento_origen_id are checked by
     MovimientoService.
     """
 
@@ -208,17 +209,6 @@ class MovimientoCreateSerializer(serializers.Serializer):
         minimum=_SMALLINT_MIN,
         maximum=_SMALLINT_MAX,
     )
-    c_usuari_login = serializers.CharField(
-        max_length=20,
-        trim_whitespace=True,
-        error_messages={
-            'required': 'El campo c_usuari_login es obligatorio',
-            'blank': 'El campo c_usuari_login es obligatorio',
-            'null': 'El campo c_usuari_login es obligatorio',
-            'invalid': 'El campo c_usuari_login debe ser texto',
-            'max_length': 'El campo c_usuari_login no debe superar 20 caracteres',
-        },
-    )
     detalles = serializers.ListField(
         child=MovimientoDetalleCreateSerializer(),
         allow_empty=False,
@@ -229,6 +219,15 @@ class MovimientoCreateSerializer(serializers.Serializer):
             'empty': 'Debe registrar al menos un detalle',
         },
     )
+
+
+class MovimientoUpdateSerializer(MovimientoCreateSerializer):
+    """Validate the body used to update a warehouse movement and its details.
+
+    Same fields as create. c_usuari_login comes from the authenticated user.
+    Existence, active flags, quantity sign, movimiento_origen_id and the
+    planilla link are checked by MovimientoService.
+    """
 
 
 class MovimientoDetalleSerializer(serializers.Serializer):
