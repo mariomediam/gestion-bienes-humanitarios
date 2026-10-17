@@ -139,6 +139,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  actualizarMovimiento: async (movimientoId, data) => {
+    const response = await api.put(`/api/sgbh/movimientos/${movimientoId}/`, data)
+    return response.data
+  },
+
   buscarMovimientos: async (params) => {
     const response = await api.get('/api/sgbh/movimientos/buscar/', { params })
     return response.data

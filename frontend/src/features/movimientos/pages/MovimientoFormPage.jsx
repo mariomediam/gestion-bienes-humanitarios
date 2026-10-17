@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
 import EncargadoAlmacenSelect from '@features/movimientos/components/EncargadoAlmacenSelect'
@@ -70,6 +70,65 @@ function cantidadParaApi(raw, naturaleza) {
   return texto
 }
 
+function fechaMovimientoParaInput(value) {
+  if (!value) return ''
+  const coincidencia = String(value).trim().match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/)
+  if (!coincidencia) return ''
+  return `${coincidencia[1]}T${coincidencia[2]}`
+}
+
+function fechaDocumentoParaInput(value) {
+  if (!value) return ''
+  const coincidencia = String(value).trim().match(/^(\d{4}-\d{2}-\d{2})/)
+  return coincidencia ? coincidencia[1] : ''
+}
+
+function cantidadParaFormulario(cantidad, naturaleza) {
+  let texto = String(cantidad ?? '').trim()
+  if (!texto) return ''
+  if ((naturaleza === 'E' || naturaleza === 'S') && texto.startsWith('-')) {
+    texto = texto.slice(1)
+  }
+  if (texto.includes('.')) {
+    texto = texto.replace(/0+$/, '').replace(/\.$/, '')
+  }
+  return texto
+}
+
+function formularioDesdeMovimiento(movimiento, siguienteKey) {
+  const naturaleza = movimiento.tipo_movimiento_naturaleza || ''
+  return {
+    form: {
+      tipo_movimiento_id: movimiento.tipo_movimiento_id
+        ? String(movimiento.tipo_movimiento_id)
+        : '',
+      naturaleza,
+      fecha_movimiento: fechaMovimientoParaInput(movimiento.fecha_movimiento),
+      documento_referencia: movimiento.documento_referencia ?? '',
+      fecha_documento: fechaDocumentoParaInput(movimiento.fecha_documento),
+      destinatario: movimiento.destinatario ?? '',
+      observacion: movimiento.observacion ?? '',
+      encargado: movimiento.encargado_almacen_id
+        ? {
+            value: movimiento.encargado_almacen_id,
+            label: movimiento.encargado_almacen_nombre || '',
+          }
+        : null,
+    },
+    lineas: (movimiento.detalles || []).map((detalle) => ({
+      key: siguienteKey(),
+      bien: {
+        value: detalle.bien_id,
+        label: detalle.bien_nombre,
+        unidad_medida_nombre: detalle.unidad_medida_nombre || '',
+        unidad_medida_abreviatura: detalle.unidad_medida_abreviatura || '',
+      },
+      cantidad: cantidadParaFormulario(detalle.cantidad, naturaleza),
+      cantidad_texto: detalle.cantidad_texto ?? '',
+    })),
+  }
+}
+
 function validarFormulario(form, lineas) {
   const errores = {}
 
@@ -122,12 +181,64 @@ function validarFormulario(form, lineas) {
 }
 
 export default function MovimientoFormPage() {
+  const { movimientoId } = useParams()
+  const esEdicion = Boolean(movimientoId)
   const navigate = useNavigate()
   const lineaId = useRef(0)
   const [form, setForm] = useState(EMPTY_FORM)
   const [lineas, setLineas] = useState([])
   const [errores, setErrores] = useState({})
   const [loading, setLoading] = useState(false)
+  const [cargandoMovimiento, setCargandoMovimiento] = useState(esEdicion)
+
+  useEffect(() => {
+    if (!movimientoId) {
+      setForm(EMPTY_FORM)
+      setLineas([])
+      setErrores({})
+      setCargandoMovimiento(false)
+      return undefined
+    }
+
+    let active = true
+    let salir = false
+    setCargandoMovimiento(true)
+    setErrores({})
+
+    sgbhApi
+      .buscarMovimientos({ movimiento_id: movimientoId })
+      .then((rows) => {
+        if (!active) return
+        const movimiento = Array.isArray(rows) ? rows[0] : null
+        if (!movimiento) {
+          salir = true
+          toast.error('El movimiento de almacén indicado no existe')
+          navigate('/alm-movimientos')
+          return
+        }
+        const cargado = formularioDesdeMovimiento(movimiento, () => {
+          lineaId.current += 1
+          return lineaId.current
+        })
+        setForm(cargado.form)
+        setLineas(cargado.lineas)
+      })
+      .catch((error) => {
+        if (!active) return
+        salir = true
+        toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de movimientos de almacén'))
+        navigate('/alm-movimientos')
+      })
+      .finally(() => {
+        if (active && !salir) {
+          setCargandoMovimiento(false)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [movimientoId, navigate])
 
   function crearLinea() {
     lineaId.current += 1
@@ -221,14 +332,40 @@ export default function MovimientoFormPage() {
 
     setLoading(true)
     try {
-      await sgbhApi.crearMovimiento(payload)
-      toast.success('Movimiento registrado correctamente')
+      if (esEdicion) {
+        await sgbhApi.actualizarMovimiento(movimientoId, payload)
+        toast.success('Movimiento modificado correctamente')
+      } else {
+        await sgbhApi.crearMovimiento(payload)
+        toast.success('Movimiento registrado correctamente')
+      }
       navigate('/alm-movimientos')
     } catch (error) {
-      toast.error(getErrorMessage(error, 'No se pudo registrar el movimiento de almacén'))
+      toast.error(
+        getErrorMessage(
+          error,
+          esEdicion
+            ? 'No se pudo modificar el movimiento de almacén'
+            : 'No se pudo registrar el movimiento de almacén',
+        ),
+      )
     } finally {
       setLoading(false)
     }
+  }
+
+  if (cargandoMovimiento) {
+    return (
+      <div className="space-y-6">
+        <Link
+          to="/alm-movimientos"
+          className="inline-flex text-sm font-medium text-[#1e3064] hover:underline focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 rounded-sm"
+        >
+          Volver al listado
+        </Link>
+        <p className="text-sm text-gray-600">Cargando...</p>
+      </div>
+    )
   }
 
   return (
@@ -241,8 +378,14 @@ export default function MovimientoFormPage() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-bold text-[#1e3064]">Agregar movimiento</h1>
-        <p className="mt-1 text-sm text-gray-600">Registro de un movimiento de almacén y sus bienes</p>
+        <h1 className="text-2xl font-bold text-[#1e3064]">
+          {esEdicion ? 'Modificar movimiento' : 'Agregar movimiento'}
+        </h1>
+        <p className="mt-1 text-sm text-gray-600">
+          {esEdicion
+            ? 'Modificación de un movimiento de almacén y sus bienes'
+            : 'Registro de un movimiento de almacén y sus bienes'}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

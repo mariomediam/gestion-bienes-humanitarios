@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
@@ -98,12 +99,16 @@ export default function MovimientosResultados({ movimientos }) {
                           Ver
                         </span>
                       </button>
-                      <button type="button" aria-label="Modificar" className={actionButtonClassName}>
+                      <Link
+                        to={`/alm-movimientos/${movimiento.movimiento_id}/editar`}
+                        aria-label="Modificar"
+                        className={actionButtonClassName}
+                      >
                         <PencilIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
                           Modificar
                         </span>
-                      </button>
+                      </Link>
                       <button type="button" aria-label="Eliminar" className={deleteButtonClassName}>
                         <TrashIcon className="w-4 h-4" />
                         <span className={deleteTooltipClassName} aria-hidden="true">

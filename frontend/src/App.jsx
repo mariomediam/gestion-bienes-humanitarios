@@ -86,6 +86,7 @@ function App() {
           <Route path="formularios-2A" element={<Formularios2APage />} />
           <Route path="bah-bienes" element={<BienesPage />} />
           <Route path="alm-movimientos/nuevo" element={<MovimientoFormPage />} />
+          <Route path="alm-movimientos/:movimientoId/editar" element={<MovimientoFormPage />} />
           <Route path="alm-movimientos" element={<MovimientosPage />} />
           <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />
