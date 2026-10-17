@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import PlusIcon from '@components/icons/PlusIcon'
 import MovimientosBusquedaForm from '@features/movimientos/components/MovimientosBusquedaForm'
@@ -48,13 +49,13 @@ export default function MovimientosPage() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
+          <Link
+            to="/alm-movimientos/nuevo"
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             <PlusIcon className="w-4 h-4" />
             Agregar movimiento
-          </button>
+          </Link>
           {hayResultados && (
             <button
               type="button"

@@ -289,4 +289,9 @@ export const sgbhApi = {
     const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
     return response.data
   },
+
+  buscarEncargadosAlmacen: async (params) => {
+    const response = await api.get('/api/sgbh/personal/buscar/encargados-almacen/', { params })
+    return response.data
+  },
 }

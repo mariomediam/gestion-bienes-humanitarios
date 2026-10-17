@@ -9,9 +9,17 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
-export default function TipoMovimientoSelect({ id, value, onChange, disabled }) {
+export default function TipoMovimientoSelect({
+  id,
+  value,
+  onChange,
+  disabled,
+  excluirIds = [],
+}) {
   const [tipos, setTipos] = useState([])
   const [loading, setLoading] = useState(true)
+  const excluidos = new Set(excluirIds.map(Number))
+  const visibles = tipos.filter((tipo) => !excluidos.has(Number(tipo.tipo_movimiento_id)))
 
   useEffect(() => {
     let active = true
@@ -43,14 +51,20 @@ export default function TipoMovimientoSelect({ id, value, onChange, disabled }) 
     <select
       id={id}
       value={value}
-      onChange={(event) => onChange(event.target.value)}
+      onChange={(event) => {
+        const selectedId = event.target.value
+        const tipo = visibles.find(
+          (item) => String(item.tipo_movimiento_id) === selectedId,
+        ) || null
+        onChange(selectedId, tipo)
+      }}
       disabled={disabled || loading}
       className={selectClassName}
     >
       <option value="">
         {loading ? 'Cargando...' : 'Seleccione un tipo de movimiento'}
       </option>
-      {tipos.map((tipo) => (
+      {visibles.map((tipo) => (
         <option key={tipo.tipo_movimiento_id} value={tipo.tipo_movimiento_id}>
           {tipo.nombre}
         </option>

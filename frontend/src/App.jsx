@@ -10,6 +10,7 @@ import Formulario2ADetallePage from '@features/formularios2a/pages/Formulario2AD
 import Formulario2AReportePage from '@features/formularios2a/pages/Formulario2AReportePage'
 import BienesPage from '@features/bienes/pages/BienesPage'
 import Formularios2APage from '@features/formularios2a/pages/Formularios2APage'
+import MovimientoFormPage from '@features/movimientos/pages/MovimientoFormPage'
 import MovimientosPage from '@features/movimientos/pages/MovimientosPage'
 
 const ProtectedRoute = ({ children }) => {
@@ -84,6 +85,7 @@ function App() {
           <Route path="emergencias" element={<EmergenciasPage />} />
           <Route path="formularios-2A" element={<Formularios2APage />} />
           <Route path="bah-bienes" element={<BienesPage />} />
+          <Route path="alm-movimientos/nuevo" element={<MovimientoFormPage />} />
           <Route path="alm-movimientos" element={<MovimientosPage />} />
           <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />
