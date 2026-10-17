@@ -21,11 +21,13 @@ export default function MovimientoDetalleFilas({
   errores,
   naturaleza,
   disabled,
+  soloLectura = false,
   onAgregar,
   onQuitar,
   onCambiar,
 }) {
-  const avisoSigno = mensajeSignoCantidad(naturaleza)
+  const avisoSigno = soloLectura ? '' : mensajeSignoCantidad(naturaleza)
+  const camposBloqueados = disabled || soloLectura
 
   return (
     <section className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
@@ -34,15 +36,17 @@ export default function MovimientoDetalleFilas({
           <h2 className="text-lg font-semibold text-[#1e3064]">Bienes</h2>
           {avisoSigno && <p className="mt-1 text-xs text-gray-600">{avisoSigno}</p>}
         </div>
-        <button
-          type="button"
-          onClick={onAgregar}
-          disabled={disabled}
-          className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <PlusIcon className="w-4 h-4" />
-          Agregar bien
-        </button>
+        {!soloLectura && (
+          <button
+            type="button"
+            onClick={onAgregar}
+            disabled={disabled}
+            className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <PlusIcon className="w-4 h-4" />
+            Agregar bien
+          </button>
+        )}
       </div>
 
       {errores.detalles && <p className="text-xs text-red-600">{errores.detalles}</p>}
@@ -61,7 +65,7 @@ export default function MovimientoDetalleFilas({
               key={linea.key}
               className="grid grid-cols-1 gap-3 border border-gray-100 rounded-md p-3 lg:grid-cols-12 lg:items-start"
             >
-              <div className="lg:col-span-5">
+              <div className={soloLectura ? 'lg:col-span-6' : 'lg:col-span-5'}>
                 <label htmlFor={`bien-movimiento-${linea.key}`} className={labelClassName}>
                   Bien
                 </label>
@@ -69,7 +73,7 @@ export default function MovimientoDetalleFilas({
                   inputId={`bien-movimiento-${linea.key}`}
                   value={linea.bien}
                   onChange={(bien) => onCambiar(linea.key, 'bien', bien)}
-                  disabled={disabled}
+                  disabled={camposBloqueados}
                 />
                 {errorLinea.bien && (
                   <p className="mt-1 text-xs text-red-600">{errorLinea.bien}</p>
@@ -98,7 +102,8 @@ export default function MovimientoDetalleFilas({
                   inputMode="decimal"
                   value={linea.cantidad}
                   onChange={(event) => onCambiar(linea.key, 'cantidad', event.target.value)}
-                  disabled={disabled}
+                  readOnly={soloLectura}
+                  disabled={camposBloqueados}
                   aria-describedby={avisoSigno ? 'aviso-signo-cantidad' : undefined}
                   className={inputClassName}
                 />
@@ -117,7 +122,8 @@ export default function MovimientoDetalleFilas({
                   value={linea.cantidad_texto}
                   onChange={(event) => onCambiar(linea.key, 'cantidad_texto', event.target.value)}
                   maxLength={30}
-                  disabled={disabled}
+                  readOnly={soloLectura}
+                  disabled={camposBloqueados}
                   className={inputClassName}
                 />
                 {errorLinea.cantidad_texto && (
@@ -125,17 +131,19 @@ export default function MovimientoDetalleFilas({
                 )}
               </div>
 
-              <div className="lg:col-span-1 lg:pt-5">
-                <button
-                  type="button"
-                  onClick={() => onQuitar(linea.key)}
-                  disabled={disabled}
-                  aria-label={`Quitar bien ${index + 1}`}
-                  className="inline-flex items-center justify-center w-full h-[38px] text-red-600 border border-gray-300 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <TrashIcon className="w-4 h-4" />
-                </button>
-              </div>
+              {!soloLectura && (
+                <div className="lg:col-span-1 lg:pt-5">
+                  <button
+                    type="button"
+                    onClick={() => onQuitar(linea.key)}
+                    disabled={disabled}
+                    aria-label={`Quitar bien ${index + 1}`}
+                    className="inline-flex items-center justify-center w-full h-[38px] text-red-600 border border-gray-300 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           )
         })}

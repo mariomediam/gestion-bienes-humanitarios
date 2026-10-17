@@ -97,12 +97,16 @@ export default function MovimientosResultados({ movimientos, onEliminado }) {
                   </td>
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
                     <div className="flex gap-2">
-                      <button type="button" aria-label="Ver" className={actionButtonClassName}>
+                      <Link
+                        to={`/alm-movimientos/${movimiento.movimiento_id}/ver`}
+                        aria-label="Ver"
+                        className={actionButtonClassName}
+                      >
                         <EyeIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
                           Ver
                         </span>
-                      </button>
+                      </Link>
                       <Link
                         to={`/alm-movimientos/${movimiento.movimiento_id}/editar`}
                         aria-label="Modificar"
