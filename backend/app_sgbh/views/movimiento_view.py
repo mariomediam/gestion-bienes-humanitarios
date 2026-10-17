@@ -101,6 +101,25 @@ class MovimientoDetailView(APIView):
 
         return Response(payload, status=status.HTTP_200_OK)
 
+    def delete(self, request, movimiento_id):
+        if movimiento_id < 1 or movimiento_id > _MOVIMIENTO_ID_MAX:
+            return Response(
+                {'error': 'El campo movimiento_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            MovimientoService.delete(movimiento_id)
+        except MovimientoServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar el movimiento de almacén'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class MovimientoBuscarView(APIView):
     permission_classes = [IsAuthenticated]

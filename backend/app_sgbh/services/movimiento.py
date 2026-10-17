@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
 from django.db import IntegrityError, transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, ProtectedError
 from django.utils import timezone
 
 from ..db_router import DB_ALIAS
@@ -275,6 +275,52 @@ class MovimientoService:
             _insert_detalles(movimiento.pk, lineas, ahora)
             stored = _stored_movimiento(movimiento.pk)
         return stored
+
+    @staticmethod
+    def delete(movimiento_id):
+        """Delete one S43alm_movimientos row and all of its detail rows.
+
+        Detail rows are removed first because FK_alm_mov_det_movimiento
+        does not cascade. Rejected when a planilla BAH references this
+        movement through movimiento_almacen_id, or when another movement
+        uses it as movimiento_origen_id. The checks and the deletes run
+        in one transaction.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                movimiento = Movimiento.objects.get(pk=movimiento_id)
+            except Movimiento.DoesNotExist:
+                raise MovimientoServiceError(
+                    'El movimiento de almacén indicado no existe',
+                    not_found=True,
+                ) from None
+
+            _reject_si_no_se_puede_eliminar(movimiento.pk)
+            MovimientoDetalle.objects.filter(movimiento_id=movimiento.pk).delete()
+            try:
+                movimiento.delete()
+            except ProtectedError:
+                _reject_si_no_se_puede_eliminar(movimiento.pk)
+                raise MovimientoServiceError(
+                    'No se puede eliminar el movimiento de almacén porque '
+                    'tiene registros asociados',
+                    conflict=True,
+                ) from None
+
+
+def _reject_si_no_se_puede_eliminar(movimiento_id):
+    if PlanillaEntrega.objects.filter(movimiento_almacen_id=movimiento_id).exists():
+        raise MovimientoServiceError(
+            'No se puede eliminar el movimiento de almacén porque '
+            'está vinculado a una planilla BAH',
+            conflict=True,
+        )
+    if Movimiento.objects.filter(movimiento_origen_id=movimiento_id).exists():
+        raise MovimientoServiceError(
+            'No se puede eliminar el movimiento de almacén porque '
+            'es origen de otro movimiento',
+            conflict=True,
+        )
 
 
 def _clean_header(
