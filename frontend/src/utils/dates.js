@@ -4,6 +4,12 @@ export function getFechaUnMesAnterior(from = new Date()) {
   return format(addMonth(from, -1), 'YYYY-MM-DD')
 }
 
+export function formatFechaMovimiento(value) {
+  if (!value) return '—'
+
+  return format(value, 'DD/MM/YYYY HH:mm', 'es')
+}
+
 export function formatFechaHora(fecha, hora) {
   if (!fecha) return '—'
 
