@@ -29,6 +29,7 @@ def test_parse_busqueda_omits_every_filter_when_params_are_empty():
         'destinatario': None,
         'observacion': None,
         'encargado_almacen_id': None,
+        'bien_nombre': None,
         'fecha_desde': None,
         'fecha_hasta': None,
     }
@@ -48,6 +49,7 @@ def test_parse_busqueda_accepts_several_filters_together():
             'destinatario': ' Municipalidad ',
             'observacion': 'Entrega parcial',
             'encargado_almacen_id': '4',
+            'bien_nombre': ' Frazada ',
         }
     )
 
@@ -62,6 +64,7 @@ def test_parse_busqueda_accepts_several_filters_together():
         'destinatario': 'Municipalidad',
         'observacion': 'Entrega parcial',
         'encargado_almacen_id': 4,
+        'bien_nombre': 'Frazada',
         'fecha_desde': date(2026, 1, 1),
         'fecha_hasta': date(2026, 3, 31),
     }
@@ -99,6 +102,7 @@ def test_parse_busqueda_accepts_several_filters_together():
             {'observacion': 'a' * 1001},
             'observacion no debe superar 1000 caracteres',
         ),
+        ({'bien_nombre': 'a' * 251}, 'bien_nombre no debe superar 250 caracteres'),
     ],
 )
 def test_parse_busqueda_rejects_invalid_filters(params, message):
@@ -125,6 +129,7 @@ def test_search_returns_every_row_when_no_filter_is_sent():
         'encargado_almacen',
     )
     queryset.filter.assert_not_called()
+    queryset.distinct.assert_not_called()
     queryset.order_by.assert_called_once_with('-fecha_movimiento')
 
 
@@ -158,6 +163,7 @@ def test_search_combines_filters_with_and():
     queryset = MagicMock()
     queryset.prefetch_related.return_value = queryset
     queryset.filter.return_value = queryset
+    queryset.distinct.return_value = queryset
     queryset.order_by.return_value = 'rows'
 
     with patch('app_sgbh.services.movimiento.Movimiento') as movimiento:
@@ -174,6 +180,7 @@ def test_search_combines_filters_with_and():
             destinatario='Municipalidad',
             observacion='Entrega parcial',
             encargado_almacen_id=4,
+            bien_nombre='Frazada',
         )
 
     assert result == 'rows'
@@ -201,7 +208,12 @@ def test_search_combines_filters_with_and():
         ((), {'destinatario__ilike_pattern': text_like_pattern('Municipalidad')}),
         ((), {'observacion__ilike_pattern': text_like_pattern('Entrega parcial')}),
         ((), {'encargado_almacen_id': 4}),
+        (
+            (),
+            {'detalles__bien__nombre__ilike_pattern': text_like_pattern('Frazada')},
+        ),
     ]
+    queryset.distinct.assert_called_once_with()
     queryset.order_by.assert_called_once_with('-fecha_movimiento')
 
 
@@ -339,6 +351,7 @@ def test_get_movimientos_buscar_returns_rows():
             'fecha_hasta': '2026-03-31',
             'documento_referencia': 'GR-001',
             'encargado_almacen_id': '4',
+            'bien_nombre': 'Frazada',
         },
     )
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
@@ -368,6 +381,7 @@ def test_get_movimientos_buscar_returns_rows():
         destinatario=None,
         observacion=None,
         encargado_almacen_id=4,
+        bien_nombre='Frazada',
         fecha_desde=date(2026, 1, 1),
         fecha_hasta=date(2026, 3, 31),
     )
@@ -402,6 +416,7 @@ def test_get_movimientos_buscar_returns_every_row_without_params():
         destinatario=None,
         observacion=None,
         encargado_almacen_id=None,
+        bien_nombre=None,
         fecha_desde=None,
         fecha_hasta=None,
     )

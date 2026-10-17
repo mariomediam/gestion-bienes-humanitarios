@@ -434,6 +434,11 @@ def parse_nombre_bien(raw_value):
     return _parse_optional_text(raw_value, 'nombre', 250)
 
 
+def parse_bien_nombre(raw_value):
+    """Parse the optional bien_nombre query param for S43cat_bah_bienes.nombre."""
+    return _parse_optional_text(raw_value, 'bien_nombre', 250)
+
+
 def parse_codigo_categoria_medio_vida(raw_value):
     """Parse the optional codigo query param for S43cat_categorias_medios_vida."""
     return _parse_optional_text(raw_value, 'codigo', 30)

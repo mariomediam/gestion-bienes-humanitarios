@@ -56,6 +56,7 @@ class MovimientoService:
         destinatario=None,
         observacion=None,
         encargado_almacen_id=None,
+        bien_nombre=None,
     ):
         """Return S43alm_movimientos rows using optional filters combined with AND.
 
@@ -63,10 +64,13 @@ class MovimientoService:
         S43alm_movimiento_detalle lines, with bien and unit of measure, under
         detalles. fecha_desde and fecha_hasta bound fecha_movimiento by
         calendar day, inclusive, because the column stores date and time.
-        documento_referencia, destinatario and observacion use a
-        case-insensitive partial match. The other filters are exact.
-        Ordered by fecha_movimiento descending. With no filters, every row is
-        returned. The queryset is ready for MovimientoBusquedaSerializer.
+        documento_referencia, destinatario, observacion and bien_nombre use a
+        case-insensitive partial match. bien_nombre matches
+        S43cat_bah_bienes.nombre of a detail line. The movement is included
+        when at least one line matches, and detalles still lists every line.
+        The other filters are exact. Ordered by fecha_movimiento descending.
+        With no filters, every row is returned. The queryset is ready for
+        MovimientoBusquedaSerializer.
         """
         queryset = Movimiento.objects.select_related(
             'almacen',
@@ -104,6 +108,13 @@ class MovimientoService:
             queryset = filter_text_like(queryset, 'observacion', observacion)
         if encargado_almacen_id is not None:
             queryset = queryset.filter(encargado_almacen_id=encargado_almacen_id)
+        if bien_nombre is not None:
+            queryset = filter_text_like(
+                queryset,
+                'detalles__bien__nombre',
+                bien_nombre,
+            )
+            queryset = queryset.distinct()
 
         return queryset.order_by('-fecha_movimiento')
 
