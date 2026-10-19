@@ -44,6 +44,7 @@ from .grado_lesion_view import GradoLesionListView
 from .material_pared_view import MaterialParedListView
 from .material_piso_view import MaterialPisoListView
 from .material_techo_view import MaterialTechoListView
+from .movimiento_planilla_bah_view import MovimientoPlanillaBahBuscarView
 from .movimiento_view import (
     MovimientoBuscarView,
     MovimientoCreateView,

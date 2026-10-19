@@ -50,6 +50,7 @@ from .movimiento import (
     MovimientoCreateSerializer,
     MovimientoSerializer,
 )
+from .movimiento_planilla_bah import MovimientoPlanillaBahBusquedaSerializer
 from .persona import (
     PersonaBusquedaSerializer,
     PersonaCreateSerializer,
@@ -104,6 +105,7 @@ __all__ = [
     'MaterialTechoSerializer',
     'MovimientoBusquedaSerializer',
     'MovimientoCreateSerializer',
+    'MovimientoPlanillaBahBusquedaSerializer',
     'MovimientoSerializer',
     'PersonaBusquedaSerializer',
     'PersonaCreateSerializer',

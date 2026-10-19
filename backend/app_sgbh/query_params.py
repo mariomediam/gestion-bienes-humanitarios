@@ -614,3 +614,27 @@ def parse_destinatario(raw_value):
 def parse_observacion(raw_value):
     """Parse the optional observacion query param for S43alm_movimientos."""
     return _parse_optional_text(raw_value, 'observacion', 1000)
+
+
+def parse_planilla_entrega_id(raw_value):
+    """Parse the optional planilla_entrega_id query param."""
+    return _parse_optional_int(raw_value, 'planilla_entrega_id')
+
+
+def parse_numero_planilla(raw_value):
+    """Parse the optional numero_planilla query param."""
+    return _parse_optional_int(raw_value, 'numero_planilla')
+
+
+def parse_anio_planilla(raw_value):
+    """Parse the optional anio_planilla query param."""
+    return _parse_optional_int(raw_value, 'anio_planilla')
+
+
+def parse_integrante_receptor_nombre(raw_value):
+    """Parse the optional integrante_receptor_nombre query param.
+
+    The stored length is apellido_paterno (50), one space, apellido_materno
+    (50), one space and nombres (150).
+    """
+    return _parse_optional_text(raw_value, 'integrante_receptor_nombre', 252)
