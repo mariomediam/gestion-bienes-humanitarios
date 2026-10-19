@@ -43,6 +43,7 @@ from .views import (
     PersonalBuscarView,
     PersonalEncargadosAlmacenBuscarView,
     PersonalEvaluadoresBuscarView,
+    PlanillaEntregaCreateView,
     PlanillaEntregaTotalView,
     RolFamiliarListView,
     TipoDanioPersonalListView,
@@ -259,6 +260,11 @@ urlpatterns = [
         'viviendas/buscar/',
         Formulario2AViviendaBuscarView.as_view(),
         name='viviendas-buscar',
+    ),
+    path(
+        'planillas-bah/',
+        PlanillaEntregaCreateView.as_view(),
+        name='planillas-bah',
     ),
     path(
         'planillas-bah/total/',

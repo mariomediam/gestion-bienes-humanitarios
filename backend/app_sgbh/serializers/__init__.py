@@ -57,7 +57,11 @@ from .persona import (
     PersonaSerializer,
 )
 from .personal import PersonalSerializer
-from .planilla_entrega import PlanillaEntregaTotalSerializer
+from .planilla_entrega import (
+    PlanillaEntregaCreateSerializer,
+    PlanillaEntregaSerializer,
+    PlanillaEntregaTotalSerializer,
+)
 from .rol_familiar import RolFamiliarSerializer
 from .tipo_danio_personal import TipoDanioPersonalSerializer
 from .tipo_discapacidad import TipoDiscapacidadSerializer
@@ -111,6 +115,8 @@ __all__ = [
     'PersonaCreateSerializer',
     'PersonaSerializer',
     'PersonalSerializer',
+    'PlanillaEntregaCreateSerializer',
+    'PlanillaEntregaSerializer',
     'PlanillaEntregaTotalSerializer',
     'RolFamiliarSerializer',
     'TipoDanioPersonalSerializer',

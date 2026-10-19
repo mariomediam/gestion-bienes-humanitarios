@@ -56,7 +56,10 @@ from .personal_view import (
     PersonalEncargadosAlmacenBuscarView,
     PersonalEvaluadoresBuscarView,
 )
-from .planilla_entrega_view import PlanillaEntregaTotalView
+from .planilla_entrega_view import (
+    PlanillaEntregaCreateView,
+    PlanillaEntregaTotalView,
+)
 from .rol_familiar_view import RolFamiliarListView
 from .tipo_danio_personal_view import TipoDanioPersonalListView
 from .tipo_discapacidad_view import TipoDiscapacidadListView
