@@ -32,7 +32,7 @@ function UbicacionCell({ formulario }) {
           {formulario.viviendas
             .filter((vivienda) => vivienda.numero_lote)
             .map((vivienda) => (
-              <li key={vivienda.vivienda_id}>{vivienda.numero_lote}</li>
+              <li key={vivienda.vivienda_id}>Lote: {vivienda.numero_lote}</li>
             ))}
         </ul>
       )}
