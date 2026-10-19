@@ -33,6 +33,7 @@ def test_parse_busqueda_omits_every_filter_when_params_are_empty():
         'barrio_sector_urbanizacion': None,
         'documento_referencia': None,
         'integrante_receptor_nombre': None,
+        'bien_nombre': None,
         'fecha_desde': None,
         'fecha_hasta': None,
     }
@@ -51,6 +52,7 @@ def test_parse_busqueda_accepts_several_filters_together():
             'fecha_hasta': '2026-03-31',
             'documento_referencia': ' GR-001 ',
             'integrante_receptor_nombre': ' Perez Lopez Ana ',
+            'bien_nombre': ' Frazada ',
         }
     )
 
@@ -64,6 +66,7 @@ def test_parse_busqueda_accepts_several_filters_together():
         'barrio_sector_urbanizacion': 'Santa Rosa',
         'documento_referencia': 'GR-001',
         'integrante_receptor_nombre': 'Perez Lopez Ana',
+        'bien_nombre': 'Frazada',
         'fecha_desde': date(2026, 1, 1),
         'fecha_hasta': date(2026, 3, 31),
     }
@@ -97,6 +100,7 @@ def test_parse_busqueda_accepts_several_filters_together():
             {'integrante_receptor_nombre': 'a' * 253},
             'integrante_receptor_nombre no debe superar 252 caracteres',
         ),
+        ({'bien_nombre': 'a' * 251}, 'bien_nombre no debe superar 250 caracteres'),
     ],
 )
 def test_parse_busqueda_rejects_invalid_filters(params, message):
@@ -113,6 +117,7 @@ def _queryset():
     queryset.prefetch_related.return_value = queryset
     queryset.filter.return_value = queryset
     queryset.alias.return_value = queryset
+    queryset.distinct.return_value = queryset
     queryset.order_by.return_value = 'rows'
     return queryset
 
@@ -274,7 +279,38 @@ def test_search_combines_filters_with_and():
         ),
     ]
     queryset.alias.assert_called_once()
+    queryset.distinct.assert_not_called()
     queryset.order_by.assert_called_once_with('-movimiento_almacen__fecha_movimiento')
+
+
+def test_search_filters_by_bien_nombre():
+    queryset = _queryset()
+    distrito_qs = MagicMock()
+    distrito_qs.values.return_value = distrito_qs
+    detalle_qs = MagicMock()
+    detalle_qs.order_by.return_value = 'detalles'
+
+    with (
+        patch(
+            'app_sgbh.services.movimiento_planilla_bah.PlanillaEntrega'
+        ) as planilla,
+        patch('app_sgbh.services.movimiento_planilla_bah.Distrito') as distrito,
+        patch(
+            'app_sgbh.services.movimiento_planilla_bah.MovimientoDetalle'
+        ) as detalle,
+    ):
+        planilla.objects.filter.return_value = queryset
+        distrito.objects.filter.return_value = distrito_qs
+        detalle.objects.select_related.return_value = detalle_qs
+        result = MovimientoPlanillaBahService.search(bien_nombre='Frazada')
+
+    assert result == 'rows'
+    queryset.filter.assert_called_once_with(
+        movimiento_almacen__detalles__bien__nombre__ilike_pattern=text_like_pattern(
+            'Frazada'
+        ),
+    )
+    queryset.distinct.assert_called_once_with()
 
 
 def _planilla():
@@ -460,6 +496,7 @@ def test_get_movimientos_buscar_planilla_bah_returns_rows():
             'fecha_hasta': '2026-03-31',
             'documento_referencia': 'GR-001',
             'integrante_receptor_nombre': 'Perez Lopez Ana',
+            'bien_nombre': 'Frazada',
         },
     )
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
@@ -488,6 +525,7 @@ def test_get_movimientos_buscar_planilla_bah_returns_rows():
         barrio_sector_urbanizacion='Santa Rosa',
         documento_referencia='GR-001',
         integrante_receptor_nombre='Perez Lopez Ana',
+        bien_nombre='Frazada',
         fecha_desde=date(2026, 1, 1),
         fecha_hasta=date(2026, 3, 31),
     )
@@ -521,6 +559,7 @@ def test_get_movimientos_buscar_planilla_bah_returns_every_linked_row_without_pa
         barrio_sector_urbanizacion=None,
         documento_referencia=None,
         integrante_receptor_nombre=None,
+        bien_nombre=None,
         fecha_desde=None,
         fecha_hasta=None,
     )

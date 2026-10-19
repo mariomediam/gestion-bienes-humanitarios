@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from app_sgbh.query_params import (
     parse_anio_planilla,
     parse_barrio_sector_urbanizacion,
+    parse_bien_nombre,
     parse_codigo_sinpad,
     parse_documento_referencia,
     parse_integrante_receptor_nombre,
@@ -72,6 +73,7 @@ def _parse_busqueda(params):
         ('barrio_sector_urbanizacion', parse_barrio_sector_urbanizacion),
         ('documento_referencia', parse_documento_referencia),
         ('integrante_receptor_nombre', parse_integrante_receptor_nombre),
+        ('bien_nombre', parse_bien_nombre),
     )
     values = {}
     for name, parser in parsers:

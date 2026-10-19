@@ -1,0 +1,94 @@
+import { useState } from 'react'
+import ExcelIcon from '@components/icons/ExcelIcon'
+import PlusIcon from '@components/icons/PlusIcon'
+import PlanillasBahBusquedaForm from '@features/planillasBah/components/PlanillasBahBusquedaForm'
+import PlanillasBahResultados from '@features/planillasBah/components/PlanillasBahResultados'
+import { exportPlanillasBahExcel } from '@features/planillasBah/exportPlanillasBahExcel'
+import usePlanillasBahBusqueda from '@features/planillasBah/hooks/usePlanillasBahBusqueda'
+import { buildPlanillaBahSearchParams } from '@features/planillasBah/searchParams'
+
+const EMPTY_FILTROS = {
+  anio_planilla: '',
+  codigo_sinpad: '',
+  barrio_sector_urbanizacion: '',
+  fecha_desde: '',
+  fecha_hasta: '',
+  documento_referencia: '',
+  integrante_receptor_nombre: '',
+}
+
+export default function PlanillasBahPage() {
+  const [consulta, setConsulta] = useState('')
+  const [filtros, setFiltros] = useState(EMPTY_FILTROS)
+  const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
+  const {
+    loading,
+    searched,
+    planillas,
+    buscar,
+    limpiarResultados,
+  } = usePlanillasBahBusqueda()
+
+  function handleFiltroChange(name, value) {
+    setFiltros((current) => ({ ...current, [name]: value }))
+  }
+
+  function handleBuscar(event) {
+    event.preventDefault()
+    buscar(buildPlanillaBahSearchParams(consulta, filtros))
+  }
+
+  function handleLimpiar() {
+    setConsulta('')
+    setFiltros(EMPTY_FILTROS)
+    setAvanzadaAbierta(false)
+    limpiarResultados()
+  }
+
+  const hayResultados = searched && planillas.length > 0
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1e3064]">Planillas BAH</h1>
+          <p className="mt-1 text-sm text-gray-600">Gestión de planillas BAH</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
+          >
+            <PlusIcon className="w-4 h-4" />
+            Agregar planilla
+          </button>
+          {hayResultados && (
+            <button
+              type="button"
+              onClick={() => exportPlanillasBahExcel(planillas)}
+              className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
+            >
+              <ExcelIcon className="w-4 h-4" />
+              Exportar a Excel
+            </button>
+          )}
+        </div>
+      </div>
+
+      <PlanillasBahBusquedaForm
+        consulta={consulta}
+        onConsultaChange={setConsulta}
+        filtros={filtros}
+        onFiltroChange={handleFiltroChange}
+        avanzadaAbierta={avanzadaAbierta}
+        onToggleAvanzada={() => setAvanzadaAbierta((open) => !open)}
+        onSubmit={handleBuscar}
+        onLimpiar={handleLimpiar}
+        loading={loading}
+      />
+
+      {searched && <PlanillasBahResultados planillas={planillas} />}
+    </div>
+  )
+}

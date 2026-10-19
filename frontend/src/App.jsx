@@ -13,6 +13,7 @@ import Formularios2APage from '@features/formularios2a/pages/Formularios2APage'
 import MovimientoFormPage from '@features/movimientos/pages/MovimientoFormPage'
 import MovimientoVerPage from '@features/movimientos/pages/MovimientoVerPage'
 import MovimientosPage from '@features/movimientos/pages/MovimientosPage'
+import PlanillasBahPage from '@features/planillasBah/pages/PlanillasBahPage'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading, checkAuth } = useAuthStore()
@@ -90,6 +91,7 @@ function App() {
           <Route path="alm-movimientos/:movimientoId/editar" element={<MovimientoFormPage />} />
           <Route path="alm-movimientos/:movimientoId/ver" element={<MovimientoVerPage />} />
           <Route path="alm-movimientos" element={<MovimientosPage />} />
+          <Route path="alm-planilla-bah" element={<PlanillasBahPage />} />
           <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />
         </Route>

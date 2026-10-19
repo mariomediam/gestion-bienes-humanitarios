@@ -17,6 +17,7 @@ class MovimientoPlanillaBahService:
         fecha_hasta=None,
         documento_referencia=None,
         integrante_receptor_nombre=None,
+        bien_nombre=None,
     ):
         """Return planillas BAH linked to S43alm_movimientos.
 
@@ -29,9 +30,10 @@ class MovimientoPlanillaBahService:
         planilla_entrega_id, movimiento_id, numero_planilla, anio_planilla
         and codigo_sinpad are exact. fecha_desde and fecha_hasta bound
         fecha_entrega, inclusive. barrio_sector_urbanizacion,
-        documento_referencia and integrante_receptor_nombre use a
-        case-insensitive partial match. integrante_receptor_nombre matches
-        apellido_paterno + ' ' + apellido_materno + ' ' + nombres.
+        documento_referencia, integrante_receptor_nombre and bien_nombre
+        use a case-insensitive partial match. integrante_receptor_nombre
+        matches apellido_paterno + ' ' + apellido_materno + ' ' + nombres.
+        bien_nombre matches S43cat_bah_bienes.nombre on the movement lines.
         Ordered by fecha_movimiento descending. Each row keeps its
         S43alm_movimiento_detalle lines under detalles. The queryset is
         ready for MovimientoPlanillaBahBusquedaSerializer.
@@ -75,6 +77,13 @@ class MovimientoPlanillaBahService:
                     integrante_receptor_nombre
                 ),
             )
+        if bien_nombre is not None:
+            queryset = filter_text_like(
+                queryset,
+                'movimiento_almacen__detalles__bien__nombre',
+                bien_nombre,
+            )
+            queryset = queryset.distinct()
 
         return queryset.order_by('-movimiento_almacen__fecha_movimiento')
 

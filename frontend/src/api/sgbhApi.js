@@ -153,6 +153,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  buscarPlanillasBah: async (params) => {
+    const response = await api.get('/api/sgbh/movimientos/buscar-planilla-bah/', { params })
+    return response.data
+  },
+
   getTiposDanioPersonal: async (params) => {
     const response = await api.get('/api/sgbh/tipos-danio-personal/', { params })
     return response.data
