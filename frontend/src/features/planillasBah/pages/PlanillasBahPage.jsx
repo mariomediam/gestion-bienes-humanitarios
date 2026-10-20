@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import PlusIcon from '@components/icons/PlusIcon'
+import PlanillaBahSeleccionarFormularioModal from '@features/planillasBah/components/PlanillaBahSeleccionarFormularioModal'
 import PlanillasBahBusquedaForm from '@features/planillasBah/components/PlanillasBahBusquedaForm'
 import PlanillasBahResultados from '@features/planillasBah/components/PlanillasBahResultados'
 import { exportPlanillasBahExcel } from '@features/planillasBah/exportPlanillasBahExcel'
@@ -18,6 +20,8 @@ const EMPTY_FILTROS = {
 }
 
 export default function PlanillasBahPage() {
+  const navigate = useNavigate()
+  const [modalAbierto, setModalAbierto] = useState(false)
   const [consulta, setConsulta] = useState('')
   const [filtros, setFiltros] = useState(EMPTY_FILTROS)
   const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
@@ -58,6 +62,7 @@ export default function PlanillasBahPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
+            onClick={() => setModalAbierto(true)}
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             <PlusIcon className="w-4 h-4" />
@@ -89,6 +94,15 @@ export default function PlanillasBahPage() {
       />
 
       {searched && <PlanillasBahResultados planillas={planillas} />}
+
+      <PlanillaBahSeleccionarFormularioModal
+        isOpen={modalAbierto}
+        onClose={() => setModalAbierto(false)}
+        onSeleccionado={(vivienda) => {
+          setModalAbierto(false)
+          navigate(`/alm-planilla-bah/nuevo/${vivienda.formulario_2a_id}`)
+        }}
+      />
     </div>
   )
 }

@@ -213,6 +213,18 @@ export const sgbhApi = {
     return response.data
   },
 
+  formulario2ATienePlanillaBah: async (formulario2aId) => {
+    const response = await api.get(
+      `/api/sgbh/formularios-2a/${formulario2aId}/tiene-planilla-bah/`,
+    )
+    return response.data
+  },
+
+  crearPlanillaBah: async (data) => {
+    const response = await api.post('/api/sgbh/planillas-bah/', data)
+    return response.data
+  },
+
   buscarViviendas: async (params) => {
     const response = await api.get('/api/sgbh/viviendas/buscar/', { params })
     return response.data
