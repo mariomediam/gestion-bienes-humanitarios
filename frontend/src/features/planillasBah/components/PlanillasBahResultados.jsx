@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import PlanillaBahEliminarModal from '@features/planillasBah/components/PlanillaBahEliminarModal'
 import {
   formatFechaEntrega,
   textoCantidad,
@@ -49,7 +51,9 @@ function BienesCell({ detalles }) {
   )
 }
 
-export default function PlanillasBahResultados({ planillas }) {
+export default function PlanillasBahResultados({ planillas, onEliminada }) {
+  const [planillaAEliminar, setPlanillaAEliminar] = useState(null)
+
   return (
     <section className="bg-white rounded-lg border border-gray-200">
       <div className="px-5 py-4 border-b border-gray-200">
@@ -111,7 +115,12 @@ export default function PlanillasBahResultados({ planillas }) {
                           Modificar
                         </span>
                       </Link>
-                      <button type="button" aria-label="Eliminar" className={deleteButtonClassName}>
+                      <button
+                        type="button"
+                        aria-label="Eliminar"
+                        onClick={() => setPlanillaAEliminar(planilla)}
+                        className={deleteButtonClassName}
+                      >
                         <TrashIcon className="w-4 h-4" />
                         <span className={deleteTooltipClassName} aria-hidden="true">
                           Eliminar
@@ -125,6 +134,13 @@ export default function PlanillasBahResultados({ planillas }) {
           </tbody>
         </table>
       </div>
+
+      <PlanillaBahEliminarModal
+        isOpen={planillaAEliminar !== null}
+        planilla={planillaAEliminar}
+        onClose={() => setPlanillaAEliminar(null)}
+        onEliminada={onEliminada}
+      />
     </section>
   )
 }

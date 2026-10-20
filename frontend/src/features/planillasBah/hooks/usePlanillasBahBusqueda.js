@@ -30,11 +30,18 @@ export default function usePlanillasBahBusqueda() {
     setSearched(false)
   }
 
+  function quitarPlanilla(planillaEntregaId) {
+    setPlanillas((current) =>
+      current.filter((item) => item.planilla_entrega_id !== planillaEntregaId),
+    )
+  }
+
   return {
     loading,
     searched,
     planillas,
     buscar,
     limpiarResultados,
+    quitarPlanilla,
   }
 }

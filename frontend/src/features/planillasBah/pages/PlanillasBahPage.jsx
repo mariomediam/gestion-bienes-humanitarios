@@ -31,6 +31,7 @@ export default function PlanillasBahPage() {
     planillas,
     buscar,
     limpiarResultados,
+    quitarPlanilla,
   } = usePlanillasBahBusqueda()
 
   function handleFiltroChange(name, value) {
@@ -93,7 +94,9 @@ export default function PlanillasBahPage() {
         loading={loading}
       />
 
-      {searched && <PlanillasBahResultados planillas={planillas} />}
+      {searched && (
+        <PlanillasBahResultados planillas={planillas} onEliminada={quitarPlanilla} />
+      )}
 
       <PlanillaBahSeleccionarFormularioModal
         isOpen={modalAbierto}
