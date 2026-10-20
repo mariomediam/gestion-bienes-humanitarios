@@ -1,6 +1,7 @@
 import {
   FILAS_PLANILLA,
   GUION_FILA_VACIA,
+  ANCHO_COLUMNA_FIRMA,
   anchosColumnas,
   claseCategoria,
   formatFechaEntregaReporte,
@@ -82,6 +83,7 @@ export default function PlanillaBahReporteHoja({ reporte }) {
           {anchos.map((ancho, indice) => (
             <col key={indice} style={{ width: ancho }} />
           ))}
+          <col style={{ width: ANCHO_COLUMNA_FIRMA }} />
         </colgroup>
         <thead>
           <tr>

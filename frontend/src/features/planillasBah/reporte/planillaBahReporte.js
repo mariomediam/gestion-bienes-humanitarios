@@ -91,8 +91,12 @@ function magnitudCantidad(cantidad) {
   return `${entero}.${String(centesimas).padStart(2, '0')}`
 }
 
+export const ANCHO_COLUMNA_FIRMA = '150px'
+
 export function anchosColumnas(totalBienes) {
-  const pesos = [5, 18, 20, 11, 10, ...Array(totalBienes).fill(6), 8]
+  const pesos = [5, 18, 20, 11, 10, ...Array(totalBienes).fill(6)]
   const suma = pesos.reduce((total, peso) => total + peso, 0)
-  return pesos.map((peso) => `${(peso / suma) * 100}%`)
+  return pesos.map(
+    (peso) => `calc((100% - ${ANCHO_COLUMNA_FIRMA}) * ${peso} / ${suma})`,
+  )
 }
