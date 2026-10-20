@@ -59,6 +59,7 @@ from .personal_view import (
 from .planilla_entrega_view import (
     Formulario2ATienePlanillaBahView,
     PlanillaEntregaCreateView,
+    PlanillaEntregaDetailView,
     PlanillaEntregaTotalView,
 )
 from .rol_familiar_view import RolFamiliarListView

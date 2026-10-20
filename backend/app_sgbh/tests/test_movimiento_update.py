@@ -217,6 +217,15 @@ def test_update_rejects_movement_linked_to_planilla():
     mocks['detalle'].objects.filter.assert_not_called()
 
 
+def test_update_desde_planilla_modifica_el_movimiento_vinculado():
+    with _patched(linked=True) as mocks:
+        MovimientoService.update(15, desde_planilla=True, **_payload())
+
+    mocks['planilla'].objects.filter.assert_not_called()
+    assert mocks['row'].update_fields is not None
+    mocks['detalle'].objects.filter.return_value.delete.assert_called_once_with()
+
+
 def test_update_rejects_origin_equal_to_the_movement():
     with _patched() as mocks:
         with pytest.raises(MovimientoServiceError) as exc:

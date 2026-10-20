@@ -139,6 +139,139 @@ class PlanillaEntregaService:
                 ) from None
         return row
 
+    @staticmethod
+    def update(
+        planilla_entrega_id,
+        *,
+        almacen_id,
+        tipo_movimiento_id,
+        estado_movimiento_id,
+        movimiento_origen_id,
+        fecha_movimiento,
+        documento_referencia,
+        fecha_documento,
+        destinatario,
+        observacion,
+        fecha_confirmacion,
+        encargado_almacen_id,
+        c_usuari_login,
+        detalles,
+        anio_planilla,
+        numero_planilla,
+        integrante_receptor_id,
+        fecha_entrega,
+        estado_planilla_id,
+        planilla_entrega_observacion,
+        fecha_emision,
+    ):
+        """Replace one planilla BAH and its linked warehouse movement.
+
+        Writable columns match create. Header, movement and detail rows are
+        written in one transaction. Movement rules are the same as
+        MovimientoService.update, including replacement of every detail row.
+        The planilla link does not block that update. anio_planilla is
+        required. numero_planilla is stored when sent; otherwise it is one
+        more than the maximum numero_planilla of that year, or 1 when the
+        year has none. fecha_anulacion and motivo_anulacion stay as stored.
+        fecha_creacion stays as stored. fecha_modificacion is the current
+        time. c_usuari_login comes from the authenticated user and is the
+        login stored on the movement and on the planilla. A formulario 2A
+        can have only one planilla. The planilla being edited is excluded
+        from that check. movimiento_almacen_id stays the same.
+        """
+        planilla = _clean_planilla(
+            anio_planilla=anio_planilla,
+            numero_planilla=numero_planilla,
+            integrante_receptor_id=integrante_receptor_id,
+            fecha_entrega=fecha_entrega,
+            estado_planilla_id=estado_planilla_id,
+            planilla_entrega_observacion=planilla_entrega_observacion,
+            fecha_emision=fecha_emision,
+        )
+
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                row = PlanillaEntrega.objects.get(pk=planilla_entrega_id)
+            except PlanillaEntrega.DoesNotExist:
+                raise PlanillaEntregaServiceError(
+                    'La planilla BAH indicada no existe',
+                    not_found=True,
+                ) from None
+
+            if row.movimiento_almacen_id is None:
+                raise PlanillaEntregaServiceError(
+                    'La planilla BAH no tiene un movimiento de almacén'
+                )
+
+            formulario_2a_id = formulario_2a_id_de_integrante(
+                planilla['integrante_receptor_id']
+            )
+            if formulario_2a_id is None:
+                raise PlanillaEntregaServiceError(
+                    'El integrante receptor indicado no existe'
+                )
+            if formulario_tiene_planilla_bah(
+                formulario_2a_id,
+                excluir_planilla_entrega_id=row.pk,
+            ):
+                raise PlanillaEntregaServiceError(
+                    'El formulario EDAN 2A ya tiene registrada una planilla BAH',
+                    conflict=True,
+                )
+            _require_estado_planilla(planilla['estado_planilla_id'])
+            if planilla['numero_planilla'] is None:
+                planilla['numero_planilla'] = _siguiente_numero_planilla(
+                    planilla['anio_planilla']
+                )
+
+            movimiento = MovimientoService.update(
+                row.movimiento_almacen_id,
+                almacen_id=almacen_id,
+                tipo_movimiento_id=tipo_movimiento_id,
+                estado_movimiento_id=estado_movimiento_id,
+                movimiento_origen_id=movimiento_origen_id,
+                fecha_movimiento=fecha_movimiento,
+                documento_referencia=documento_referencia,
+                fecha_documento=fecha_documento,
+                destinatario=destinatario,
+                observacion=observacion,
+                fecha_confirmacion=fecha_confirmacion,
+                encargado_almacen_id=encargado_almacen_id,
+                c_usuari_login=c_usuari_login,
+                detalles=detalles,
+                desde_planilla=True,
+            )
+
+            row.numero_planilla = planilla['numero_planilla']
+            row.anio_planilla = planilla['anio_planilla']
+            row.integrante_receptor_id = planilla['integrante_receptor_id']
+            row.fecha_entrega = planilla['fecha_entrega']
+            row.estado_planilla_id = planilla['estado_planilla_id']
+            row.observacion = planilla['planilla_entrega_observacion']
+            row.fecha_emision = planilla['fecha_emision']
+            row.c_usuari_login = movimiento.c_usuari_login
+            row.fecha_modificacion = timezone.now()
+            try:
+                row.save(
+                    update_fields=[
+                        'numero_planilla',
+                        'anio_planilla',
+                        'integrante_receptor_id',
+                        'fecha_entrega',
+                        'estado_planilla_id',
+                        'observacion',
+                        'fecha_emision',
+                        'c_usuari_login',
+                        'fecha_modificacion',
+                    ]
+                )
+            except IntegrityError:
+                raise PlanillaEntregaServiceError(
+                    'No se pudo modificar la planilla BAH'
+                ) from None
+            row.movimiento_almacen = movimiento
+        return row
+
 
 def formulario_2a_id_de_integrante(integrante_receptor_id):
     """Return the Formulario 2A id reached from an integrante.

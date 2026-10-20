@@ -12,6 +12,7 @@ from app_sgbh.serializers.planilla_entrega import (
     PlanillaEntregaCreateSerializer,
     PlanillaEntregaSerializer,
     PlanillaEntregaTotalSerializer,
+    PlanillaEntregaUpdateSerializer,
 )
 from app_sgbh.services.formulario_2a import (
     Formulario2AService,
@@ -25,6 +26,7 @@ from app_sgbh.services.planilla_entrega import (
 )
 
 _FORMULARIO_2A_ID_MAX = 2147483647
+_PLANILLA_ENTREGA_ID_MAX = 2147483647
 
 
 class PlanillaEntregaCreateView(APIView):
@@ -59,6 +61,47 @@ class PlanillaEntregaCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class PlanillaEntregaDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, planilla_entrega_id):
+        if planilla_entrega_id < 1 or planilla_entrega_id > _PLANILLA_ENTREGA_ID_MAX:
+            return Response(
+                {'error': 'El campo planilla_entrega_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not isinstance(request.data, dict):
+            return Response(
+                {'error': 'El cuerpo de la solicitud no es válido'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = PlanillaEntregaUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'error': _first_error_message(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            updated = PlanillaEntregaService.update(
+                planilla_entrega_id,
+                c_usuari_login=getattr(request.user, 'login', ''),
+                **serializer.validated_data,
+            )
+            payload = PlanillaEntregaSerializer(updated).data
+        except (PlanillaEntregaServiceError, MovimientoServiceError) as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo modificar la planilla BAH'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 class PlanillaEntregaTotalView(APIView):

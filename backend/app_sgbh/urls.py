@@ -45,6 +45,7 @@ from .views import (
     PersonalEncargadosAlmacenBuscarView,
     PersonalEvaluadoresBuscarView,
     PlanillaEntregaCreateView,
+    PlanillaEntregaDetailView,
     PlanillaEntregaTotalView,
     RolFamiliarListView,
     TipoDanioPersonalListView,
@@ -271,6 +272,11 @@ urlpatterns = [
         'planillas-bah/',
         PlanillaEntregaCreateView.as_view(),
         name='planillas-bah',
+    ),
+    path(
+        'planillas-bah/<int:planilla_entrega_id>/',
+        PlanillaEntregaDetailView.as_view(),
+        name='planillas-bah-detalle',
     ),
     path(
         'planillas-bah/total/',

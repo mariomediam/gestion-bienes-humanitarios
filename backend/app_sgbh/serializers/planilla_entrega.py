@@ -89,6 +89,16 @@ class PlanillaEntregaCreateSerializer(MovimientoCreateSerializer):
     )
 
 
+class PlanillaEntregaUpdateSerializer(PlanillaEntregaCreateSerializer):
+    """Validate the body used to update a planilla BAH and its movement.
+
+    Same fields as create. fecha_anulacion and motivo_anulacion are not
+    accepted and stay as stored. c_usuari_login comes from the authenticated
+    user. Existence of the planilla, the receptor, the planilla state and
+    the one-planilla-per-formulario rule are checked by PlanillaEntregaService.
+    """
+
+
 class PlanillaEntregaSerializer(serializers.Serializer):
     """Stored planilla BAH with the warehouse movement created with it."""
 

@@ -212,6 +212,7 @@ class MovimientoService:
         encargado_almacen_id,
         c_usuari_login,
         detalles,
+        desde_planilla=False,
     ):
         """Replace one S43alm_movimientos row and all of its detail rows.
 
@@ -221,6 +222,8 @@ class MovimientoService:
         detail rows are deleted and the sent lines are inserted with a new
         primary key and fecha_creacion. Rejected when any planilla BAH
         references this movement through movimiento_almacen_id.
+        desde_planilla skips that rejection. Only PlanillaEntregaService.update
+        sets it, because that operation replaces the movement of its own planilla.
         """
         header = _clean_header(
             almacen_id=almacen_id,
@@ -247,7 +250,7 @@ class MovimientoService:
                     not_found=True,
                 ) from None
 
-            if PlanillaEntrega.objects.filter(
+            if not desde_planilla and PlanillaEntrega.objects.filter(
                 movimiento_almacen_id=movimiento.pk
             ).exists():
                 raise MovimientoServiceError(
