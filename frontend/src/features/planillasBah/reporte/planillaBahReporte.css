@@ -131,8 +131,12 @@
 }
 
 .bah-th-bien {
-  height: 22mm;
+  height: 46mm;
   padding: 1mm 0.4mm;
+}
+
+.bah-th-bien .bah-vertical {
+  max-height: 44mm;
 }
 
 .bah-ubicacion { background: #fff3a0; }
