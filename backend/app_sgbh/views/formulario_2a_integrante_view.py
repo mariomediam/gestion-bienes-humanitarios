@@ -4,8 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app_sgbh.query_params import (
+    parse_codigo_sinpad,
     parse_condicion_persona_id,
     parse_familia_id,
+    parse_formulario_2a_id,
     parse_integrante_id,
     parse_persona_id,
 )
@@ -153,11 +155,25 @@ class Formulario2AIntegranteBuscarView(APIView):
         if error:
             return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
 
+        formulario_2a_id, error = parse_formulario_2a_id(
+            request.query_params.get('formulario_2a_id')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        codigo_sinpad, error = parse_codigo_sinpad(
+            request.query_params.get('codigo_sinpad')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             rows = Formulario2AIntegranteService.search(
                 integrante_id=integrante_id,
                 familia_id=familia_id,
                 persona_id=persona_id,
+                formulario_2a_id=formulario_2a_id,
+                codigo_sinpad=codigo_sinpad,
             )
             payload = IntegranteBusquedaSerializer(rows, many=True).data
         except Exception:

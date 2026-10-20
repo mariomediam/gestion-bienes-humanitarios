@@ -104,6 +104,8 @@ def test_search_combines_filters_with_and():
             integrante_id=31,
             familia_id=8,
             persona_id=15,
+            formulario_2a_id=10,
+            codigo_sinpad='261404',
         )
 
     assert result == 'rows'
@@ -111,6 +113,15 @@ def test_search_combines_filters_with_and():
         ((), {'integrante_id': 31}),
         ((), {'familia_id': 8}),
         ((), {'persona_id': 15}),
+        ((), {'familia__vivienda__formulario_2a_id': 10}),
+        (
+            (),
+            {
+                'familia__vivienda__formulario_2a__emergencia__codigo_sinpad': (
+                    '261404'
+                )
+            },
+        ),
     ]
     queryset.order_by.assert_called_once_with('integrante_id')
 
@@ -198,7 +209,13 @@ def test_get_integrantes_buscar_returns_rows():
     factory = APIRequestFactory()
     request = factory.get(
         '/api/sgbh/integrantes/buscar/',
-        {'integrante_id': '31', 'familia_id': '8', 'persona_id': '15'},
+        {
+            'integrante_id': '31',
+            'familia_id': '8',
+            'persona_id': '15',
+            'formulario_2a_id': '10',
+            'codigo_sinpad': ' 261404 ',
+        },
     )
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
     rows = [{'integrante_id': 31, 'familia_id': 8, 'persona_id': 15}]
@@ -217,7 +234,13 @@ def test_get_integrantes_buscar_returns_rows():
 
     assert response.status_code == 200
     assert response.data == rows
-    search.assert_called_once_with(integrante_id=31, familia_id=8, persona_id=15)
+    search.assert_called_once_with(
+        integrante_id=31,
+        familia_id=8,
+        persona_id=15,
+        formulario_2a_id=10,
+        codigo_sinpad='261404',
+    )
     serializer_cls.assert_called_once_with('queryset', many=True)
 
 
@@ -243,6 +266,24 @@ def test_get_integrantes_buscar_returns_every_row_without_params():
         integrante_id=None,
         familia_id=None,
         persona_id=None,
+        formulario_2a_id=None,
+        codigo_sinpad=None,
+    )
+
+
+def test_get_integrantes_buscar_rejects_codigo_sinpad_too_long():
+    factory = APIRequestFactory()
+    request = factory.get(
+        '/api/sgbh/integrantes/buscar/',
+        {'codigo_sinpad': 'a' * 31},
+    )
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+
+    response = Formulario2AIntegranteBuscarView.as_view()(request)
+
+    assert response.status_code == 400
+    assert response.data['error'] == (
+        'El filtro codigo_sinpad no debe superar 30 caracteres'
     )
 
 

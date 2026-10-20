@@ -39,13 +39,20 @@ class Formulario2AIntegranteServiceError(Exception):
 
 class Formulario2AIntegranteService:
     @staticmethod
-    def search(integrante_id=None, familia_id=None, persona_id=None):
+    def search(
+        integrante_id=None,
+        familia_id=None,
+        persona_id=None,
+        formulario_2a_id=None,
+        codigo_sinpad=None,
+    ):
         """Return integrante rows using optional filters combined with AND.
 
-        Filters are exact. With no filters, every row is returned.
-        Ordered by integrante_id. Person columns, catalog names and the
-        familia chain come from the related rows. The queryset is ready
-        for IntegranteBusquedaSerializer.
+        Filters are exact. formulario_2a_id and codigo_sinpad come from
+        the familia chain (vivienda, formulario and emergency). With no
+        filters, every row is returned. Ordered by integrante_id. Person
+        columns, catalog names and the familia chain come from the related
+        rows. The queryset is ready for IntegranteBusquedaSerializer.
         """
         queryset = Formulario2AIntegrante.objects.select_related(
             'persona',
@@ -67,6 +74,16 @@ class Formulario2AIntegranteService:
             queryset = queryset.filter(familia_id=familia_id)
         if persona_id is not None:
             queryset = queryset.filter(persona_id=persona_id)
+        if formulario_2a_id is not None:
+            queryset = queryset.filter(
+                familia__vivienda__formulario_2a_id=formulario_2a_id,
+            )
+        if codigo_sinpad is not None:
+            queryset = queryset.filter(
+                familia__vivienda__formulario_2a__emergencia__codigo_sinpad=(
+                    codigo_sinpad
+                ),
+            )
 
         return queryset.order_by('integrante_id')
 
