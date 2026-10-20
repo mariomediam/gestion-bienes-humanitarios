@@ -93,6 +93,7 @@ function App() {
           <Route path="alm-movimientos/:movimientoId/ver" element={<MovimientoVerPage />} />
           <Route path="alm-movimientos" element={<MovimientosPage />} />
           <Route path="alm-planilla-bah/nuevo/:formulario2aId" element={<PlanillaBahFormPage />} />
+          <Route path="alm-planilla-bah/:movimientoId/editar" element={<PlanillaBahFormPage />} />
           <Route path="alm-planilla-bah" element={<PlanillasBahPage />} />
           <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />

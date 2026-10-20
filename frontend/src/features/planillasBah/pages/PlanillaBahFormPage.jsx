@@ -84,6 +84,69 @@ function cantidadParaApi(raw, naturaleza) {
   return texto
 }
 
+function fechaMovimientoParaInput(value) {
+  if (!value) return ''
+  const coincidencia = String(value).trim().match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/)
+  if (!coincidencia) return ''
+  return `${coincidencia[1]}T${coincidencia[2]}`
+}
+
+function fechaParaInput(value) {
+  if (!value) return ''
+  const coincidencia = String(value).trim().match(/^(\d{4}-\d{2}-\d{2})/)
+  return coincidencia ? coincidencia[1] : ''
+}
+
+function cantidadParaFormulario(cantidad, naturaleza) {
+  let texto = String(cantidad ?? '').trim()
+  if (!texto) return ''
+  if ((naturaleza === 'E' || naturaleza === 'S') && texto.startsWith('-')) {
+    texto = texto.slice(1)
+  }
+  if (texto.includes('.')) {
+    texto = texto.replace(/0+$/, '').replace(/\.$/, '')
+  }
+  return texto
+}
+
+function formularioDesdePlanilla(planilla, siguienteKey) {
+  const naturalezaPlanilla = planilla.tipo_movimiento_naturaleza || ''
+  return {
+    naturaleza: naturalezaPlanilla,
+    form: {
+      fecha_movimiento: fechaMovimientoParaInput(planilla.fecha_movimiento),
+      documento_referencia: planilla.documento_referencia ?? '',
+      fecha_documento: fechaParaInput(planilla.fecha_documento),
+      destinatario: planilla.destinatario ?? '',
+      observacion: planilla.observacion ?? '',
+      encargado: planilla.encargado_almacen_id
+        ? {
+            value: planilla.encargado_almacen_id,
+            label: planilla.encargado_almacen_nombre || '',
+          }
+        : null,
+      numero_planilla:
+        planilla.numero_planilla == null ? '' : String(planilla.numero_planilla),
+      anio_planilla: planilla.anio_planilla == null ? '' : String(planilla.anio_planilla),
+      integrante_receptor_id:
+        planilla.integrante_receptor_id == null ? '' : String(planilla.integrante_receptor_id),
+      fecha_entrega: fechaParaInput(planilla.planilla_fecha_entrega),
+      planilla_observacion: planilla.planilla_entrega_observacion ?? '',
+    },
+    lineas: (planilla.detalles || []).map((detalle) => ({
+      key: siguienteKey(),
+      bien: {
+        value: detalle.bien_id,
+        label: detalle.bien_nombre,
+        unidad_medida_nombre: detalle.unidad_medida_nombre || '',
+        unidad_medida_abreviatura: detalle.unidad_medida_abreviatura || '',
+      },
+      cantidad: cantidadParaFormulario(detalle.cantidad, naturalezaPlanilla),
+      cantidad_texto: detalle.cantidad_texto ?? '',
+    })),
+  }
+}
+
 function leerEntero(raw, etiqueta, { obligatorio }) {
   const texto = String(raw ?? '').trim()
   if (!texto) {
@@ -168,7 +231,8 @@ function validarFormulario(form, lineas, naturaleza) {
 }
 
 export default function PlanillaBahFormPage() {
-  const { formulario2aId } = useParams()
+  const { formulario2aId, movimientoId } = useParams()
+  const esEdicion = Boolean(movimientoId)
   const navigate = useNavigate()
   const lineaId = useRef(0)
   const [form, setForm] = useState(EMPTY_FORM)
@@ -177,20 +241,96 @@ export default function PlanillaBahFormPage() {
   const [naturaleza, setNaturaleza] = useState('')
   const [loading, setLoading] = useState(false)
   const [cargando, setCargando] = useState(true)
-  const formularioId = idFormulario(formulario2aId)
+  const [planillaEntregaId, setPlanillaEntregaId] = useState(null)
+  const [formularioIdEdicion, setFormularioIdEdicion] = useState(null)
+  const formularioIdRuta = idFormulario(formulario2aId)
+  const movimientoIdRuta = idFormulario(movimientoId)
+  const formularioId = esEdicion ? formularioIdEdicion : formularioIdRuta
 
   useEffect(() => {
-    if (!formularioId) {
+    let active = true
+
+    if (esEdicion) {
+      if (!movimientoIdRuta) {
+        toast.error('El movimiento de almacén indicado no es válido')
+        navigate('/alm-planilla-bah', { replace: true })
+        return undefined
+      }
+
+      let salir = false
+      setCargando(true)
+      setErrores({})
+
+      sgbhApi
+        .buscarPlanillasBah({ movimiento_id: movimientoIdRuta })
+        .then(async (rows) => {
+          if (!active) return
+          const planilla = Array.isArray(rows) ? rows[0] : null
+          if (!planilla?.planilla_entrega_id) {
+            salir = true
+            toast.error('La planilla BAH indicada no existe')
+            navigate('/alm-planilla-bah', { replace: true })
+            return
+          }
+          if (!planilla.tipo_movimiento_naturaleza) {
+            salir = true
+            toast.error('No se encontró el tipo de movimiento de la planilla BAH')
+            navigate('/alm-planilla-bah', { replace: true })
+            return
+          }
+
+          const integrantes = await sgbhApi.buscarIntegrantes({
+            integrante_id: planilla.integrante_receptor_id,
+          })
+          if (!active) return
+          const integrante = Array.isArray(integrantes) ? integrantes[0] : null
+          const formularioDelIntegrante = idFormulario(integrante?.formulario_2a_id)
+          if (!formularioDelIntegrante) {
+            salir = true
+            toast.error('No se pudo identificar el formulario EDAN 2A de la planilla')
+            navigate('/alm-planilla-bah', { replace: true })
+            return
+          }
+
+          const cargado = formularioDesdePlanilla(planilla, () => {
+            lineaId.current += 1
+            return lineaId.current
+          })
+          setForm(cargado.form)
+          setLineas(cargado.lineas)
+          setNaturaleza(cargado.naturaleza)
+          setPlanillaEntregaId(planilla.planilla_entrega_id)
+          setFormularioIdEdicion(formularioDelIntegrante)
+        })
+        .catch((error) => {
+          if (!active) return
+          salir = true
+          toast.error(
+            getErrorMessage(error, 'No se pudo obtener la búsqueda de movimientos de planilla BAH'),
+          )
+          navigate('/alm-planilla-bah', { replace: true })
+        })
+        .finally(() => {
+          if (active && !salir) {
+            setCargando(false)
+          }
+        })
+
+      return () => {
+        active = false
+      }
+    }
+
+    if (!formularioIdRuta) {
       toast.error('El formulario 2A indicado no es válido')
       navigate('/alm-planilla-bah', { replace: true })
       return undefined
     }
 
-    let active = true
     setCargando(true)
 
     Promise.all([
-      sgbhApi.formulario2ATienePlanillaBah(formularioId),
+      sgbhApi.formulario2ATienePlanillaBah(formularioIdRuta),
       sgbhApi.getTiposMovimiento(),
     ])
       .then(([planilla, tipos]) => {
@@ -220,7 +360,7 @@ export default function PlanillaBahFormPage() {
     return () => {
       active = false
     }
-  }, [formularioId, navigate])
+  }, [esEdicion, formularioIdRuta, movimientoIdRuta, navigate])
 
   function crearLinea() {
     lineaId.current += 1
@@ -314,11 +454,23 @@ export default function PlanillaBahFormPage() {
 
     setLoading(true)
     try {
-      await sgbhApi.crearPlanillaBah(payload)
-      toast.success('Planilla BAH registrada correctamente')
+      if (esEdicion) {
+        await sgbhApi.actualizarPlanillaBah(planillaEntregaId, payload)
+        toast.success('Planilla BAH modificada correctamente')
+      } else {
+        await sgbhApi.crearPlanillaBah(payload)
+        toast.success('Planilla BAH registrada correctamente')
+      }
       navigate('/alm-planilla-bah')
     } catch (error) {
-      toast.error(getErrorMessage(error, 'No se pudo registrar la planilla BAH'))
+      toast.error(
+        getErrorMessage(
+          error,
+          esEdicion
+            ? 'No se pudo modificar la planilla BAH'
+            : 'No se pudo registrar la planilla BAH',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -348,9 +500,13 @@ export default function PlanillaBahFormPage() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-bold text-[#1e3064]">Agregar planilla BAH</h1>
+        <h1 className="text-2xl font-bold text-[#1e3064]">
+          {esEdicion ? 'Modificar planilla BAH' : 'Agregar planilla BAH'}
+        </h1>
         <p className="mt-1 text-sm text-gray-600">
-          Registro de una planilla BAH y sus bienes
+          {esEdicion
+            ? 'Modificación de una planilla BAH y sus bienes'
+            : 'Registro de una planilla BAH y sus bienes'}
         </p>
       </div>
 

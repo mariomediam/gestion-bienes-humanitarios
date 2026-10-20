@@ -225,6 +225,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  actualizarPlanillaBah: async (planillaEntregaId, data) => {
+    const response = await api.put(`/api/sgbh/planillas-bah/${planillaEntregaId}/`, data)
+    return response.data
+  },
+
   buscarViviendas: async (params) => {
     const response = await api.get('/api/sgbh/viviendas/buscar/', { params })
     return response.data
