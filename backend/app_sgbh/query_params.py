@@ -621,6 +621,11 @@ def parse_planilla_entrega_id(raw_value):
     return _parse_optional_int(raw_value, 'planilla_entrega_id')
 
 
+def parse_excluir_planilla_entrega_id(raw_value):
+    """Parse the optional excluir_planilla_entrega_id query param."""
+    return _parse_optional_int(raw_value, 'excluir_planilla_entrega_id')
+
+
 def parse_numero_planilla(raw_value):
     """Parse the optional numero_planilla query param."""
     return _parse_optional_int(raw_value, 'numero_planilla')

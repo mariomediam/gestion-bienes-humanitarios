@@ -20,6 +20,12 @@ class PlanillaEntregaTotalSerializer(serializers.Serializer):
     total = serializers.IntegerField(min_value=0)
 
 
+class Formulario2ATienePlanillaBahSerializer(serializers.Serializer):
+    """Whether one Formulario 2A already has a BAH planilla."""
+
+    tiene_planilla_bah = serializers.BooleanField()
+
+
 class PlanillaEntregaCreateSerializer(MovimientoCreateSerializer):
     """Validate the body used to insert a planilla BAH and its movement.
 

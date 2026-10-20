@@ -59,6 +59,7 @@ from .persona import (
 )
 from .personal import PersonalSerializer
 from .planilla_entrega import (
+    Formulario2ATienePlanillaBahSerializer,
     PlanillaEntregaCreateSerializer,
     PlanillaEntregaSerializer,
     PlanillaEntregaTotalSerializer,
@@ -102,6 +103,7 @@ __all__ = [
     'MedioVidaCreateSerializer',
     'MedioVidaSerializer',
     'MedioVidaUpdateSerializer',
+    'Formulario2ATienePlanillaBahSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
     'GradoLesionSerializer',

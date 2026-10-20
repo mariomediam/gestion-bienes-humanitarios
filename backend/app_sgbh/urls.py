@@ -29,6 +29,7 @@ from .views import (
     Formulario2AMedioVidaBuscarView,
     Formulario2AMedioVidaCreateView,
     Formulario2AMedioVidaDetailView,
+    Formulario2ATienePlanillaBahView,
     Formulario2ATotalView,
     Formulario2AViviendaBuscarView,
     Formulario2AViviendaCreateView,
@@ -220,6 +221,11 @@ urlpatterns = [
         'formularios-2a/<int:formulario_2a_id>/reporte/',
         Formulario2AReporteView.as_view(),
         name='formularios-2a-reporte',
+    ),
+    path(
+        'formularios-2a/<int:formulario_2a_id>/tiene-planilla-bah/',
+        Formulario2ATienePlanillaBahView.as_view(),
+        name='formularios-2a-tiene-planilla-bah',
     ),
     path(
         'formularios-2a/buscar/',
