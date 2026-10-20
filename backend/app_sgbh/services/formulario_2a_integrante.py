@@ -401,6 +401,22 @@ def _require_catalogos(
     )
 
 
+def contar_integrantes_familia(familia_id):
+    """Count integrantes that share one familia_id.
+
+    Same count the planilla print query stores in @nro_integrantes: every
+    row of S43edan_formulario_2a_integrantes whose familia_id is the
+    receptor's. A missing familia returns 0, as the inner joins do when
+    the planilla or the receptor is absent.
+    """
+    if familia_id is None:
+        return 0
+    result = Formulario2AIntegrante.objects.filter(
+        familia_id=familia_id,
+    ).aggregate(total=Count('*'))
+    return result['total']
+
+
 def _integrante_guardado(integrante_id):
     return Formulario2AIntegrante.objects.select_related(
         'rol_familiar',

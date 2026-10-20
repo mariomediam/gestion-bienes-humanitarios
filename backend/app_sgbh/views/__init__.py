@@ -56,6 +56,7 @@ from .personal_view import (
     PersonalEncargadosAlmacenBuscarView,
     PersonalEvaluadoresBuscarView,
 )
+from .planilla_entrega_reporte_view import PlanillaEntregaReporteView
 from .planilla_entrega_view import (
     Formulario2ATienePlanillaBahView,
     PlanillaEntregaCreateView,
