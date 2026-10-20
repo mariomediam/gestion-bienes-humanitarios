@@ -103,7 +103,7 @@ export default function PlanillaBahReporteHoja({ reporte }) {
               </th>
             ))}
             <th rowSpan={2} scope="col">
-              <span className="bah-vertical">Firmo en señal de conformidad con lo entregado</span>
+              <span >Firmo en señal de conformidad con lo entregado</span>
             </th>
           </tr>
           <tr>

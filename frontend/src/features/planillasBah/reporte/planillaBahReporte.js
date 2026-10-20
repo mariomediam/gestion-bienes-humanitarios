@@ -91,10 +91,10 @@ function magnitudCantidad(cantidad) {
   return `${entero}.${String(centesimas).padStart(2, '0')}`
 }
 
-export const ANCHO_COLUMNA_FIRMA = '150px'
-export const ANCHO_COLUMNA_NOMBRES = '150px'
-export const ANCHO_COLUMNA_DIRECCION = '100px'
-export const ANCHO_COLUMNA_DOCUMENTO = '60px'
+export const ANCHO_COLUMNA_FIRMA = '120px'
+export const ANCHO_COLUMNA_NOMBRES = '130px'
+export const ANCHO_COLUMNA_DIRECCION = '90px'
+export const ANCHO_COLUMNA_DOCUMENTO = '55px'
 
 export function anchosColumnas(totalBienes) {
   const pesosAntes = [5]
