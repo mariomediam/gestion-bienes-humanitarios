@@ -92,11 +92,23 @@ function magnitudCantidad(cantidad) {
 }
 
 export const ANCHO_COLUMNA_FIRMA = '150px'
+export const ANCHO_COLUMNA_NOMBRES = '150px'
+export const ANCHO_COLUMNA_DIRECCION = '100px'
+export const ANCHO_COLUMNA_DOCUMENTO = '60px'
 
 export function anchosColumnas(totalBienes) {
-  const pesos = [5, 18, 20, 11, 10, ...Array(totalBienes).fill(6)]
-  const suma = pesos.reduce((total, peso) => total + peso, 0)
-  return pesos.map(
-    (peso) => `calc((100% - ${ANCHO_COLUMNA_FIRMA}) * ${peso} / ${suma})`,
+  const pesosAntes = [5]
+  const pesosDespues = [10, ...Array(totalBienes).fill(6)]
+  const suma = [...pesosAntes, ...pesosDespues].reduce((total, peso) => total + peso, 0)
+  const ancho = (peso) => (
+    `calc((100% - ${ANCHO_COLUMNA_FIRMA} - ${ANCHO_COLUMNA_NOMBRES} - ${ANCHO_COLUMNA_DIRECCION} - ${ANCHO_COLUMNA_DOCUMENTO}) * ${peso} / ${suma})`
   )
+
+  return [
+    ...pesosAntes.map(ancho),
+    ANCHO_COLUMNA_DIRECCION,
+    ANCHO_COLUMNA_NOMBRES,
+    ANCHO_COLUMNA_DOCUMENTO,
+    ...pesosDespues.map(ancho),
+  ]
 }
