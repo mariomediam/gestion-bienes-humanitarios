@@ -32,7 +32,7 @@ function FilaPlanilla({ numero, reporte, grupos }) {
       <td className={conDatos ? 'bah-texto' : 'bah-guion'}>
         {conDatos ? textoReporte(reporte.integrante_receptor_nombre) : GUION_FILA_VACIA}
       </td>
-      <td className={conDatos ? undefined : 'bah-guion'}>
+      <td className={conDatos ? 'bah-texto' : 'bah-guion'}>
         {conDatos ? textoReporte(reporte.integrante_receptor_doc_ident) : GUION_FILA_VACIA}
       </td>
       <td className={conDatos ? undefined : 'bah-guion'}>
@@ -129,7 +129,7 @@ export default function PlanillaBahReporteHoja({ reporte }) {
         </tbody>
       </table>
 
-      <div className="bah-cierre">
+      <div className="bah-cierre">   
         <p className="bah-responsable">
           Responsable de Entrega:
           <span className="bah-responsable-linea" />
@@ -149,7 +149,7 @@ export default function PlanillaBahReporteHoja({ reporte }) {
         </div>
         <div>
           <p className="bah-firma-nombre">{textoReporte(reporte.encargado_almacen_nombre)}</p>
-          <p>Encargado del Almacén</p>
+          <p className="mt-0">Encargado del Almacén</p>
         </div>
         <div>
           <p className="bah-firma-nombre" />

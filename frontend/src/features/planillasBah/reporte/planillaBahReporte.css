@@ -112,7 +112,7 @@
 }
 
 .bah-tabla .bah-texto {
-  text-align: left;
+  text-align: center;
   padding-left: 0.6mm;
   font-size: 6pt;
 }
@@ -157,7 +157,7 @@
 }
 
 .bah-responsable {
-  margin: 0;
+  margin: 2mm 0 0;
   white-space: nowrap;
 }
 
@@ -176,6 +176,8 @@
 
 .bah-detalle p {
   margin: 0;
+  font-size: 6pt;
+
 }
 
 .bah-firmas {
