@@ -103,6 +103,25 @@ class PlanillaEntregaDetailView(APIView):
 
         return Response(payload, status=status.HTTP_200_OK)
 
+    def delete(self, request, planilla_entrega_id):
+        if planilla_entrega_id < 1 or planilla_entrega_id > _PLANILLA_ENTREGA_ID_MAX:
+            return Response(
+                {'error': 'El campo planilla_entrega_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            PlanillaEntregaService.delete(planilla_entrega_id)
+        except (PlanillaEntregaServiceError, MovimientoServiceError) as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar la planilla BAH'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class PlanillaEntregaTotalView(APIView):
     permission_classes = [IsAuthenticated]

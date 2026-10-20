@@ -272,6 +272,32 @@ class PlanillaEntregaService:
             row.movimiento_almacen = movimiento
         return row
 
+    @staticmethod
+    def delete(planilla_entrega_id):
+        """Delete one planilla BAH and its linked warehouse movement.
+
+        The planilla row is removed first. Then MovimientoService.delete
+        removes the linked S43alm_movimientos row and its
+        S43alm_movimiento_detalle rows. Any planilla can be deleted,
+        whatever its estado or fecha_anulacion. A planilla without
+        movimiento_almacen_id removes only its own row. When the movement
+        is the origin of another movement, MovimientoService.delete rejects
+        the operation and this transaction removes nothing.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                row = PlanillaEntrega.objects.get(pk=planilla_entrega_id)
+            except PlanillaEntrega.DoesNotExist:
+                raise PlanillaEntregaServiceError(
+                    'La planilla BAH indicada no existe',
+                    not_found=True,
+                ) from None
+
+            movimiento_id = row.movimiento_almacen_id
+            row.delete()
+            if movimiento_id is not None:
+                MovimientoService.delete(movimiento_id)
+
 
 def formulario_2a_id_de_integrante(integrante_receptor_id):
     """Return the Formulario 2A id reached from an integrante.
