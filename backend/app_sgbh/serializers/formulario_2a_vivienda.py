@@ -90,10 +90,10 @@ class ViviendaUpdateSerializer(ViviendaCreateSerializer):
 
 
 class ViviendaBusquedaSerializer(serializers.Serializer):
-    """One vivienda row returned by the search endpoint.
+    """One vivienda row returned after creating or updating it.
 
-    Catalog names follow the LEFT JOIN aliases of the search query.
-    A null foreign key yields a null name.
+    Catalog names come from the related rows. A null foreign key yields
+    a null name.
     """
 
     vivienda_id = serializers.IntegerField()
@@ -132,3 +132,101 @@ def _catalog_nombre(catalog):
     if catalog is None:
         return None
     return catalog.nombre
+
+
+class ViviendaBuscarSerializer(serializers.Serializer):
+    """One vivienda row returned by the search endpoint.
+
+    Catalog names, the parent formulario, the emergency and the hazard
+    come from the related rows. distrito_nombre is annotated from DISTRITO.
+    A null foreign key or a missing district yields null.
+    """
+
+    vivienda_id = serializers.IntegerField()
+    formulario_2a_id = serializers.IntegerField()
+    numero_orden = serializers.IntegerField()
+    numero_lote = serializers.CharField(allow_null=True)
+    tenencia_propia = serializers.BooleanField(allow_null=True)
+    tipo_uso_instalacion_id = serializers.IntegerField()
+    condicion_vivienda_id = serializers.IntegerField(allow_null=True)
+    material_techo_id = serializers.IntegerField(allow_null=True)
+    material_pared_id = serializers.IntegerField(allow_null=True)
+    material_piso_id = serializers.IntegerField(allow_null=True)
+    fecha_creacion = serializers.DateTimeField()
+    tipo_uso_instalacion_nombre = serializers.CharField(
+        source='tipo_uso_instalacion.nombre',
+    )
+    condicion_vivienda_nombre = serializers.SerializerMethodField()
+    material_techo_nombre = serializers.SerializerMethodField()
+    material_pared_nombre = serializers.SerializerMethodField()
+    material_piso_nombre = serializers.SerializerMethodField()
+    emergencia_id = serializers.IntegerField(source='formulario_2a.emergencia_id')
+    fecha_empadronamiento = serializers.DateField(
+        source='formulario_2a.fecha_empadronamiento',
+    )
+    hora_empadronamiento = serializers.TimeField(
+        source='formulario_2a.hora_empadronamiento',
+        allow_null=True,
+    )
+    localidad = serializers.CharField(
+        source='formulario_2a.localidad',
+        allow_null=True,
+    )
+    barrio_sector_urbanizacion = serializers.CharField(
+        source='formulario_2a.barrio_sector_urbanizacion',
+        allow_null=True,
+    )
+    centro_poblado = serializers.CharField(
+        source='formulario_2a.centro_poblado',
+        allow_null=True,
+    )
+    caserio = serializers.CharField(source='formulario_2a.caserio', allow_null=True)
+    anexo = serializers.CharField(source='formulario_2a.anexo', allow_null=True)
+    calle_manzana = serializers.CharField(
+        source='formulario_2a.calle_manzana',
+        allow_null=True,
+    )
+    edificio_piso_dpto = serializers.CharField(
+        source='formulario_2a.edificio_piso_dpto',
+        allow_null=True,
+    )
+    otros_ubicacion = serializers.CharField(
+        source='formulario_2a.otros_ubicacion',
+        allow_null=True,
+    )
+    numero_hoja = serializers.IntegerField(source='formulario_2a.numero_hoja')
+    total_hojas = serializers.IntegerField(
+        source='formulario_2a.total_hojas',
+        allow_null=True,
+    )
+    institucion = serializers.CharField(
+        source='formulario_2a.institucion',
+        allow_null=True,
+    )
+    evaluador_id = serializers.IntegerField(source='formulario_2a.evaluador_id')
+    estado_registro_id = serializers.IntegerField(
+        source='formulario_2a.estado_registro_id',
+    )
+    codigo_sinpad = serializers.CharField(
+        source='formulario_2a.emergencia.codigo_sinpad',
+        allow_null=True,
+    )
+    tipo_peligro_id = serializers.IntegerField(
+        source='formulario_2a.emergencia.tipo_peligro_id',
+    )
+    nombre_tipo_peligro = serializers.CharField(
+        source='formulario_2a.emergencia.tipo_peligro.nombre',
+    )
+    distrito_nombre = serializers.CharField(allow_null=True)
+
+    def get_condicion_vivienda_nombre(self, obj):
+        return _catalog_nombre(obj.condicion_vivienda)
+
+    def get_material_techo_nombre(self, obj):
+        return _catalog_nombre(obj.material_techo)
+
+    def get_material_pared_nombre(self, obj):
+        return _catalog_nombre(obj.material_pared)
+
+    def get_material_piso_nombre(self, obj):
+        return _catalog_nombre(obj.material_piso)

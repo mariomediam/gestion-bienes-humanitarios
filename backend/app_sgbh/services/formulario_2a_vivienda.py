@@ -1,9 +1,10 @@
 from django.db import transaction
-from django.db.models import Max, ProtectedError
+from django.db.models import CharField, Max, OuterRef, ProtectedError, Subquery
 
 from ..db_router import DB_ALIAS
 from ..models import (
     CondicionVivienda,
+    Distrito,
     Formulario2A,
     Formulario2AIntegrante,
     Formulario2AVivienda,
@@ -30,24 +31,24 @@ class Formulario2AViviendaServiceError(Exception):
 
 class Formulario2AViviendaService:
     @staticmethod
-    def search(vivienda_id=None, formulario_2a_id=None):
+    def search(vivienda_id=None, formulario_2a_id=None, codigo_sinpad=None):
         """Return vivienda rows using optional filters combined with AND.
 
-        Both filters are exact. With no filters, every row is returned.
-        Ordered by vivienda_id. Catalog names come from the related rows.
-        The queryset is ready for ViviendaBusquedaSerializer.
+        All filters are exact. codigo_sinpad matches the parent emergency.
+        With no filters, every row is returned. Ordered by vivienda_id.
+        Each row includes the parent formulario, the emergency, the hazard
+        name, distrito_nombre and the vivienda catalog names. The queryset
+        is ready for ViviendaBuscarSerializer.
         """
-        queryset = Formulario2AVivienda.objects.select_related(
-            'tipo_uso_instalacion',
-            'condicion_vivienda',
-            'material_techo',
-            'material_pared',
-            'material_piso',
-        )
+        queryset = _viviendas_busqueda()
         if vivienda_id is not None:
             queryset = queryset.filter(vivienda_id=vivienda_id)
         if formulario_2a_id is not None:
             queryset = queryset.filter(formulario_2a_id=formulario_2a_id)
+        if codigo_sinpad is not None:
+            queryset = queryset.filter(
+                formulario_2a__emergencia__codigo_sinpad=codigo_sinpad,
+            )
 
         return queryset.order_by('vivienda_id')
 
@@ -265,6 +266,31 @@ def _vivienda_guardada(vivienda_id):
         'material_pared',
         'material_piso',
     ).get(pk=vivienda_id)
+
+
+def _viviendas_busqueda():
+    """Vivienda rows with formulario, emergency, hazard and catalog names.
+
+    distrito_nombre comes from DISTRITO matched by the three ubigeo codes
+    of the parent formulario.
+    """
+    distrito_nombre = Distrito.objects.filter(
+        departamento_id=OuterRef('formulario_2a__departamento_id'),
+        provincia_id=OuterRef('formulario_2a__provincia_id'),
+        distrito_id=OuterRef('formulario_2a__distrito_id'),
+    ).values('distrito_nombre')[:1]
+    return Formulario2AVivienda.objects.select_related(
+        'formulario_2a',
+        'formulario_2a__emergencia',
+        'formulario_2a__emergencia__tipo_peligro',
+        'tipo_uso_instalacion',
+        'condicion_vivienda',
+        'material_techo',
+        'material_pared',
+        'material_piso',
+    ).annotate(
+        distrito_nombre=Subquery(distrito_nombre, output_field=CharField())
+    )
 
 
 def _require_catalogo(model, catalog_id, message):

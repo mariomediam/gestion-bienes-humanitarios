@@ -3,8 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app_sgbh.query_params import parse_formulario_2a_id, parse_vivienda_id
+from app_sgbh.query_params import (
+    parse_codigo_sinpad,
+    parse_formulario_2a_id,
+    parse_vivienda_id,
+)
 from app_sgbh.serializers import (
+    ViviendaBuscarSerializer,
     ViviendaBusquedaSerializer,
     ViviendaCreateSerializer,
     ViviendaUpdateSerializer,
@@ -140,12 +145,19 @@ class Formulario2AViviendaBuscarView(APIView):
         if error:
             return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
 
+        codigo_sinpad, error = parse_codigo_sinpad(
+            request.query_params.get('codigo_sinpad')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             rows = Formulario2AViviendaService.search(
                 vivienda_id=vivienda_id,
                 formulario_2a_id=formulario_2a_id,
+                codigo_sinpad=codigo_sinpad,
             )
-            payload = ViviendaBusquedaSerializer(rows, many=True).data
+            payload = ViviendaBuscarSerializer(rows, many=True).data
         except Exception:
             return Response(
                 {'error': 'No se pudo obtener la búsqueda de viviendas'},
