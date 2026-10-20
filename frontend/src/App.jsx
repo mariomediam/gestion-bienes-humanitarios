@@ -14,6 +14,7 @@ import MovimientoFormPage from '@features/movimientos/pages/MovimientoFormPage'
 import MovimientoVerPage from '@features/movimientos/pages/MovimientoVerPage'
 import MovimientosPage from '@features/movimientos/pages/MovimientosPage'
 import PlanillaBahFormPage from '@features/planillasBah/pages/PlanillaBahFormPage'
+import PlanillaBahReportePage from '@features/planillasBah/pages/PlanillaBahReportePage'
 import PlanillasBahPage from '@features/planillasBah/pages/PlanillasBahPage'
 
 const ProtectedRoute = ({ children }) => {
@@ -94,6 +95,7 @@ function App() {
           <Route path="alm-movimientos" element={<MovimientosPage />} />
           <Route path="alm-planilla-bah/nuevo/:formulario2aId" element={<PlanillaBahFormPage />} />
           <Route path="alm-planilla-bah/:movimientoId/editar" element={<PlanillaBahFormPage />} />
+          <Route path="alm-planilla-bah/:planillaEntregaId/reporte" element={<PlanillaBahReportePage />} />
           <Route path="alm-planilla-bah" element={<PlanillasBahPage />} />
           <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />

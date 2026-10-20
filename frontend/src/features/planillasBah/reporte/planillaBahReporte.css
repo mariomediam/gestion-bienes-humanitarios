@@ -1,0 +1,263 @@
+.bah-pagina {
+  color: #111;
+}
+
+.bah-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.bah-hoja {
+  width: 297mm;
+  height: 210mm;
+  margin: 0 auto 1rem;
+  padding: 5mm;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+  font-family: Arial, Helvetica, sans-serif;
+  color: #111;
+}
+
+.bah-titulo-fila {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3.5mm;
+  text-align: center;
+}
+
+.bah-titulo {
+  margin: 0;
+  font-size: 12pt;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.bah-numero {
+  margin: 1.4mm 0 0;
+  font-size: 10pt;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bah-numero-label {
+  margin-right: 1.5mm;
+}
+
+.bah-cabecera {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 2.2mm 3mm;
+  margin-bottom: 3.5mm;
+  font-size: 8pt;
+}
+
+.bah-dato {
+  min-width: 0;
+}
+
+.bah-dato-label {
+  margin-right: 1mm;
+}
+
+.bah-dato-valor {
+  display: inline-block;
+  min-width: 8mm;
+  border-bottom: 0.25mm solid #222;
+  font-weight: 700;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.bah-span-2 { grid-column: span 2; }
+.bah-span-3 { grid-column: span 3; }
+.bah-span-4 { grid-column: span 4; }
+
+.bah-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.bah-tabla th,
+.bah-tabla td {
+  border: 0.2mm solid #222;
+  padding: 0.4mm;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 6pt;
+  line-height: 1.1;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.bah-tabla thead th {
+  font-weight: 700;
+}
+
+.bah-tabla thead tr:first-child th {
+  padding-top: 1.8mm;
+  padding-bottom: 1.8mm;
+}
+
+.bah-tabla td {
+  height: 12mm;
+  font-size: 7.5pt;
+}
+
+.bah-tabla .bah-texto {
+  text-align: left;
+  padding-left: 0.6mm;
+  font-size: 6pt;
+}
+
+.bah-tabla .bah-guion {
+  letter-spacing: 0.2mm;
+}
+
+.bah-vertical {
+  display: inline-block;
+  max-height: 20mm;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  line-height: 1.05;
+  font-size: 6pt;
+}
+
+.bah-th-bien {
+  height: 22mm;
+  padding: 1mm 0.4mm;
+}
+
+.bah-ubicacion { background: #fff3a0; }
+.bah-jefe { background: #c8f5c0; }
+.bah-cat-techo { background: #67c7ea; }
+.bah-cat-abrigo { background: #5b92d6; }
+.bah-cat-alimentos { background: #f0b36a; }
+.bah-cat-enseres { background: #d5d5d5; }
+.bah-cat-otros { background: #c4c4c4; }
+
+.bah-cierre {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10mm;
+  margin-top: 3.5mm;
+  font-size: 7.5pt;
+}
+
+.bah-responsable {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.bah-responsable-linea {
+  display: inline-block;
+  width: 70mm;
+  margin-left: 2mm;
+  border-bottom: 0.25mm solid #222;
+  vertical-align: baseline;
+}
+
+.bah-detalle {
+  margin: 0;
+  text-align: left;
+}
+
+.bah-detalle p {
+  margin: 0;
+}
+
+.bah-firmas {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10mm;
+  margin-top: 8mm;
+  font-size: 8pt;
+  text-align: center;
+  font-weight: 700;
+}
+
+.bah-firma-nombre {
+  min-height: 14mm;
+  margin: 0 6mm 1mm;
+  border-bottom: 0.25mm solid #222;
+  font-size: 8pt;
+  line-height: 14mm;
+}
+
+.bah-firmas p {
+  margin: 0;
+}
+
+.bah-leyenda {
+  margin: 5mm 0 0;
+  font-size: 6.5pt;
+  text-align: justify;
+  line-height: 1.3;
+}
+
+.bah-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 5mm;
+  }
+
+  html,
+  body,
+  #root,
+  .min-h-screen,
+  .min-h-screen > div,
+  main {
+    overflow: visible !important;
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  header,
+  aside,
+  .bah-toolbar,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  .bah-hoja {
+    width: 287mm;
+    height: 200mm;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    overflow: hidden;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .bah-tabla th,
+  .bah-tabla td {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

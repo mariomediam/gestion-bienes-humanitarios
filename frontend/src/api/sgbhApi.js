@@ -234,6 +234,11 @@ export const sgbhApi = {
     await api.delete(`/api/sgbh/planillas-bah/${planillaEntregaId}/`)
   },
 
+  getPlanillaBahReporte: async (planillaEntregaId) => {
+    const response = await api.get(`/api/sgbh/planillas-bah/${planillaEntregaId}/reporte/`)
+    return response.data
+  },
+
   buscarViviendas: async (params) => {
     const response = await api.get('/api/sgbh/viviendas/buscar/', { params })
     return response.data

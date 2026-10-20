@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
@@ -52,6 +52,7 @@ function BienesCell({ detalles }) {
 }
 
 export default function PlanillasBahResultados({ planillas, onEliminada }) {
+  const navigate = useNavigate()
   const [planillaAEliminar, setPlanillaAEliminar] = useState(null)
 
   return (
@@ -99,7 +100,12 @@ export default function PlanillasBahResultados({ planillas, onEliminada }) {
                   </td>
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
                     <div className="flex gap-2">
-                      <button type="button" aria-label="Ver" className={actionButtonClassName}>
+                      <button
+                        type="button"
+                        aria-label="Ver"
+                        className={actionButtonClassName}
+                        onClick={() => navigate(`/alm-planilla-bah/${planilla.planilla_entrega_id}/reporte`)}
+                      >
                         <EyeIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
                           Ver
