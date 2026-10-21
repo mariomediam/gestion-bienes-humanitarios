@@ -7,48 +7,25 @@ import PlanillasBahBusquedaForm from '@features/planillasBah/components/Planilla
 import PlanillasBahResultados from '@features/planillasBah/components/PlanillasBahResultados'
 import { exportPlanillasBahExcel } from '@features/planillasBah/exportPlanillasBahExcel'
 import usePlanillasBahBusqueda from '@features/planillasBah/hooks/usePlanillasBahBusqueda'
-import { buildPlanillaBahSearchParams } from '@features/planillasBah/searchParams'
-
-const EMPTY_FILTROS = {
-  anio_planilla: '',
-  codigo_sinpad: '',
-  barrio_sector_urbanizacion: '',
-  fecha_desde: '',
-  fecha_hasta: '',
-  documento_referencia: '',
-  integrante_receptor_nombre: '',
-}
 
 export default function PlanillasBahPage() {
   const navigate = useNavigate()
   const [modalAbierto, setModalAbierto] = useState(false)
-  const [consulta, setConsulta] = useState('')
-  const [filtros, setFiltros] = useState(EMPTY_FILTROS)
-  const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
   const {
     loading,
     searched,
     planillas,
+    consulta,
+    filtros,
+    avanzadaAbierta,
+    setConsulta,
+    setFiltro,
+    toggleAvanzada,
     buscar,
-    limpiarResultados,
+    limpiar,
+    solicitarActualizacion,
     quitarPlanilla,
   } = usePlanillasBahBusqueda()
-
-  function handleFiltroChange(name, value) {
-    setFiltros((current) => ({ ...current, [name]: value }))
-  }
-
-  function handleBuscar(event) {
-    event.preventDefault()
-    buscar(buildPlanillaBahSearchParams(consulta, filtros))
-  }
-
-  function handleLimpiar() {
-    setConsulta('')
-    setFiltros(EMPTY_FILTROS)
-    setAvanzadaAbierta(false)
-    limpiarResultados()
-  }
 
   const hayResultados = searched && planillas.length > 0
 
@@ -86,16 +63,20 @@ export default function PlanillasBahPage() {
         consulta={consulta}
         onConsultaChange={setConsulta}
         filtros={filtros}
-        onFiltroChange={handleFiltroChange}
+        onFiltroChange={setFiltro}
         avanzadaAbierta={avanzadaAbierta}
-        onToggleAvanzada={() => setAvanzadaAbierta((open) => !open)}
-        onSubmit={handleBuscar}
-        onLimpiar={handleLimpiar}
+        onToggleAvanzada={toggleAvanzada}
+        onSubmit={buscar}
+        onLimpiar={limpiar}
         loading={loading}
       />
 
       {searched && (
-        <PlanillasBahResultados planillas={planillas} onEliminada={quitarPlanilla} />
+        <PlanillasBahResultados
+          planillas={planillas}
+          onModificar={solicitarActualizacion}
+          onEliminada={quitarPlanilla}
+        />
       )}
 
       <PlanillaBahSeleccionarFormularioModal

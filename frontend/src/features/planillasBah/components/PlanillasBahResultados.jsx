@@ -51,7 +51,7 @@ function BienesCell({ detalles }) {
   )
 }
 
-export default function PlanillasBahResultados({ planillas, onEliminada }) {
+export default function PlanillasBahResultados({ planillas, onModificar, onEliminada }) {
   const navigate = useNavigate()
   const [planillaAEliminar, setPlanillaAEliminar] = useState(null)
 
@@ -115,6 +115,7 @@ export default function PlanillasBahResultados({ planillas, onEliminada }) {
                         to={`/alm-planilla-bah/${planilla.movimiento_id}/editar`}
                         aria-label="Modificar"
                         className={actionButtonClassName}
+                        onClick={onModificar}
                       >
                         <PencilIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
