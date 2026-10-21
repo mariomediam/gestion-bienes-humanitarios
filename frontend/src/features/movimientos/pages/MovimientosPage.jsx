@@ -53,6 +53,16 @@ export default function MovimientosPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#1e3064]">Movimientos de almacén</h1>
           <p className="mt-1 text-sm text-gray-600">Gestión de movimientos de almacén</p>
+          <p className="mt-3 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-[#1e3064]" role="note">
+            En esta opción no se visualizan las planillas de BAH. Las planillas deben verse en el menú{' '}
+            <Link
+              to="/alm-planilla-bah"
+              className="font-semibold underline hover:text-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 rounded-sm"
+            >
+              Planilla BAH
+            </Link>
+            .
+          </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
