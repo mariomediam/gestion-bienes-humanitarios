@@ -84,7 +84,7 @@ export default function MovimientosResultados({ movimientos, onEliminado }) {
                 </td>
               </tr>
             ) : (
-              movimientos.map((movimiento) => (
+              movimientos.filter((movimiento) => movimiento.tipo_movimiento_codigo !== "ENTREGA_BAH").map((movimiento) => (
                 <tr key={movimiento.movimiento_id} className="border-t border-gray-100 align-top">
                   <td className="px-5 py-3 text-gray-800">{texto(movimiento.tipo_movimiento_nombre)}</td>
                   <td className="px-5 py-3 text-gray-800 whitespace-nowrap">
