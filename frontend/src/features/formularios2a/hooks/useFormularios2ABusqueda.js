@@ -20,6 +20,7 @@ export default function useFormularios2ABusqueda() {
   const toggleAvanzada = useFormularios2ABusquedaStore((state) => state.toggleAvanzada)
   const limpiar = useFormularios2ABusquedaStore((state) => state.limpiar)
   const solicitarActualizacion = useFormularios2ABusquedaStore((state) => state.solicitarActualizacion)
+  const quitarFormulario = useFormularios2ABusquedaStore((state) => state.quitarFormulario)
 
   async function ejecutarBusqueda() {
     const { consulta: consultaActual, filtros: filtrosActuales, setResultados } =
@@ -64,5 +65,6 @@ export default function useFormularios2ABusqueda() {
     buscar,
     limpiar,
     solicitarActualizacion,
+    quitarFormulario,
   }
 }

@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import Formulario2AEliminarModal from '@features/formularios2a/components/Formulario2AEliminarModal'
 import { partesUbicacion } from '@features/formularios2a/ubicacion'
 import { formatFechaHora } from '@utils/dates'
 
@@ -40,8 +42,9 @@ function UbicacionCell({ formulario }) {
   )
 }
 
-export default function Formularios2AResultados({ formularios, onModificar }) {
+export default function Formularios2AResultados({ formularios, onModificar, onEliminada }) {
   const navigate = useNavigate()
+  const [formularioAEliminar, setFormularioAEliminar] = useState(null)
 
   return (
     <section className="bg-white rounded-lg border border-gray-200">
@@ -108,6 +111,7 @@ export default function Formularios2AResultados({ formularios, onModificar }) {
                       <button
                         type="button"
                         aria-label="Eliminar"
+                        onClick={() => setFormularioAEliminar(formulario)}
                         className={deleteButtonClassName}
                       >
                         <TrashIcon className="w-4 h-4" />
@@ -123,6 +127,13 @@ export default function Formularios2AResultados({ formularios, onModificar }) {
           </tbody>
         </table>
       </div>
+
+      <Formulario2AEliminarModal
+        isOpen={formularioAEliminar !== null}
+        formulario={formularioAEliminar}
+        onClose={() => setFormularioAEliminar(null)}
+        onEliminada={onEliminada}
+      />
     </section>
   )
 }

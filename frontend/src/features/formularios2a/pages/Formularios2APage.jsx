@@ -26,6 +26,7 @@ export default function Formularios2APage() {
     buscar,
     limpiar,
     solicitarActualizacion,
+    quitarFormulario,
   } = useFormularios2ABusqueda()
 
   function handleEmergenciaEncontrada(emergencia) {
@@ -90,6 +91,7 @@ export default function Formularios2APage() {
         <Formularios2AResultados
           formularios={formularios}
           onModificar={solicitarActualizacion}
+          onEliminada={quitarFormulario}
         />
       )}
 

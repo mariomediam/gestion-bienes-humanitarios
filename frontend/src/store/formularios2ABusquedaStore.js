@@ -30,6 +30,13 @@ const useFormularios2ABusquedaStore = create((set) => ({
 
   setResultados: (formularios) => set({ formularios, searched: true }),
 
+  quitarFormulario: (formulario2aId) =>
+    set((state) => ({
+      formularios: state.formularios.filter(
+        (item) => item.formulario_2a_id !== formulario2aId,
+      ),
+    })),
+
   solicitarActualizacion: () => set({ actualizarAlRegresar: true }),
 
   limpiar: () =>

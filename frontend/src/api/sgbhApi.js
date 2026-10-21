@@ -203,6 +203,10 @@ export const sgbhApi = {
     return response.data
   },
 
+  eliminarFormulario2A: async (formulario2aId) => {
+    await api.delete(`/api/sgbh/formularios-2a/${formulario2aId}/`)
+  },
+
   getFormulario2A: async (formulario2aId) => {
     const response = await api.get(`/api/sgbh/formularios-2a/${formulario2aId}/`)
     return response.data
