@@ -191,11 +191,15 @@
 }
 
 .bah-firma-nombre {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   min-height: 14mm;
   margin: 0 6mm 1mm;
+  padding-bottom: 0.4mm;
   border-bottom: 0.25mm solid #222;
   font-size: 8pt;
-  line-height: 14mm;
+  line-height: 1.1;
 }
 
 .bah-firmas p {
