@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import CharField, Count, OuterRef, Prefetch, Subquery
+from django.db.models import CharField, Count, OuterRef, Prefetch, ProtectedError, Subquery
 from django.utils import timezone
 
 from ..db_router import DB_ALIAS
@@ -257,6 +257,43 @@ class Formulario2AService:
 
             stored = _formularios_con_distrito().get(pk=formulario.pk)
         return stored
+
+    @staticmethod
+    def delete(formulario_2a_id):
+        """Delete one S43edan_formulario_2a row.
+
+        Rejected when the current estado_registro_id is inactive (2)
+        or a related Planilla BAH is in state EMITIDA.
+        Also rejected when S43edan_formulario_2a_viviendas already
+        references that formulario_2a_id. The checks and the delete
+        run in one transaction.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            try:
+                formulario = Formulario2A.objects.get(pk=formulario_2a_id)
+            except Formulario2A.DoesNotExist:
+                raise Formulario2AServiceError(
+                    'El formulario EDAN 2A indicado no existe',
+                    not_found=True,
+                )
+
+            _require_formulario_modificable(formulario)
+
+            if Formulario2AVivienda.objects.filter(
+                formulario_2a_id=formulario_2a_id,
+            ).exists():
+                raise Formulario2AServiceError(
+                    'No se puede eliminar el formulario EDAN 2A porque tiene viviendas asociadas',
+                    conflict=True,
+                )
+
+            try:
+                formulario.delete()
+            except ProtectedError:
+                raise Formulario2AServiceError(
+                    'No se puede eliminar el formulario EDAN 2A porque tiene viviendas asociadas',
+                    conflict=True,
+                )
 
 
 def _require_hojas(numero_hoja, total_hojas):

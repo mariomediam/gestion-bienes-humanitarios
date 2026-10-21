@@ -130,6 +130,25 @@ class Formulario2ADetailView(APIView):
 
         return Response(payload, status=status.HTTP_200_OK)
 
+    def delete(self, request, formulario_2a_id):
+        if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:
+            return Response(
+                {'error': 'El campo formulario_2a_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            Formulario2AService.delete(formulario_2a_id)
+        except Formulario2AServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar el formulario EDAN 2A'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class Formulario2ABuscarView(APIView):
     permission_classes = [IsAuthenticated]
