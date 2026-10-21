@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import PlusIcon from '@components/icons/PlusIcon'
 import TrashIcon from '@components/icons/TrashIcon'
 import BienMovimientoSelect, {
@@ -28,6 +29,31 @@ export default function MovimientoDetalleFilas({
 }) {
   const avisoSigno = soloLectura ? '' : mensajeSignoCantidad(naturaleza)
   const camposBloqueados = disabled || soloLectura
+  const irAlFinalRef = useRef(false)
+
+  useEffect(() => {
+    if (!irAlFinalRef.current) return
+    irAlFinalRef.current = false
+    const desplazables = [document.scrollingElement, document.querySelector('main')].filter(Boolean)
+    desplazables.forEach((elemento) => {
+      elemento.scrollTo({ top: elemento.scrollHeight, behavior: 'smooth' })
+    })
+  }, [lineas])
+
+  useEffect(() => {
+    if (soloLectura || disabled) return undefined
+
+    function handleKeyDown(event) {
+      if (event.repeat || (event.key !== 'Insert' && event.code !== 'Insert')) return
+      if (event.target instanceof Element && event.target.closest('[role="dialog"]')) return
+      event.preventDefault()
+      irAlFinalRef.current = true
+      onAgregar()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [soloLectura, disabled, onAgregar])
 
   return (
     <section className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
@@ -35,12 +61,19 @@ export default function MovimientoDetalleFilas({
         <div>
           <h2 className="text-lg font-semibold text-[#1e3064]">Bienes</h2>
           {avisoSigno && <p className="mt-1 text-xs text-gray-600">{avisoSigno}</p>}
+          {!soloLectura && (
+            <p className="mt-1 text-xs text-gray-600">
+              También se pueden agregar bienes presionando la tecla Insert
+            </p>
+          )}
         </div>
         {!soloLectura && (
           <button
             type="button"
             onClick={onAgregar}
             disabled={disabled}
+            title="Insert"
+            aria-keyshortcuts="Insert"
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-white bg-[#1e3064] rounded-md hover:bg-[#2a4080] focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <PlusIcon className="w-4 h-4" />
