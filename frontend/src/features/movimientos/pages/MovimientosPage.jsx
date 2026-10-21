@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import PlusIcon from '@components/icons/PlusIcon'
@@ -6,44 +5,23 @@ import MovimientosBusquedaForm from '@features/movimientos/components/Movimiento
 import MovimientosResultados from '@features/movimientos/components/MovimientosResultados'
 import { exportMovimientosExcel } from '@features/movimientos/exportMovimientosExcel'
 import useMovimientosBusqueda from '@features/movimientos/hooks/useMovimientosBusqueda'
-import { buildMovimientoSearchParams } from '@features/movimientos/searchParams'
-
-const EMPTY_FILTROS = {
-  fecha_desde: '',
-  fecha_hasta: '',
-  tipo_movimiento_id: '',
-  documento_referencia: '',
-  destinatario: '',
-}
 
 export default function MovimientosPage() {
-  const [bienNombre, setBienNombre] = useState('')
-  const [filtros, setFiltros] = useState(EMPTY_FILTROS)
-  const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
   const {
     loading,
     searched,
     movimientos,
+    bienNombre,
+    filtros,
+    avanzadaAbierta,
+    setBienNombre,
+    setFiltro,
+    toggleAvanzada,
     buscar,
-    limpiarResultados,
+    limpiar,
+    solicitarActualizacion,
     quitarMovimiento,
   } = useMovimientosBusqueda()
-
-  function handleFiltroChange(name, value) {
-    setFiltros((current) => ({ ...current, [name]: value }))
-  }
-
-  function handleBuscar(event) {
-    event.preventDefault()
-    buscar(buildMovimientoSearchParams(bienNombre, filtros))
-  }
-
-  function handleLimpiar() {
-    setBienNombre('')
-    setFiltros(EMPTY_FILTROS)
-    setAvanzadaAbierta(false)
-    limpiarResultados()
-  }
 
   const hayResultados = searched && movimientos.length > 0
 
@@ -90,16 +68,20 @@ export default function MovimientosPage() {
         bienNombre={bienNombre}
         onBienNombreChange={setBienNombre}
         filtros={filtros}
-        onFiltroChange={handleFiltroChange}
+        onFiltroChange={setFiltro}
         avanzadaAbierta={avanzadaAbierta}
-        onToggleAvanzada={() => setAvanzadaAbierta((open) => !open)}
-        onSubmit={handleBuscar}
-        onLimpiar={handleLimpiar}
+        onToggleAvanzada={toggleAvanzada}
+        onSubmit={buscar}
+        onLimpiar={limpiar}
         loading={loading}
       />
 
       {searched && (
-        <MovimientosResultados movimientos={movimientos} onEliminado={quitarMovimiento} />
+        <MovimientosResultados
+          movimientos={movimientos}
+          onModificar={solicitarActualizacion}
+          onEliminado={quitarMovimiento}
+        />
       )}
     </div>
   )

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
@@ -55,7 +55,8 @@ function BienesCell({ detalles }) {
   )
 }
 
-export default function MovimientosResultados({ movimientos, onEliminado }) {
+export default function MovimientosResultados({ movimientos, onModificar, onEliminado }) {
+  const navigate = useNavigate()
   const [movimientoAEliminar, setMovimientoAEliminar] = useState(null)
 
   return (
@@ -107,16 +108,20 @@ export default function MovimientosResultados({ movimientos, onEliminado }) {
                           Ver
                         </span>
                       </Link>
-                      <Link
-                        to={`/alm-movimientos/${movimiento.movimiento_id}/editar`}
+                      <button
+                        type="button"
                         aria-label="Modificar"
                         className={actionButtonClassName}
+                        onClick={() => {
+                          onModificar()
+                          navigate(`/alm-movimientos/${movimiento.movimiento_id}/editar`)
+                        }}
                       >
                         <PencilIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
                           Modificar
                         </span>
-                      </Link>
+                      </button>
                       <button
                         type="button"
                         aria-label="Eliminar"
