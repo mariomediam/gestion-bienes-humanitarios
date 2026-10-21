@@ -7,7 +7,9 @@ import Formulario2AFormModal from '@features/formularios2a/components/Formulario
 import Formularios2ABusquedaForm from '@features/formularios2a/components/Formularios2ABusquedaForm'
 import Formularios2AResultados from '@features/formularios2a/components/Formularios2AResultados'
 import { exportFormularios2AExcel } from '@features/formularios2a/exportFormularios2AExcel'
-import useFormularios2ABusqueda from '@features/formularios2a/hooks/useFormularios2ABusqueda'
+import useFormularios2ABusqueda, {
+  mostrarFormularioRecienCreado,
+} from '@features/formularios2a/hooks/useFormularios2ABusqueda'
 
 export default function Formularios2APage() {
   const navigate = useNavigate()
@@ -38,7 +40,10 @@ export default function Formularios2APage() {
     setEmergenciaSeleccionada(null)
   }
 
-  function handleFormularioGuardado(formulario) {
+  async function handleFormularioGuardado(formulario) {
+    if (formulario?.formulario_2a_id) {
+      await mostrarFormularioRecienCreado(formulario.formulario_2a_id)
+    }
     setEmergenciaSeleccionada(null)
     navigate(`/formularios-2A/${formulario.formulario_2a_id}`)
   }

@@ -15,6 +15,7 @@ const useFormularios2ABusquedaStore = create((set) => ({
   searched: false,
   formularios: [],
   actualizarAlRegresar: false,
+  formularioCreadoId: null,
 
   setConsulta: (consulta) => set({ consulta }),
 
@@ -39,6 +40,17 @@ const useFormularios2ABusquedaStore = create((set) => ({
 
   solicitarActualizacion: () => set({ actualizarAlRegresar: true }),
 
+  prepararFormularioCreado: (formulario2aId) =>
+    set({
+      consulta: '',
+      filtros: { ...EMPTY_FILTROS_FORMULARIO_2A },
+      avanzadaAbierta: false,
+      searched: true,
+      formularios: [],
+      actualizarAlRegresar: false,
+      formularioCreadoId: formulario2aId,
+    }),
+
   limpiar: () =>
     set({
       consulta: '',
@@ -47,6 +59,7 @@ const useFormularios2ABusquedaStore = create((set) => ({
       searched: false,
       formularios: [],
       actualizarAlRegresar: false,
+      formularioCreadoId: null,
     }),
 }));
 

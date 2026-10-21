@@ -8,6 +8,19 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
+export async function mostrarFormularioRecienCreado(formulario2aId) {
+  const { prepararFormularioCreado, setResultados } = useFormularios2ABusquedaStore.getState()
+  prepararFormularioCreado(formulario2aId)
+
+  try {
+    const rows = await sgbhApi.buscarFormularios2A({ formulario_2a_id: formulario2aId })
+    setResultados(rows)
+    useFormularios2ABusquedaStore.setState({ formularioCreadoId: null })
+  } catch (error) {
+    toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de formularios EDAN 2A'))
+  }
+}
+
 export default function useFormularios2ABusqueda() {
   const [loading, setLoading] = useState(false)
   const consulta = useFormularios2ABusquedaStore((state) => state.consulta)
@@ -40,7 +53,14 @@ export default function useFormularios2ABusqueda() {
   }
 
   useEffect(() => {
-    const { searched: yaBuscado, actualizarAlRegresar } = useFormularios2ABusquedaStore.getState()
+    const { formularioCreadoId, searched: yaBuscado, actualizarAlRegresar } =
+      useFormularios2ABusquedaStore.getState()
+
+    if (formularioCreadoId) {
+      mostrarFormularioRecienCreado(formularioCreadoId)
+      return
+    }
+
     if (!yaBuscado || !actualizarAlRegresar) return
 
     useFormularios2ABusquedaStore.setState({ actualizarAlRegresar: false })

@@ -242,7 +242,7 @@ export default function Formulario2AFormModal({
       )
       setForm(EMPTY_FORM)
       setErrors({})
-      onSaved(saved)
+      await onSaved(saved)
     } catch (error) {
       toast.error(
         getErrorMessage(
