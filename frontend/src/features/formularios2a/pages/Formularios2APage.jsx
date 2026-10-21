@@ -25,6 +25,7 @@ export default function Formularios2APage() {
     toggleAvanzada,
     buscar,
     limpiar,
+    solicitarActualizacion,
   } = useFormularios2ABusqueda()
 
   function handleEmergenciaEncontrada(emergencia) {
@@ -85,7 +86,12 @@ export default function Formularios2APage() {
         loading={loading}
       />
 
-      {searched && <Formularios2AResultados formularios={formularios} />}
+      {searched && (
+        <Formularios2AResultados
+          formularios={formularios}
+          onModificar={solicitarActualizacion}
+        />
+      )}
 
       <Formulario2ACodigoSinpadModal
         isOpen={codigoModalAbierto}

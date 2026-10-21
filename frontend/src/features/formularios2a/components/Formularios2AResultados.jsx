@@ -40,7 +40,7 @@ function UbicacionCell({ formulario }) {
   )
 }
 
-export default function Formularios2AResultados({ formularios }) {
+export default function Formularios2AResultados({ formularios, onModificar }) {
   const navigate = useNavigate()
 
   return (
@@ -95,7 +95,10 @@ export default function Formularios2AResultados({ formularios }) {
                         type="button"
                         aria-label="Modificar"
                         className={actionButtonClassName}
-                        onClick={() => navigate(`/formularios-2A/${formulario.formulario_2a_id}`)}
+                        onClick={() => {
+                          onModificar()
+                          navigate(`/formularios-2A/${formulario.formulario_2a_id}`)
+                        }}
                       >
                         <PencilIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">

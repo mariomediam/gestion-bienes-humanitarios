@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
 import { buildFormulario2ASearchParams } from '@features/formularios2a/searchParams'
@@ -19,9 +19,9 @@ export default function useFormularios2ABusqueda() {
   const setFiltro = useFormularios2ABusquedaStore((state) => state.setFiltro)
   const toggleAvanzada = useFormularios2ABusquedaStore((state) => state.toggleAvanzada)
   const limpiar = useFormularios2ABusquedaStore((state) => state.limpiar)
+  const solicitarActualizacion = useFormularios2ABusquedaStore((state) => state.solicitarActualizacion)
 
-  async function buscar(event) {
-    event.preventDefault()
+  async function ejecutarBusqueda() {
     const { consulta: consultaActual, filtros: filtrosActuales, setResultados } =
       useFormularios2ABusquedaStore.getState()
     setLoading(true)
@@ -38,6 +38,19 @@ export default function useFormularios2ABusqueda() {
     }
   }
 
+  useEffect(() => {
+    const { searched: yaBuscado, actualizarAlRegresar } = useFormularios2ABusquedaStore.getState()
+    if (!yaBuscado || !actualizarAlRegresar) return
+
+    useFormularios2ABusquedaStore.setState({ actualizarAlRegresar: false })
+    ejecutarBusqueda()
+  }, [])
+
+  function buscar(event) {
+    event.preventDefault()
+    ejecutarBusqueda()
+  }
+
   return {
     loading,
     searched,
@@ -50,5 +63,6 @@ export default function useFormularios2ABusqueda() {
     toggleAvanzada,
     buscar,
     limpiar,
+    solicitarActualizacion,
   }
 }
