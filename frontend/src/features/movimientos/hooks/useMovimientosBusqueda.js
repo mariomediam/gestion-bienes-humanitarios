@@ -8,6 +8,19 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
+export async function mostrarMovimientoRecienCreado(movimientoId) {
+  const { prepararMovimientoCreado, setResultados } = useMovimientosBusquedaStore.getState()
+  prepararMovimientoCreado(movimientoId)
+
+  try {
+    const rows = await sgbhApi.buscarMovimientos({ movimiento_id: movimientoId })
+    setResultados(rows)
+    useMovimientosBusquedaStore.setState({ movimientoCreadoId: null })
+  } catch (error) {
+    toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de movimientos de almacén'))
+  }
+}
+
 export default function useMovimientosBusqueda() {
   const [loading, setLoading] = useState(false)
   const bienNombre = useMovimientosBusquedaStore((state) => state.bienNombre)
@@ -40,7 +53,14 @@ export default function useMovimientosBusqueda() {
   }
 
   useEffect(() => {
-    const { searched: yaBuscado, actualizarAlRegresar } = useMovimientosBusquedaStore.getState()
+    const { movimientoCreadoId, searched: yaBuscado, actualizarAlRegresar } =
+      useMovimientosBusquedaStore.getState()
+
+    if (movimientoCreadoId) {
+      mostrarMovimientoRecienCreado(movimientoCreadoId)
+      return
+    }
+
     if (!yaBuscado || !actualizarAlRegresar) return
 
     useMovimientosBusquedaStore.setState({ actualizarAlRegresar: false })

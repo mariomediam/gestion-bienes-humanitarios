@@ -15,6 +15,7 @@ const useMovimientosBusquedaStore = create((set) => ({
   searched: false,
   movimientos: [],
   actualizarAlRegresar: false,
+  movimientoCreadoId: null,
 
   setBienNombre: (bienNombre) => set({ bienNombre }),
 
@@ -37,6 +38,17 @@ const useMovimientosBusquedaStore = create((set) => ({
 
   solicitarActualizacion: () => set({ actualizarAlRegresar: true }),
 
+  prepararMovimientoCreado: (movimientoId) =>
+    set({
+      bienNombre: '',
+      filtros: { ...EMPTY_FILTROS_MOVIMIENTO },
+      avanzadaAbierta: false,
+      searched: true,
+      movimientos: [],
+      actualizarAlRegresar: false,
+      movimientoCreadoId: movimientoId,
+    }),
+
   limpiar: () =>
     set({
       bienNombre: '',
@@ -45,6 +57,7 @@ const useMovimientosBusquedaStore = create((set) => ({
       searched: false,
       movimientos: [],
       actualizarAlRegresar: false,
+      movimientoCreadoId: null,
     }),
 }));
 

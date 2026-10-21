@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
+import { mostrarMovimientoRecienCreado } from '@features/movimientos/hooks/useMovimientosBusqueda'
 import EncargadoAlmacenSelect from '@features/movimientos/components/EncargadoAlmacenSelect'
 import MovimientoDetalleFilas from '@features/movimientos/components/MovimientoDetalleFilas'
 import TipoMovimientoSelect from '@features/movimientos/components/TipoMovimientoSelect'
@@ -336,8 +337,11 @@ export default function MovimientoFormPage() {
         await sgbhApi.actualizarMovimiento(movimientoId, payload)
         toast.success('Movimiento modificado correctamente')
       } else {
-        await sgbhApi.crearMovimiento(payload)
+        const creado = await sgbhApi.crearMovimiento(payload)
         toast.success('Movimiento registrado correctamente')
+        if (creado?.movimiento_id) {
+          await mostrarMovimientoRecienCreado(creado.movimiento_id)
+        }
       }
       navigate('/alm-movimientos')
     } catch (error) {
