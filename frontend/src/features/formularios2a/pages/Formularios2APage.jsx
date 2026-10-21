@@ -8,40 +8,24 @@ import Formularios2ABusquedaForm from '@features/formularios2a/components/Formul
 import Formularios2AResultados from '@features/formularios2a/components/Formularios2AResultados'
 import { exportFormularios2AExcel } from '@features/formularios2a/exportFormularios2AExcel'
 import useFormularios2ABusqueda from '@features/formularios2a/hooks/useFormularios2ABusqueda'
-import { buildFormulario2ASearchParams } from '@features/formularios2a/searchParams'
-
-const EMPTY_FILTROS = {
-  tipoPeligro: null,
-  distrito: null,
-  fecha_desde: '',
-  fecha_hasta: '',
-  localidad: '',
-}
 
 export default function Formularios2APage() {
   const navigate = useNavigate()
-  const [consulta, setConsulta] = useState('')
-  const [filtros, setFiltros] = useState(EMPTY_FILTROS)
-  const [avanzadaAbierta, setAvanzadaAbierta] = useState(false)
   const [codigoModalAbierto, setCodigoModalAbierto] = useState(false)
   const [emergenciaSeleccionada, setEmergenciaSeleccionada] = useState(null)
-  const { loading, searched, formularios, buscar, limpiarResultados } = useFormularios2ABusqueda()
-
-  function handleFiltroChange(name, value) {
-    setFiltros((current) => ({ ...current, [name]: value }))
-  }
-
-  function handleBuscar(event) {
-    event.preventDefault()
-    buscar(buildFormulario2ASearchParams(consulta, filtros))
-  }
-
-  function handleLimpiar() {
-    setConsulta('')
-    setFiltros(EMPTY_FILTROS)
-    setAvanzadaAbierta(false)
-    limpiarResultados()
-  }
+  const {
+    loading,
+    searched,
+    formularios,
+    consulta,
+    filtros,
+    avanzadaAbierta,
+    setConsulta,
+    setFiltro,
+    toggleAvanzada,
+    buscar,
+    limpiar,
+  } = useFormularios2ABusqueda()
 
   function handleEmergenciaEncontrada(emergencia) {
     setCodigoModalAbierto(false)
@@ -93,11 +77,11 @@ export default function Formularios2APage() {
         consulta={consulta}
         onConsultaChange={setConsulta}
         filtros={filtros}
-        onFiltroChange={handleFiltroChange}
+        onFiltroChange={setFiltro}
         avanzadaAbierta={avanzadaAbierta}
-        onToggleAvanzada={() => setAvanzadaAbierta((open) => !open)}
-        onSubmit={handleBuscar}
-        onLimpiar={handleLimpiar}
+        onToggleAvanzada={toggleAvanzada}
+        onSubmit={buscar}
+        onLimpiar={limpiar}
         loading={loading}
       />
 
