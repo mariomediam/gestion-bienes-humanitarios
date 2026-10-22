@@ -35,8 +35,7 @@ function BienesCell({ detalles, es_movimiento_mixto }) {
     <table className="min-w-full text-xs text-left">
       <thead className="text-gray-500">
         <tr>
-          <th scope="col" className="pr-3 py-1 font-medium">Bien</th>
-          <th scope="col" className="pr-3 py-1 font-medium">Unidad</th>
+          <th scope="col" className="pr-3 py-1 font-medium">Bien</th>          
           <th scope="col" className="pr-3 py-1 font-medium">Cantidad</th>
           <th scope="col" className="py-1 font-medium">Cantidad texto</th>
         </tr>
@@ -44,8 +43,8 @@ function BienesCell({ detalles, es_movimiento_mixto }) {
       <tbody>
         {detalles.map((detalle) => (
           <tr key={detalle.movimiento_detalle_id}>
-            <td className="pr-3 py-1 text-gray-800">{texto(detalle.bien_nombre)}</td>
-            <td className="pr-3 py-1 text-gray-800">{texto(detalle.unidad_medida_abreviatura)}</td>
+            <td className="pr-3 py-1 text-gray-800">{texto(detalle.bien_nombre)} ({texto(detalle.unidad_medida_abreviatura)})</td>
+            
             <td className="pr-3 py-1 text-gray-800 whitespace-nowrap">{texto( es_movimiento_mixto ? detalle.cantidad : Math.abs(detalle.cantidad))}</td>
             <td className="py-1 text-gray-800">{texto(detalle.cantidad_texto)}</td>
           </tr>
