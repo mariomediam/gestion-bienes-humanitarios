@@ -49,6 +49,7 @@ from .views import (
     PlanillaEntregaReporteView,
     PlanillaEntregaTotalView,
     RolFamiliarListView,
+    StockActualListView,
     TipoDanioPersonalListView,
     TipoDiscapacidadListView,
     TipoDocumentoListView,
@@ -140,6 +141,7 @@ urlpatterns = [
     path('bienes/', BienCreateView.as_view(), name='bienes'),
     path('bienes/<int:bien_id>/', BienDetailView.as_view(), name='bienes-detalle'),
     path('bienes/buscar/', BienBuscarView.as_view(), name='bienes-buscar'),
+    path('stock-actual/', StockActualListView.as_view(), name='stock-actual'),
     path(
         'categorias-medios-vida/',
         CategoriaMedioVidaListView.as_view(),

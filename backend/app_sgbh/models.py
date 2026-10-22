@@ -203,6 +203,35 @@ class AlmacenStockActual(models.Model):
         return f'{self.almacen_id}-{self.bien_id}: {self.stock_actual}'
 
 
+class StockActual(models.Model):
+    """Read-only view S43vw_stock_actual.
+
+    Each row is the sum of detail quantities for movements whose state
+    code is CONFIRMADO, grouped by good across every warehouse. bien
+    identifies the row.
+    """
+
+    bien = models.ForeignKey(
+        'Bien',
+        on_delete=models.DO_NOTHING,
+        db_column='bien_id',
+        primary_key=True,
+        db_constraint=False,
+        db_index=False,
+        related_name='stock_total',
+    )
+    stock_actual = models.DecimalField(max_digits=18, decimal_places=6)
+
+    class Meta:
+        managed = False
+        db_table = 'S43vw_stock_actual'
+        verbose_name = 'Stock actual'
+        verbose_name_plural = 'Stocks actuales'
+
+    def __str__(self):
+        return f'{self.bien_id}: {self.stock_actual}'
+
+
 class Personal(models.Model):
     personal_id = models.SmallAutoField(primary_key=True)
     apellido_paterno = models.CharField(max_length=50)

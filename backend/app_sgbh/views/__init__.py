@@ -64,6 +64,7 @@ from .planilla_entrega_view import (
     PlanillaEntregaTotalView,
 )
 from .rol_familiar_view import RolFamiliarListView
+from .stock_actual_view import StockActualListView
 from .tipo_danio_personal_view import TipoDanioPersonalListView
 from .tipo_discapacidad_view import TipoDiscapacidadListView
 from .tipo_documento_view import TipoDocumentoListView

@@ -65,6 +65,7 @@ from .planilla_entrega import (
     PlanillaEntregaTotalSerializer,
 )
 from .rol_familiar import RolFamiliarSerializer
+from .stock_actual import StockActualSerializer
 from .tipo_danio_personal import TipoDanioPersonalSerializer
 from .tipo_discapacidad import TipoDiscapacidadSerializer
 from .tipo_documento import TipoDocumentoSerializer
@@ -122,6 +123,7 @@ __all__ = [
     'PlanillaEntregaSerializer',
     'PlanillaEntregaTotalSerializer',
     'RolFamiliarSerializer',
+    'StockActualSerializer',
     'TipoDanioPersonalSerializer',
     'TipoDiscapacidadSerializer',
     'TipoDocumentoSerializer',
