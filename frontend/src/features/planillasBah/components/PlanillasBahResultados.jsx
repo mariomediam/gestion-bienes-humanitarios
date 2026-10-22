@@ -24,6 +24,15 @@ const actionTooltipClassName =
 const deleteTooltipClassName =
   'pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-red-600 px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'
 
+  function texto(value) {
+    if (value === null || value === undefined || value === '') {
+      return '—'
+    }
+  
+    return String(value)
+  }
+  
+
 function BienesCell({ detalles }) {
   if (!detalles || detalles.length === 0) {
     return <span className="text-gray-400">—</span>
@@ -33,17 +42,17 @@ function BienesCell({ detalles }) {
     <table className="min-w-full text-xs text-left">
       <thead className="text-gray-500">
         <tr>
-          <th scope="col" className="pr-3 py-1 font-medium">Bien</th>
-          <th scope="col" className="pr-3 py-1 font-medium">Unidad</th>
+          <th scope="col" className="pr-3 py-1 font-medium">Bien</th>          
           <th scope="col" className="py-1 font-medium">Cantidad</th>
+          <th scope="col" className="py-1 font-medium">Cantidad texto</th>
         </tr>
       </thead>
       <tbody>
         {detalles.map((detalle) => (
           <tr key={detalle.movimiento_detalle_id}>
-            <td className="pr-3 py-1 text-gray-800">{textoVisible(detalle.bien_nombre)}</td>
-            <td className="pr-3 py-1 text-gray-800">{textoVisible(detalle.unidad_medida_abreviatura)}</td>
-            <td className="py-1 text-gray-800 whitespace-nowrap">{textoCantidad(detalle)}</td>
+            <td className="pr-3 py-1 text-gray-800">{textoVisible(detalle.bien_nombre)} ({textoVisible(detalle.unidad_medida_abreviatura)})</td>
+            <td className="pr-3 py-1 text-gray-800 whitespace-nowrap">{texto(Math.abs(detalle.cantidad))}</td>
+            <td className="py-1 ms-2 text-gray-800">{texto(detalle.cantidad_texto)}</td>
           </tr>
         ))}
       </tbody>

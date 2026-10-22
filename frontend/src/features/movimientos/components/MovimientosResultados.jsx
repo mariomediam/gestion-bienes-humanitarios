@@ -26,7 +26,7 @@ function texto(value) {
   return String(value)
 }
 
-function BienesCell({ detalles }) {
+function BienesCell({ detalles, es_movimiento_mixto }) {
   if (!detalles || detalles.length === 0) {
     return <span className="text-gray-400">—</span>
   }
@@ -46,7 +46,7 @@ function BienesCell({ detalles }) {
           <tr key={detalle.movimiento_detalle_id}>
             <td className="pr-3 py-1 text-gray-800">{texto(detalle.bien_nombre)}</td>
             <td className="pr-3 py-1 text-gray-800">{texto(detalle.unidad_medida_abreviatura)}</td>
-            <td className="pr-3 py-1 text-gray-800 whitespace-nowrap">{texto(detalle.cantidad)}</td>
+            <td className="pr-3 py-1 text-gray-800 whitespace-nowrap">{texto( es_movimiento_mixto ? detalle.cantidad : Math.abs(detalle.cantidad))}</td>
             <td className="py-1 text-gray-800">{texto(detalle.cantidad_texto)}</td>
           </tr>
         ))}
@@ -58,6 +58,8 @@ function BienesCell({ detalles }) {
 export default function MovimientosResultados({ movimientos, onModificar, onEliminado }) {
   const navigate = useNavigate()
   const [movimientoAEliminar, setMovimientoAEliminar] = useState(null)
+
+  
 
   return (
     <section className="bg-white rounded-lg border border-gray-200">
@@ -94,7 +96,7 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
                   <td className="px-5 py-3 text-gray-800">{texto(movimiento.documento_referencia)}</td>
                   <td className="px-5 py-3 text-gray-800">{texto(movimiento.destinatario)}</td>
                   <td className="px-5 py-3 text-gray-800">
-                    <BienesCell detalles={movimiento.detalles} />
+                    <BienesCell detalles={movimiento.detalles} es_movimiento_mixto={movimiento.tipo_movimiento_naturaleza === "M"} />
                   </td>
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
                     <div className="flex gap-2">
