@@ -42,17 +42,17 @@ function BienesCell({ detalles }) {
     <table className="min-w-full text-xs text-left">
       <thead className="text-gray-500">
         <tr>
-          <th scope="col" className="pr-3 py-1 font-medium">Bien</th>          
-          <th scope="col" className="py-1 font-medium">Cantidad</th>
-          <th scope="col" className="py-1 font-medium">Cantidad texto</th>
+          <th scope="col" className="pr-3 py-1 font-medium">Bien</th>
+          <th scope="col" className="pr-6 py-1 font-medium whitespace-nowrap">Cantidad</th>
+          <th scope="col" className="pl-2 py-1 font-medium whitespace-nowrap">Cantidad texto</th>
         </tr>
       </thead>
       <tbody>
         {detalles.map((detalle) => (
           <tr key={detalle.movimiento_detalle_id}>
             <td className="pr-3 py-1 text-gray-800">{textoVisible(detalle.bien_nombre)} ({textoVisible(detalle.unidad_medida_abreviatura)})</td>
-            <td className="pr-3 py-1 text-gray-800 whitespace-nowrap">{texto(Math.abs(detalle.cantidad))}</td>
-            <td className="py-1 ms-2 text-gray-800">{texto(detalle.cantidad_texto)}</td>
+            <td className="pr-6 py-1 text-gray-800 whitespace-nowrap">{texto(Math.abs(detalle.cantidad))}</td>
+            <td className="pl-2 py-1 text-gray-800">{texto(detalle.cantidad_texto)}</td>
           </tr>
         ))}
       </tbody>
