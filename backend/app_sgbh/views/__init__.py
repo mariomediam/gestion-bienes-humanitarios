@@ -41,6 +41,7 @@ from .formulario_2a_vivienda_view import (
     Formulario2AViviendaDetailView,
 )
 from .grado_lesion_view import GradoLesionListView
+from .kardex_view import AlmacenKardexBuscarView
 from .material_pared_view import MaterialParedListView
 from .material_piso_view import MaterialPisoListView
 from .material_techo_view import MaterialTechoListView

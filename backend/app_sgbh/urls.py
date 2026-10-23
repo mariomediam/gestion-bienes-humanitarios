@@ -34,6 +34,7 @@ from .views import (
     Formulario2AViviendaBuscarView,
     Formulario2AViviendaCreateView,
     Formulario2AViviendaDetailView,
+    AlmacenKardexBuscarView,
     GradoLesionListView,
     MaterialParedListView,
     MaterialPisoListView,
@@ -142,6 +143,7 @@ urlpatterns = [
     path('bienes/<int:bien_id>/', BienDetailView.as_view(), name='bienes-detalle'),
     path('bienes/buscar/', BienBuscarView.as_view(), name='bienes-buscar'),
     path('stock-actual/', StockActualListView.as_view(), name='stock-actual'),
+    path('kardex/buscar/', AlmacenKardexBuscarView.as_view(), name='kardex-buscar'),
     path(
         'categorias-medios-vida/',
         CategoriaMedioVidaListView.as_view(),

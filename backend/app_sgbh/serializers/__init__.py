@@ -43,6 +43,7 @@ from .formulario_2a_vivienda import (
     ViviendaUpdateSerializer,
 )
 from .grado_lesion import GradoLesionSerializer
+from .kardex import AlmacenKardexBusquedaSerializer
 from .material_pared import MaterialParedSerializer
 from .material_piso import MaterialPisoSerializer
 from .material_techo import MaterialTechoSerializer
@@ -107,6 +108,7 @@ __all__ = [
     'Formulario2ATienePlanillaBahSerializer',
     'Formulario2ATotalSerializer',
     'Formulario2AUbicacionSerializer',
+    'AlmacenKardexBusquedaSerializer',
     'GradoLesionSerializer',
     'MaterialParedSerializer',
     'MaterialPisoSerializer',

@@ -189,6 +189,14 @@ def parse_estado_movimiento_id(raw_value):
     return _parse_optional_smallint(raw_value, 'estado_movimiento_id')
 
 
+def parse_estado_movimiento(raw_value):
+    """Parse the optional estado_movimiento query param.
+
+    Matches S43vw_alm_kardex.estado_movimiento, which is the state code.
+    """
+    return _parse_optional_text(raw_value, 'estado_movimiento', 30)
+
+
 def parse_grado_lesion_id(raw_value):
     """Parse the optional grado_lesion_id query param."""
     return _parse_optional_smallint(raw_value, 'grado_lesion_id')
