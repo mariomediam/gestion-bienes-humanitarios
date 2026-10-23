@@ -37,9 +37,9 @@ const LoginForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="mb-6 text-center">
-        <h2 className="text-base font-semibold text-[#1e3064]">
+    <form onSubmit={handleSubmit} className=" px-6 pb-6">
+      <div className="mb-3">
+        <h2 className="text-xs font-semibold text-[#1e3064]">
           Inicia sesión con tu cuenta institucional
         </h2>
       </div>

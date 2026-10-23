@@ -15,9 +15,10 @@ const LoginPage = () => {
 
       </header>
       <hr className="w-full border-gray-300" />
+      
       <div className="flex-1 flex items-center justify-center px-4 py-6">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-4 ">
+        <div className="w-full max-w-md bg-white rounded-lg border border-gray-300">
+          <div className="text-center sm:my-4 lg:my-8">
             {/* <div className="inline-flex items-center justify-center w-14 h-14 bg-[#1e3064] rounded-xl mb-4"> */}
             <img
               src="/images/emblema.webp"
@@ -25,7 +26,7 @@ const LoginPage = () => {
               className="h-32 w-auto inline-flex items-center justify-center"
             />
             {/* </div> */}
-            <h1 className="font-bold text-[#1e3064]">Sistema de Gestión de Bienes de Ayuda Humanitaria</h1>
+            <h1 className="font-bold text-[#1e3064] text-xl">Sistema de Gestión de Bienes de Ayuda Humanitaria</h1>
             {/* <p className="text-gray-500 text-sm mt-1">Sistema de Gestión de Bienes de Ayuda Humanitaria</p> */}
           </div>
 
