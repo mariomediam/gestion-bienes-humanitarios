@@ -16,6 +16,7 @@ import MovimientosPage from '@features/movimientos/pages/MovimientosPage'
 import PlanillaBahFormPage from '@features/planillasBah/pages/PlanillaBahFormPage'
 import PlanillaBahReportePage from '@features/planillasBah/pages/PlanillaBahReportePage'
 import PlanillasBahPage from '@features/planillasBah/pages/PlanillasBahPage'
+import StockActualPage from '@features/stockActual/pages/StockActualPage'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading, checkAuth } = useAuthStore()
@@ -97,6 +98,7 @@ function App() {
           <Route path="alm-planilla-bah/:movimientoId/editar" element={<PlanillaBahFormPage />} />
           <Route path="alm-planilla-bah/:planillaEntregaId/reporte" element={<PlanillaBahReportePage />} />
           <Route path="alm-planilla-bah" element={<PlanillasBahPage />} />
+          <Route path="alm-stock-actual" element={<StockActualPage />} />
           <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />
         </Route>

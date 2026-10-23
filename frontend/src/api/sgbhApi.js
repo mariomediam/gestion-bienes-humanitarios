@@ -105,6 +105,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  getStockActual: async (params) => {
+    const response = await api.get('/api/sgbh/stock-actual/', { params })
+    return response.data
+  },
+
   crearBien: async (data) => {
     const response = await api.post('/api/sgbh/bienes/', data)
     return response.data
