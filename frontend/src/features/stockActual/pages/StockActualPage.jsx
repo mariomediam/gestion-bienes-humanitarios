@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import StockActualBusquedaForm from '@features/stockActual/components/StockActualBusquedaForm'
 import StockActualResultados from '@features/stockActual/components/StockActualResultados'
@@ -6,13 +5,14 @@ import { exportStockActualExcel } from '@features/stockActual/exportStockActualE
 import useStockActualBusqueda from '@features/stockActual/hooks/useStockActualBusqueda'
 
 export default function StockActualPage() {
-  const [bien, setBien] = useState(null)
   const {
     loading,
     searched,
     filas,
+    bien,
+    setBien,
     buscar,
-    limpiarResultados,
+    limpiar,
   } = useStockActualBusqueda()
 
   function handleBuscar(event) {
@@ -22,11 +22,6 @@ export default function StockActualPage() {
       params.bien_id = bien.value
     }
     buscar(params)
-  }
-
-  function handleLimpiar() {
-    setBien(null)
-    limpiarResultados()
   }
 
   const hayResultados = searched && filas.length > 0
@@ -55,7 +50,7 @@ export default function StockActualPage() {
         bien={bien}
         onBienChange={setBien}
         onSubmit={handleBuscar}
-        onLimpiar={handleLimpiar}
+        onLimpiar={limpiar}
         loading={loading}
       />
 
