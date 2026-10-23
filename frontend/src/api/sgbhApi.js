@@ -110,6 +110,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  buscarKardex: async (params) => {
+    const response = await api.get('/api/sgbh/kardex/buscar/', { params })
+    return response.data
+  },
+
   crearBien: async (data) => {
     const response = await api.post('/api/sgbh/bienes/', data)
     return response.data

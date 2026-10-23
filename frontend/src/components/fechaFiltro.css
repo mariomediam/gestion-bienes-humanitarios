@@ -1,0 +1,14 @@
+.fecha-filtro,
+.fecha-filtro::-webkit-datetime-edit,
+.fecha-filtro::-webkit-datetime-edit-fields-wrapper,
+.fecha-filtro::-webkit-datetime-edit-text,
+.fecha-filtro::-webkit-datetime-edit-day-field,
+.fecha-filtro::-webkit-datetime-edit-month-field,
+.fecha-filtro::-webkit-datetime-edit-year-field {
+  color: transparent;
+}
+
+.fecha-filtro::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+}

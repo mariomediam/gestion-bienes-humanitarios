@@ -1,0 +1,14 @@
+---
+description: Los filtros de fecha son input type date y se muestran en dd/mm/yyyy
+alwaysApply: true
+---
+
+# Filtros de fecha
+
+Los filtros de fecha (`fecha_desde`, `fecha_hasta` y equivalentes) son `<input type="date">`.
+
+La fecha que ve el usuario es siempre `dd/mm/yyyy`. El navegador no debe mostrar `mm/dd/yyyy`.
+
+El valor del input sigue en `YYYY-MM-DD`, que es el formato que reciben los endpoints.
+
+Usar `FechaFiltroInput` (`frontend/src/components/FechaFiltroInput.jsx`). No reemplazar estos filtros por un input de texto.

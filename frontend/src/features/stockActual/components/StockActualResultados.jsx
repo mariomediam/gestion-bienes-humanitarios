@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 function texto(value) {
   if (value === null || value === undefined || value === '') {
     return '—'
@@ -39,12 +41,12 @@ export default function StockActualResultados({ filas }) {
                   <td className="px-5 py-3 text-gray-800">{texto(fila.unidad_medida_nombre)}</td>
                   <td className="px-5 py-3 text-gray-800 whitespace-nowrap">{texto(fila.stock_actual)}</td>
                   <td className="px-5 py-3 whitespace-nowrap">
-                    <button
-                      type="button"
+                    <Link
+                      to={`/alm-stock-actual/${fila.bien_id}/kardex`}
                       className="inline-flex items-center whitespace-nowrap px-3 py-1.5 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
                     >
                       Ver Kardex
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))

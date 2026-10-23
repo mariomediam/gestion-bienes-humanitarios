@@ -1,0 +1,5 @@
+@media print {
+  .kardex-no-imprimir {
+    display: none !important;
+  }
+}
