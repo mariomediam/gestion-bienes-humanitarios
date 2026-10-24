@@ -24,6 +24,10 @@ env = environ.Env(
     SYSTEM_CODE=(str, '39'),
     STORAGE_ROOT=(str, ''),
     USE_SSL=(bool, False),
+    RENIEC_NUDNIUSUARIO=(str, ''),
+    RENIEC_NURUCUSUARIO=(str, ''),
+    RENIEC_PASSWORD=(str, ''),
+    RENIEC_TIMEOUT=(int, 10),
 )
 
 env_file = BASE_DIR / os.environ.get('DJANGO_ENV_FILE', '.env.dev')
@@ -189,3 +193,9 @@ if not DEBUG:
         SECURE_HSTS_SECONDS = 31536000
         SECURE_HSTS_INCLUDE_SUBDOMAINS = True
         SECURE_HSTS_PRELOAD = True
+
+# RENIEC / PIDE
+RENIEC_NUDNIUSUARIO = env('RENIEC_NUDNIUSUARIO')
+RENIEC_NURUCUSUARIO = env('RENIEC_NURUCUSUARIO')
+RENIEC_PASSWORD     = env('RENIEC_PASSWORD')
+RENIEC_TIMEOUT      = env('RENIEC_TIMEOUT')

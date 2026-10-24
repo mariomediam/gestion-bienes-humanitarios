@@ -64,6 +64,7 @@ from .views import (
     TipoSeguroView,
     TipoUsoInstalacionListView,
     UnidadMedidaListView,
+    ReniecConsultarView,
 )
 
 app_name = 'sgbh'
@@ -328,5 +329,6 @@ urlpatterns = [
         Formulario2AMedioVidaBuscarView.as_view(),
         name='medios-vida-buscar',
     ),
+    path('reniec/consultar/', ReniecConsultarView.as_view(), name='reniec-consultar'),
 ]
 
