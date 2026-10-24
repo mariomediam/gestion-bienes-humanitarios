@@ -9,6 +9,7 @@ import EmergenciasPage from '@features/emergencias/pages/EmergenciasPage'
 import Formulario2ADetallePage from '@features/formularios2a/pages/Formulario2ADetallePage'
 import Formulario2AReportePage from '@features/formularios2a/pages/Formulario2AReportePage'
 import BienesPage from '@features/bienes/pages/BienesPage'
+import PersonasPage from '@features/personas/pages/PersonasPage'
 import Formularios2APage from '@features/formularios2a/pages/Formularios2APage'
 import MovimientoFormPage from '@features/movimientos/pages/MovimientoFormPage'
 import MovimientoVerPage from '@features/movimientos/pages/MovimientoVerPage'
@@ -91,6 +92,7 @@ function App() {
           <Route path="emergencias" element={<EmergenciasPage />} />
           <Route path="formularios-2A" element={<Formularios2APage />} />
           <Route path="bah-bienes" element={<BienesPage />} />
+          <Route path="personas" element={<PersonasPage />} />
           <Route path="alm-movimientos/nuevo" element={<MovimientoFormPage />} />
           <Route path="alm-movimientos/:movimientoId/editar" element={<MovimientoFormPage />} />
           <Route path="alm-movimientos/:movimientoId/ver" element={<MovimientoVerPage />} />

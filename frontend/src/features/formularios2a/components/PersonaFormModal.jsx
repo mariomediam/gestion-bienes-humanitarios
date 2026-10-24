@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
 import CatalogoSelect from '@features/formularios2a/components/CatalogoSelect'
 
-const OPCIONES_SEXO = [
+export const OPCIONES_SEXO = [
   { value: 'M', label: 'Masculino' },
   { value: 'F', label: 'Femenino' },
   { value: 'D', label: 'Desconocido' },
