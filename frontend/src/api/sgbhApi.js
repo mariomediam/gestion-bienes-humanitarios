@@ -343,6 +343,11 @@ export const sgbhApi = {
     await api.delete(`/api/sgbh/personas/${personaId}/`)
   },
 
+  consultarReniec: async (dni) => {
+    const response = await api.get('/api/sgbh/reniec/consultar/', { params: { dni } })
+    return response.data
+  },
+
   buscarEvaluadores: async (params) => {
     const response = await api.get('/api/sgbh/personal/buscar/evaluadores/', { params })
     return response.data

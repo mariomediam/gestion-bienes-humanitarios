@@ -158,14 +158,18 @@ export default function PersonaFormModal({
   const [cargando, setCargando] = useState(false)
   const [estaActivo, setEstaActivo] = useState(true)
   const [tiposDocumento, setTiposDocumento] = useState([])
+  const [consultandoReniec, setConsultandoReniec] = useState(false)
   const onCloseRef = useRef(onClose)
+  const consultaReniecRef = useRef(0)
   onCloseRef.current = onClose
 
   useEffect(() => {
     if (!isOpen) {
+      consultaReniecRef.current += 1
       setForm(EMPTY_FORM)
       setErrors({})
       setCargando(false)
+      setConsultandoReniec(false)
       setEstaActivo(true)
       return undefined
     }
@@ -233,6 +237,44 @@ export default function PersonaFormModal({
     setForm(EMPTY_FORM)
     setErrors({})
     onClose()
+  }
+
+  async function handleConsultarReniec() {
+    const dni = form.numero_documento.trim()
+    if (!puedeConsultarReniec(form.tipo_documento, dni, tiposDocumento)) return
+
+    const consultaId = ++consultaReniecRef.current
+    setConsultandoReniec(true)
+    try {
+      const data = await sgbhApi.consultarReniec(dni)
+      if (consultaId !== consultaReniecRef.current) return
+
+      const resultado = data?.consultarResponse?.return
+      const persona = resultado?.datosPersona
+      if (resultado?.coResultado !== '0000' || !persona) {
+        toast.error(resultado?.deResultado || 'No se pudo consultar RENIEC')
+        return
+      }
+
+      setForm((current) => ({
+        ...current,
+        apellido_paterno: textoCampo(persona.apPrimer).trim(),
+        apellido_materno: textoCampo(persona.apSegundo).trim(),
+        nombres: textoCampo(persona.prenombres).trim(),
+      }))
+      setErrors((current) => ({
+        ...current,
+        apellido_paterno: '',
+        apellido_materno: '',
+        nombres: '',
+      }))
+      if (resultado.deResultado) toast.success(resultado.deResultado)
+    } catch (error) {
+      if (consultaId !== consultaReniecRef.current) return
+      toast.error(getErrorMessage(error, 'No se pudo consultar RENIEC'))
+    } finally {
+      if (consultaId === consultaReniecRef.current) setConsultandoReniec(false)
+    }
   }
 
   async function handleSubmit(event) {
@@ -353,13 +395,15 @@ export default function PersonaFormModal({
 
             <button
               type="button"
+              onClick={handleConsultarReniec}
               disabled={
                 loading ||
+                consultandoReniec ||
                 !puedeConsultarReniec(form.tipo_documento, form.numero_documento, tiposDocumento)
               }
               className="w-full sm:col-span-2 px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
             >
-              Consultar RENIEC
+              {consultandoReniec ? 'Consultando...' : 'Consultar RENIEC'}
             </button>
 
             <Campo
