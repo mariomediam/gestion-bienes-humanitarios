@@ -15,6 +15,7 @@ from .emergencia_view import (
 from .formulario_2a_archivo_view import (
     Formulario2AArchivoBuscarView,
     Formulario2AArchivoCreateView,
+    Formulario2AArchivoDescargarView,
     Formulario2AArchivoDetailView,
 )
 from .formulario_2a_familia_view import (

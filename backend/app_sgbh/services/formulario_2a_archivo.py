@@ -109,6 +109,44 @@ class Formulario2AArchivoService:
             archivo.esta_activo = False
             archivo.save(update_fields=['esta_activo'])
 
+    @staticmethod
+    def download(formulario_2a_id, archivo_id):
+        """Return the stored file so the view can stream it.
+
+        The row must belong to the formulario. An inactive row can still
+        be downloaded: the logical delete keeps the bytes on disk.
+        The resolved path must stay inside STORAGE_ROOT. The caller
+        receives the path only to open it; the HTTP response uses the
+        original name and never the internal path.
+        """
+        archivo = _require_archivo_lectura(formulario_2a_id, archivo_id)
+        path = _safe_stored_file(archivo.ruta_archivo)
+        return Formulario2AArchivoDownload(
+            path=path,
+            filename=_download_filename(
+                archivo.nombre_original,
+                archivo.nombre_archivo,
+            ),
+            content_type=_content_type(archivo.extension),
+        )
+
+
+class Formulario2AArchivoDownload:
+    """File the view streams. path stays on the server."""
+
+    def __init__(self, path, filename, content_type):
+        self.path = path
+        self.filename = filename
+        self.content_type = content_type
+
+
+_CONTENT_TYPES = {
+    'pdf': 'application/pdf',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+}
+
 
 def _require_login(c_usuari_login):
     """Return the token login stored in c_usuari_login."""
@@ -180,6 +218,70 @@ def _basename(raw_name):
 
 def _destination(ruta_archivo):
     return Path(settings.STORAGE_ROOT).joinpath(*ruta_archivo.split('/'))
+
+
+def _safe_stored_file(ruta_archivo):
+    """Resolve ruta_archivo under STORAGE_ROOT and require a regular file."""
+    raw = str(ruta_archivo or '').replace('\\', '/').strip()
+    if not raw or raw.startswith('/') or ':' in raw:
+        raise Formulario2AArchivoServiceError(
+            'El archivo indicado no existe',
+            not_found=True,
+        )
+    parts = [part for part in raw.split('/') if part not in ('', '.')]
+    if not parts or any(part == '..' for part in parts):
+        raise Formulario2AArchivoServiceError(
+            'El archivo indicado no existe',
+            not_found=True,
+        )
+
+    root = Path(settings.STORAGE_ROOT).resolve()
+    destination = root.joinpath(*parts).resolve()
+    if destination != root and root not in destination.parents:
+        raise Formulario2AArchivoServiceError(
+            'El archivo indicado no existe',
+            not_found=True,
+        )
+    if not destination.is_file():
+        raise Formulario2AArchivoServiceError(
+            'El archivo indicado no existe',
+            not_found=True,
+        )
+    return destination
+
+
+def _download_filename(nombre_original, nombre_archivo):
+    """Name sent to the browser. Falls back when the original is unsafe."""
+    for candidate in (nombre_original, nombre_archivo):
+        name = _basename(candidate)
+        if (
+            name
+            and name not in {'.', '..'}
+            and len(name) <= _NOMBRE_MAX
+            and all(ord(char) >= 32 for char in name)
+        ):
+            return name
+    return 'archivo'
+
+
+def _content_type(extension):
+    return _CONTENT_TYPES.get(
+        str(extension or '').strip().lower().lstrip('.'),
+        'application/octet-stream',
+    )
+
+
+def _require_archivo_lectura(formulario_2a_id, archivo_id):
+    try:
+        return Formulario2AArchivo.objects.get(
+            pk=archivo_id,
+            formulario_2a_id=formulario_2a_id,
+        )
+    except Formulario2AArchivo.DoesNotExist:
+        raise Formulario2AArchivoServiceError(
+            'El archivo indicado no existe',
+            not_found=True,
+        ) from None
 
 
 def _write_upload(destination, archivo):

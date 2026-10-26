@@ -1,5 +1,48 @@
 import api from '@api/axios'
 
+function nombreDesdeContentDisposition(header) {
+  if (!header) return ''
+  const utf8 = header.match(/filename\*=UTF-8''([^;]+)/i)
+  if (utf8) {
+    try {
+      return decodeURIComponent(utf8[1].trim())
+    } catch {
+      return ''
+    }
+  }
+  const quoted = header.match(/filename="([^"]*)"/i)
+  if (quoted) return quoted[1]
+  const plain = header.match(/filename=([^;]+)/i)
+  return plain ? plain[1].trim() : ''
+}
+
+function guardarDescarga(response) {
+  const filename = nombreDesdeContentDisposition(
+    response.headers['content-disposition'],
+  ) || 'archivo'
+  const url = URL.createObjectURL(response.data)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+async function errorConCuerpoLegible(error) {
+  const data = error?.response?.data
+  if (data instanceof Blob) {
+    const text = await data.text()
+    try {
+      error.response.data = JSON.parse(text)
+    } catch {
+      error.response.data = { error: 'No se pudo descargar el archivo' }
+    }
+  }
+  throw error
+}
+
 export const sgbhApi = {
   getTotalEmergencias: async () => {
     const response = await api.get('/api/sgbh/emergencias/total/')
@@ -225,6 +268,18 @@ export const sgbhApi = {
   getFormulario2AReporte: async (formulario2aId) => {
     const response = await api.get(`/api/sgbh/formularios-2a/${formulario2aId}/reporte/`)
     return response.data
+  },
+
+  descargarArchivoFormulario2A: async (formulario2aId, archivoId) => {
+    try {
+      const response = await api.get(
+        `/api/sgbh/formularios-2a/${formulario2aId}/archivos/${archivoId}/descargar/`,
+        { responseType: 'blob' },
+      )
+      guardarDescarga(response)
+    } catch (error) {
+      await errorConCuerpoLegible(error)
+    }
   },
 
   formulario2ATienePlanillaBah: async (formulario2aId) => {

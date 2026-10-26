@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.http import FileResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -114,6 +115,60 @@ class Formulario2AArchivoDetailView(APIView):
             )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class Formulario2AArchivoDescargarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, formulario_2a_id, archivo_id):
+        if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:
+            return Response(
+                {'error': 'El campo formulario_2a_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        archivo_uuid = _parse_archivo_id(archivo_id)
+        if archivo_uuid is None:
+            return Response(
+                {'error': 'El campo archivo_id debe ser un UUID'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            descarga = Formulario2AArchivoService.download(
+                formulario_2a_id,
+                archivo_uuid,
+            )
+            handle = descarga.path.open('rb')
+        except Formulario2AArchivoServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except OSError:
+            return Response(
+                {'error': 'El archivo indicado no existe'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception:
+            return Response(
+                {'error': 'No se pudo descargar el archivo del formulario EDAN 2A'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        try:
+            response = FileResponse(
+                handle,
+                as_attachment=True,
+                filename=descarga.filename,
+                content_type=descarga.content_type,
+            )
+        except Exception:
+            handle.close()
+            return Response(
+                {'error': 'No se pudo descargar el archivo del formulario EDAN 2A'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        response['X-Content-Type-Options'] = 'nosniff'
+        response['Cache-Control'] = 'private, no-store'
+        return response
 
 
 class Formulario2AArchivoBuscarView(APIView):
