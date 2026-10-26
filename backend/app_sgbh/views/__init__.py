@@ -13,6 +13,7 @@ from .emergencia_view import (
     EmergenciaTotalView,
 )
 from .formulario_2a_archivo_view import (
+    Formulario2AArchivoBuscarView,
     Formulario2AArchivoCreateView,
     Formulario2AArchivoDetailView,
 )

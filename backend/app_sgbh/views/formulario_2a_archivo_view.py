@@ -5,7 +5,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app_sgbh.serializers import Formulario2AArchivoSerializer
+from app_sgbh.query_params import (
+    parse_archivo_id,
+    parse_esta_activo,
+    parse_formulario_2a_id,
+)
+from app_sgbh.serializers import (
+    Formulario2AArchivoBusquedaSerializer,
+    Formulario2AArchivoSerializer,
+)
 from app_sgbh.services.formulario_2a_archivo import (
     Formulario2AArchivoService,
     Formulario2AArchivoServiceError,
@@ -106,6 +114,45 @@ class Formulario2AArchivoDetailView(APIView):
             )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class Formulario2AArchivoBuscarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        archivo_id, error = parse_archivo_id(request.query_params.get('archivo_id'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        formulario_2a_id, error = parse_formulario_2a_id(
+            request.query_params.get('formulario_2a_id')
+        )
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        esta_activo, error = parse_esta_activo(request.query_params.get('esta_activo'))
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rows = Formulario2AArchivoService.search(
+                archivo_id=archivo_id,
+                formulario_2a_id=formulario_2a_id,
+                esta_activo=esta_activo,
+            )
+            payload = Formulario2AArchivoBusquedaSerializer(rows, many=True).data
+        except Exception:
+            return Response(
+                {
+                    'error': (
+                        'No se pudo obtener la búsqueda de archivos '
+                        'del formulario EDAN 2A'
+                    )
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
 
 
 def _parse_archivo_id(archivo_id):

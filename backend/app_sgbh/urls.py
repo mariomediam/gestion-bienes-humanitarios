@@ -17,6 +17,7 @@ from .views import (
     EmergenciaTotalPorTipoPeligroView,
     EmergenciaTotalView,
     EnfermedadCronicaListView,
+    Formulario2AArchivoBuscarView,
     Formulario2AArchivoCreateView,
     Formulario2AArchivoDetailView,
     Formulario2ABuscarView,
@@ -255,6 +256,11 @@ urlpatterns = [
         'formularios-2a/<int:formulario_2a_id>/tiene-planilla-bah/',
         Formulario2ATienePlanillaBahView.as_view(),
         name='formularios-2a-tiene-planilla-bah',
+    ),
+    path(
+        'formularios-2a/archivos/buscar/',
+        Formulario2AArchivoBuscarView.as_view(),
+        name='formularios-2a-archivos-buscar',
     ),
     path(
         'formularios-2a/<int:formulario_2a_id>/archivos/',

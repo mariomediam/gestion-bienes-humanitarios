@@ -27,6 +27,28 @@ class Formulario2AArchivoServiceError(Exception):
 
 class Formulario2AArchivoService:
     @staticmethod
+    def search(archivo_id=None, formulario_2a_id=None, esta_activo=None):
+        """Return file rows using optional filters combined with AND.
+
+        All filters are exact. With no filters, every row is returned.
+        Ordered by fecha_registro ascending, the same order as
+        ORDER BY fecha_registro. Each row includes the parent formulario
+        and its emergency so the response can expose emergencia_id and
+        codigo_sinpad.
+        """
+        queryset = Formulario2AArchivo.objects.select_related(
+            'formulario_2a',
+            'formulario_2a__emergencia',
+        )
+        if archivo_id is not None:
+            queryset = queryset.filter(archivo_id=archivo_id)
+        if formulario_2a_id is not None:
+            queryset = queryset.filter(formulario_2a_id=formulario_2a_id)
+        if esta_activo is not None:
+            queryset = queryset.filter(esta_activo=esta_activo)
+        return queryset.order_by('fecha_registro')
+
+    @staticmethod
     def create(*, formulario_2a_id, archivo, c_usuari_login):
         """Store one digital file and insert its S43edan_formulario_2a_archivos row.
 

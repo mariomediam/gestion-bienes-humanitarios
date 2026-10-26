@@ -1,6 +1,7 @@
 """Shared parsers for query parameters."""
 
 from datetime import date
+from uuid import UUID
 
 _TRUE_VALUES = {'1', 'true'}
 _FALSE_VALUES = {'0', 'false'}
@@ -294,6 +295,22 @@ def parse_emergencia_id(raw_value):
 def parse_formulario_2a_id(raw_value):
     """Parse the optional formulario_2a_id query param."""
     return _parse_optional_int(raw_value, 'formulario_2a_id')
+
+
+def parse_archivo_id(raw_value):
+    """Parse the optional archivo_id query param.
+
+    Returns (value, error_message). value is a UUID or None.
+    None means the filter was omitted.
+    """
+    if raw_value is None or raw_value == '':
+        return None, None
+
+    normalized = str(raw_value).strip()
+    try:
+        return UUID(normalized), None
+    except (TypeError, ValueError, AttributeError):
+        return None, 'El filtro archivo_id debe ser un UUID'
 
 
 def parse_bien_id(raw_value):
