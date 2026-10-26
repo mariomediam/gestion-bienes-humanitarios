@@ -9,7 +9,7 @@ services:
     environment:
       - DJANGO_ENV_FILE=.env.prod
     volumes:
-      - sgbh_storage:/app/storage
+      - /opt/sgbh/storage:/app/storage
       - backend_static:/app/staticfiles
     expose:
       - "8000"
@@ -38,7 +38,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  sgbh_storage:
-    driver: local
   backend_static:
     driver: local

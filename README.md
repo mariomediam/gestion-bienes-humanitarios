@@ -135,36 +135,35 @@ Contenido (ajustar según el servidor):
 # Django
 DEBUG=False
 SECRET_KEY=<GENERAR_CLAVE_SEGURA>
-ALLOWED_HOSTS=<IP_DEL_SERVIDOR>,localhost,127.0.0.1
+ALLOWED_HOSTS=192.168.100.59,localhost,127.0.0.1
 USE_SSL=False
 
-# Database - SQL Server SIGA NET
-DB_HOST=192.168.100.20
+# Database - SQL Server
+DB_HOST=<HOST_SQL_SERVER>
 DB_PORT=1433
-DB_USERNAME=usuariosiga
-DB_PASSWORD=<CONTRASEÑA>
+DB_USERNAME=<USUARIO_SQL>
+DB_PASSWORD=<CONTRASEÑA_SQL>
 DB_NAME=GENERAL
-DB_SIGA=SIGA
-
-# Database - SQL Server SIGA MEF
-DB_HOST_SIGAMEF=192.168.100.51
-DB_PORT_SIGAMEF=1433
-DB_USERNAME_SIGAMEF=usuariosiga
-DB_PASSWORD_SIGAMEF=<CONTRASEÑA>
-DB_SIGA_SIGAMEF=SIGA_301529_MPP
+DB_SIAC=SIAC
 
 # System code
-SYSTEM_CODE=39
+SYSTEM_CODE=43
 
-# Document storage
+# Document storage (carpeta del host montada en el contenedor)
 STORAGE_ROOT=/app/storage
 
-# CORS (incluir la URL completa con puerto)
-CORS_ALLOWED_ORIGINS=http://<IP_DEL_SERVIDOR>:3100
+# CORS
+CORS_ALLOWED_ORIGINS=http://192.168.100.59:3100
 
 # JWT
 JWT_ACCESS_TOKEN_LIFETIME_MINUTES=30
 JWT_REFRESH_TOKEN_LIFETIME_DAYS=7
+
+# RENIEC / PIDE
+RENIEC_NUDNIUSUARIO=<DNI_USUARIO_PIDE>
+RENIEC_NURUCUSUARIO=<RUC_USUARIO_PIDE>
+RENIEC_PASSWORD=<CONTRASEÑA_PIDE>
+RENIEC_TIMEOUT=10
 ```
 
 Para generar un SECRET_KEY seguro:
@@ -173,9 +172,10 @@ Para generar un SECRET_KEY seguro:
 python3 -c "import secrets; print(secrets.token_urlsafe(50))"
 ```
 
-### Paso 4: Construir y levantar
+### Paso 4: Crear la carpeta de documentos y levantar
 
 ```bash
+sudo mkdir -p /opt/sgbh/storage
 cd /opt/sgbh
 sudo docker compose -f docker-compose.prod.yml up -d --build
 ```
@@ -305,22 +305,24 @@ Verificar que el contenedor puede alcanzar los servidores de BD:
 
 ```bash
 sudo docker compose -f docker-compose.prod.yml exec backend python -c "
-import socket
-for host in ['192.168.100.20', '192.168.100.51']:
-    try:
-        s = socket.create_connection((host, 1433), timeout=5)
-        s.close()
-        print(f'{host}:1433 - OK')
-    except Exception as e:
-        print(f'{host}:1433 - ERROR: {e}')
+import os, socket
+host = os.environ['DB_HOST']
+port = int(os.environ.get('DB_PORT', '1433'))
+try:
+    s = socket.create_connection((host, port), timeout=5)
+    s.close()
+    print(f'{host}:{port} - OK')
+except Exception as e:
+    print(f'{host}:{port} - ERROR: {e}')
 "
 ```
 
 ### Error de permisos al subir archivos
 
-Verificar permisos del volumen de storage:
+Los documentos quedan en `/opt/sgbh/storage` del servidor. Verificar permisos:
 
 ```bash
+sudo mkdir -p /opt/sgbh/storage
 sudo docker compose -f docker-compose.prod.yml exec backend ls -la /app/storage
 ```
 
@@ -342,4 +344,4 @@ sudo docker compose -f docker-compose.prod.yml down -v   # -v elimina volúmenes
 sudo docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-**Advertencia:** El flag `-v` elimina los volúmenes, incluyendo los archivos subidos en `/app/storage`.
+**Advertencia:** El flag `-v` elimina el volumen de archivos estáticos. Los documentos de `/opt/sgbh/storage` permanecen en el disco del servidor.
