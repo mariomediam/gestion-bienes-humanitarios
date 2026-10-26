@@ -10,6 +10,7 @@ from .emergencia import (
     EmergenciaSerializer,
     first_error_message,
 )
+from .formulario_2a_archivo import Formulario2AArchivoSerializer
 from .formulario_2a_familia import (
     FamiliaBusquedaSerializer,
     FamiliaCreateSerializer,
@@ -92,6 +93,7 @@ __all__ = [
     'FamiliaBusquedaSerializer',
     'FamiliaCreateSerializer',
     'FamiliaSerializer',
+    'Formulario2AArchivoSerializer',
     'Formulario2ABusquedaSerializer',
     'Formulario2ACreateSerializer',
     'Formulario2AUpdateSerializer',

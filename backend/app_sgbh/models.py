@@ -1101,8 +1101,8 @@ class Formulario2AArchivo(models.Model):
     tamano_bytes = models.BigIntegerField(null=True, blank=True)
     esta_activo = models.BooleanField(default=True)
     fecha_registro = models.DateTimeField(default=timezone.now)
-    # No foreign key in the schema.
-    usuario_registro_id = models.IntegerField(null=True, blank=True)
+    # Login from the authenticated token. No foreign key in the schema.
+    c_usuari_login = models.CharField(max_length=20)
 
     class Meta:
         managed = False

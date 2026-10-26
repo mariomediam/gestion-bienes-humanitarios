@@ -23,6 +23,8 @@ env = environ.Env(
     JWT_REFRESH_TOKEN_LIFETIME_DAYS=(int, 7),
     SYSTEM_CODE=(str, '43'),
     STORAGE_ROOT=(str, ''),
+    STORAGE_MAX_UPLOAD_BYTES=(int, 20 * 1024 * 1024),
+    STORAGE_ALLOWED_EXTENSIONS=(list, ['pdf', 'jpg', 'jpeg', 'png']),
     USE_SSL=(bool, False),
     RENIEC_NUDNIUSUARIO=(str, ''),
     RENIEC_NURUCUSUARIO=(str, ''),
@@ -173,8 +175,14 @@ SIMPLE_JWT = {
 # System code for stored procedures
 SYSTEM_CODE = env('SYSTEM_CODE')
 
-# Document storage
+# Document storage. Files stay outside the public media URL.
 STORAGE_ROOT = Path(env('STORAGE_ROOT')) if env('STORAGE_ROOT') else BASE_DIR / 'media' / 'sgbh'
+STORAGE_MAX_UPLOAD_BYTES = env('STORAGE_MAX_UPLOAD_BYTES')
+STORAGE_ALLOWED_EXTENSIONS = [
+    item.strip().lower().lstrip('.')
+    for item in env('STORAGE_ALLOWED_EXTENSIONS')
+    if isinstance(item, str) and item.strip()
+]
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS')
