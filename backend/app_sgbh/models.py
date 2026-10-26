@@ -1085,6 +1085,35 @@ class Formulario2A(models.Model):
         return str(self.formulario_2a_id)
 
 
+class Formulario2AArchivo(models.Model):
+    archivo_id = models.BigAutoField(primary_key=True)
+    formulario_2a = models.ForeignKey(
+        Formulario2A,
+        on_delete=models.PROTECT,
+        db_column='formulario_2a_id',
+        db_index=False,
+        related_name='archivos',
+    )
+    nombre_original = models.CharField(max_length=255)
+    nombre_archivo = models.CharField(max_length=255)
+    ruta_archivo = models.CharField(max_length=500)
+    extension = models.CharField(max_length=10, null=True, blank=True)
+    tamano_bytes = models.BigIntegerField(null=True, blank=True)
+    esta_activo = models.BooleanField(default=True)
+    fecha_registro = models.DateTimeField(default=timezone.now)
+    # No foreign key in the schema.
+    usuario_registro_id = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'S43edan_formulario_2a_archivos'
+        verbose_name = 'Archivo del formulario 2A'
+        verbose_name_plural = 'Archivos del formulario 2A'
+
+    def __str__(self):
+        return self.nombre_original
+
+
 class Formulario2AFamilia(models.Model):
     familia_id = models.AutoField(primary_key=True)
     vivienda = models.ForeignKey(
