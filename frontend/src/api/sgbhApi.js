@@ -16,10 +16,10 @@ function nombreDesdeContentDisposition(header) {
   return plain ? plain[1].trim() : ''
 }
 
-function guardarDescarga(response) {
-  const filename = nombreDesdeContentDisposition(
-    response.headers['content-disposition'],
-  ) || 'archivo'
+function guardarDescarga(response, nombreOriginal) {
+  const filename = String(nombreOriginal || '').trim()
+    || nombreDesdeContentDisposition(response.headers['content-disposition'])
+    || 'archivo'
   const url = URL.createObjectURL(response.data)
   const link = document.createElement('a')
   link.href = url
@@ -270,13 +270,40 @@ export const sgbhApi = {
     return response.data
   },
 
-  descargarArchivoFormulario2A: async (formulario2aId, archivoId) => {
+  buscarArchivosFormulario2A: async (params) => {
+    const response = await api.get('/api/sgbh/formularios-2a/archivos/buscar/', { params })
+    return response.data
+  },
+
+  crearArchivoFormulario2A: async (formulario2aId, archivo, { onUploadProgress, signal } = {}) => {
+    const formData = new FormData()
+    formData.append('archivo', archivo)
+    const response = await api.post(
+      `/api/sgbh/formularios-2a/${formulario2aId}/archivos/`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 120000,
+        onUploadProgress,
+        signal,
+      },
+    )
+    return response.data
+  },
+
+  eliminarArchivoFormulario2A: async (formulario2aId, archivoId) => {
+    await api.delete(
+      `/api/sgbh/formularios-2a/${formulario2aId}/archivos/${archivoId}/`,
+    )
+  },
+
+  descargarArchivoFormulario2A: async (formulario2aId, archivoId, nombreOriginal) => {
     try {
       const response = await api.get(
         `/api/sgbh/formularios-2a/${formulario2aId}/archivos/${archivoId}/descargar/`,
-        { responseType: 'blob' },
+        { responseType: 'blob', timeout: 120000 },
       )
-      guardarDescarga(response)
+      guardarDescarga(response, nombreOriginal)
     } catch (error) {
       await errorConCuerpoLegible(error)
     }

@@ -4,6 +4,7 @@ import EyeIcon from '@components/icons/EyeIcon'
 import PaperclipIcon from '@components/icons/PaperclipIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import Formulario2AArchivosModal from '@features/formularios2a/components/Formulario2AArchivosModal'
 import Formulario2AEliminarModal from '@features/formularios2a/components/Formulario2AEliminarModal'
 import { partesUbicacion } from '@features/formularios2a/ubicacion'
 import { formatFechaHora } from '@utils/dates'
@@ -46,6 +47,7 @@ function UbicacionCell({ formulario }) {
 export default function Formularios2AResultados({ formularios, onModificar, onEliminada }) {
   const navigate = useNavigate()
   const [formularioAEliminar, setFormularioAEliminar] = useState(null)
+  const [formularioArchivos, setFormularioArchivos] = useState(null)
 
   return (
     <section className="bg-white rounded-lg border border-gray-200">
@@ -113,6 +115,7 @@ export default function Formularios2AResultados({ formularios, onModificar, onEl
                         type="button"
                         aria-label="Archivos adjuntos"
                         className={actionButtonClassName}
+                        onClick={() => setFormularioArchivos(formulario)}
                       >
                         <PaperclipIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
@@ -144,6 +147,11 @@ export default function Formularios2AResultados({ formularios, onModificar, onEl
         formulario={formularioAEliminar}
         onClose={() => setFormularioAEliminar(null)}
         onEliminada={onEliminada}
+      />
+      <Formulario2AArchivosModal
+        isOpen={formularioArchivos !== null}
+        formulario={formularioArchivos}
+        onClose={() => setFormularioArchivos(null)}
       />
     </section>
   )
