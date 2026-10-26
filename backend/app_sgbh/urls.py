@@ -16,6 +16,7 @@ from .views import (
     EmergenciaTotalView,
     EnfermedadCronicaListView,
     Formulario2AArchivoCreateView,
+    Formulario2AArchivoDetailView,
     Formulario2ABuscarView,
     Formulario2ACreateView,
     Formulario2ADetailView,
@@ -239,6 +240,11 @@ urlpatterns = [
         'formularios-2a/<int:formulario_2a_id>/archivos/',
         Formulario2AArchivoCreateView.as_view(),
         name='formularios-2a-archivos',
+    ),
+    path(
+        'formularios-2a/<int:formulario_2a_id>/archivos/<int:archivo_id>/',
+        Formulario2AArchivoDetailView.as_view(),
+        name='formularios-2a-archivos-detalle',
     ),
     path(
         'formularios-2a/buscar/',

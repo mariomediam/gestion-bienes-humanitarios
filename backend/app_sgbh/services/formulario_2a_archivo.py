@@ -69,6 +69,24 @@ class Formulario2AArchivoService:
                 raise
         return stored
 
+    @staticmethod
+    def delete(formulario_2a_id, archivo_id):
+        """Mark one S43edan_formulario_2a_archivos row inactive.
+
+        The row and the file on disk stay in place. esta_activo becomes
+        false. Rejected when the file does not belong to the formulario
+        or is already inactive.
+        """
+        with transaction.atomic(using=DB_ALIAS):
+            archivo = _require_archivo(formulario_2a_id, archivo_id)
+            if not archivo.esta_activo:
+                raise Formulario2AArchivoServiceError(
+                    'El archivo indicado ya está inactivo',
+                    conflict=True,
+                )
+            archivo.esta_activo = False
+            archivo.save(update_fields=['esta_activo'])
+
 
 def _require_login(c_usuari_login):
     """Return the token login stored in c_usuari_login."""
@@ -159,6 +177,19 @@ def _delete_file(path):
         path.unlink(missing_ok=True)
     except OSError:
         return
+
+
+def _require_archivo(formulario_2a_id, archivo_id):
+    try:
+        return Formulario2AArchivo.objects.select_for_update().get(
+            pk=archivo_id,
+            formulario_2a_id=formulario_2a_id,
+        )
+    except Formulario2AArchivo.DoesNotExist:
+        raise Formulario2AArchivoServiceError(
+            'El archivo indicado no existe',
+            not_found=True,
+        ) from None
 
 
 def _require_formulario(formulario_2a_id):

@@ -10,6 +10,7 @@ from app_sgbh.services.formulario_2a_archivo import (
 )
 
 _FORMULARIO_2A_ID_MAX = 2147483647
+_ARCHIVO_ID_MAX = 9223372036854775807
 _CAMPOS_DEL_SISTEMA = (
     'archivo_id',
     'formulario_2a_id',
@@ -75,6 +76,34 @@ class Formulario2AArchivoCreateView(APIView):
             )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class Formulario2AArchivoDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, formulario_2a_id, archivo_id):
+        if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:
+            return Response(
+                {'error': 'El campo formulario_2a_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if archivo_id < 1 or archivo_id > _ARCHIVO_ID_MAX:
+            return Response(
+                {'error': 'El campo archivo_id debe ser un número entero'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            Formulario2AArchivoService.delete(formulario_2a_id, archivo_id)
+        except Formulario2AArchivoServiceError as exc:
+            return _respuesta_error_servicio(exc)
+        except Exception:
+            return Response(
+                {'error': 'No se pudo eliminar el archivo del formulario EDAN 2A'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def _respuesta_error_servicio(exc):
