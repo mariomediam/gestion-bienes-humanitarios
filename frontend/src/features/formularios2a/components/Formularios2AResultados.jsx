@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
+import PaperclipIcon from '@components/icons/PaperclipIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
 import Formulario2AEliminarModal from '@features/formularios2a/components/Formulario2AEliminarModal'
@@ -60,7 +61,7 @@ export default function Formularios2AResultados({ formularios, onModificar, onEl
               <th scope="col" className="px-5 py-3 font-medium">Distrito, barrio y lote</th>
               <th scope="col" className="px-5 py-3 font-medium">Tipo de peligro</th>
               <th scope="col" className="px-5 py-3 font-medium">Fecha y hora de empadronamiento</th>
-              <th scope="col" className="px-5 py-3 font-medium">Acciones</th>
+              <th scope="col" className="w-28 px-5 py-3 font-medium">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -81,8 +82,8 @@ export default function Formularios2AResultados({ formularios, onModificar, onEl
                   <td className="px-5 py-3 text-gray-800 whitespace-nowrap">
                     {formatFechaHora(formulario.fecha_empadronamiento, formulario.hora_empadronamiento)}
                   </td>
-                  <td className="relative z-10 px-5 py-3 whitespace-nowrap">
-                    <div className="flex gap-2">
+                  <td className="relative z-10 w-28 px-5 py-3">
+                    <div className="flex w-[4.5rem] flex-wrap gap-2">
                       <button
                         type="button"
                         aria-label="Ver"
@@ -106,6 +107,16 @@ export default function Formularios2AResultados({ formularios, onModificar, onEl
                         <PencilIcon className="w-4 h-4" />
                         <span className={actionTooltipClassName} aria-hidden="true">
                           Modificar
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Archivos adjuntos"
+                        className={actionButtonClassName}
+                      >
+                        <PaperclipIcon className="w-4 h-4" />
+                        <span className={actionTooltipClassName} aria-hidden="true">
+                          Archivos adjuntos
                         </span>
                       </button>
                       <button
