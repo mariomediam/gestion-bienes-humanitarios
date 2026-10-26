@@ -1,4 +1,6 @@
-from django.urls import path
+import uuid
+
+from django.urls import path, register_converter
 
 from .views import (
     BienBuscarView,
@@ -68,6 +70,24 @@ from .views import (
     UnidadMedidaListView,
     ReniecConsultarView,
 )
+
+
+class _ArchivoUUIDConverter:
+    """UUID in either case. SQL Server returns uniqueidentifier in uppercase."""
+
+    regex = (
+        '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+        '[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+    )
+
+    def to_python(self, value):
+        return uuid.UUID(value)
+
+    def to_url(self, value):
+        return str(value)
+
+
+register_converter(_ArchivoUUIDConverter, 'archivo_uuid')
 
 app_name = 'sgbh'
 
@@ -242,7 +262,7 @@ urlpatterns = [
         name='formularios-2a-archivos',
     ),
     path(
-        'formularios-2a/<int:formulario_2a_id>/archivos/<int:archivo_id>/',
+        'formularios-2a/<int:formulario_2a_id>/archivos/<archivo_uuid:archivo_id>/',
         Formulario2AArchivoDetailView.as_view(),
         name='formularios-2a-archivos-detalle',
     ),

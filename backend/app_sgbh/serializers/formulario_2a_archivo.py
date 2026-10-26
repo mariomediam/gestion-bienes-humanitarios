@@ -7,7 +7,7 @@ class Formulario2AArchivoSerializer(serializers.Serializer):
     ruta_archivo stays out of the response because it is an internal path.
     """
 
-    archivo_id = serializers.IntegerField()
+    archivo_id = serializers.UUIDField()
     formulario_2a_id = serializers.IntegerField()
     nombre_original = serializers.CharField()
     nombre_archivo = serializers.CharField()

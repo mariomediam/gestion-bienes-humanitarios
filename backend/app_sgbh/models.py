@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
@@ -1085,8 +1087,34 @@ class Formulario2A(models.Model):
         return str(self.formulario_2a_id)
 
 
+class SqlServerUUIDField(models.UUIDField):
+    """uniqueidentifier column.
+
+    mssql-django writes a UUIDField as 32 hex characters. SQL Server
+    rejects that string for uniqueidentifier and accepts the dashed form.
+    """
+
+    def db_type(self, connection):
+        return 'uniqueidentifier'
+
+    def rel_db_type(self, connection):
+        return 'uniqueidentifier'
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if value is None:
+            return None
+        if not isinstance(value, uuid.UUID):
+            value = self.to_python(value)
+        return str(value)
+
+
 class Formulario2AArchivo(models.Model):
-    archivo_id = models.BigAutoField(primary_key=True)
+    # Random UUID. The client does not send it.
+    archivo_id = SqlServerUUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
     formulario_2a = models.ForeignKey(
         Formulario2A,
         on_delete=models.PROTECT,

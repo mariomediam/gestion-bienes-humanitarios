@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,7 +12,6 @@ from app_sgbh.services.formulario_2a_archivo import (
 )
 
 _FORMULARIO_2A_ID_MAX = 2147483647
-_ARCHIVO_ID_MAX = 9223372036854775807
 _CAMPOS_DEL_SISTEMA = (
     'archivo_id',
     'formulario_2a_id',
@@ -87,14 +88,15 @@ class Formulario2AArchivoDetailView(APIView):
                 {'error': 'El campo formulario_2a_id debe ser un número entero'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if archivo_id < 1 or archivo_id > _ARCHIVO_ID_MAX:
+        archivo_uuid = _parse_archivo_id(archivo_id)
+        if archivo_uuid is None:
             return Response(
-                {'error': 'El campo archivo_id debe ser un número entero'},
+                {'error': 'El campo archivo_id debe ser un UUID'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
-            Formulario2AArchivoService.delete(formulario_2a_id, archivo_id)
+            Formulario2AArchivoService.delete(formulario_2a_id, archivo_uuid)
         except Formulario2AArchivoServiceError as exc:
             return _respuesta_error_servicio(exc)
         except Exception:
@@ -104,6 +106,17 @@ class Formulario2AArchivoDetailView(APIView):
             )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def _parse_archivo_id(archivo_id):
+    if isinstance(archivo_id, UUID):
+        return archivo_id
+    if isinstance(archivo_id, str):
+        try:
+            return UUID(archivo_id)
+        except ValueError:
+            return None
+    return None
 
 
 def _respuesta_error_servicio(exc):

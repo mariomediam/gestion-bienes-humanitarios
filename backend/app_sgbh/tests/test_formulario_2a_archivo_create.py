@@ -10,6 +10,7 @@ from django.utils import timezone
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from app_auth.authentication import ExternalUser
+from app_sgbh.models import Formulario2AArchivo
 from app_sgbh.serializers.formulario_2a_archivo import Formulario2AArchivoSerializer
 from app_sgbh.services.formulario_2a_archivo import (
     Formulario2AArchivoService,
@@ -18,6 +19,7 @@ from app_sgbh.services.formulario_2a_archivo import (
 from app_sgbh.views.formulario_2a_archivo_view import Formulario2AArchivoCreateView
 
 _FIXED_UUID = UUID('12345678-1234-5678-1234-567812345678')
+_ARCHIVO_ID = UUID('11111111-2222-4333-8444-555555555555')
 _FIXED_NAME = f'{_FIXED_UUID.hex}.pdf'
 
 
@@ -251,9 +253,25 @@ def test_create_rejects_a_value_that_is_not_a_file(tmp_path):
     assert exc.value.message == 'El archivo es obligatorio'
 
 
+def test_archivo_id_is_a_random_uuid_sent_with_hyphens():
+    field = Formulario2AArchivo._meta.get_field('archivo_id')
+    connection = SimpleNamespace(
+        features=SimpleNamespace(has_native_uuid_field=False),
+    )
+
+    value = field.get_default()
+    prepared = field.get_db_prep_value(_ARCHIVO_ID, connection)
+
+    assert field.primary_key is True
+    assert field.db_type(connection) == 'uniqueidentifier'
+    assert isinstance(value, UUID)
+    assert value.version == 4
+    assert prepared == str(_ARCHIVO_ID)
+
+
 def test_serializer_omits_the_internal_path():
     row = SimpleNamespace(
-        archivo_id=9,
+        archivo_id=_ARCHIVO_ID,
         formulario_2a_id=10,
         nombre_original='ficha.PDF',
         nombre_archivo=_FIXED_NAME,
@@ -274,7 +292,7 @@ def test_serializer_omits_the_internal_path():
 
 def test_post_archivos_returns_the_created_row():
     stored = SimpleNamespace(
-        archivo_id=9,
+        archivo_id=_ARCHIVO_ID,
         formulario_2a_id=10,
         nombre_original='ficha.pdf',
         nombre_archivo=_FIXED_NAME,
@@ -297,7 +315,7 @@ def test_post_archivos_returns_the_created_row():
         )
 
     assert response.status_code == 201
-    assert response.data['archivo_id'] == 9
+    assert response.data['archivo_id'] == str(_ARCHIVO_ID)
     assert response.data['formulario_2a_id'] == 10
     assert response.data['extension'] == 'pdf'
     assert response.data['c_usuari_login'] == 'mmedina'
