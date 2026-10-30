@@ -8,7 +8,10 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from app_auth.authentication import ExternalUser
 from app_sgbh.query_params import parse_familia_id
 from app_sgbh.serializers.formulario_2a_familia import FamiliaBusquedaSerializer
-from app_sgbh.services.formulario_2a_familia import Formulario2AFamiliaService
+from app_sgbh.services.formulario_2a_familia import (
+    Formulario2AFamiliaService,
+    codigo_sinpad_de_familia,
+)
 from app_sgbh.views.formulario_2a_familia_view import Formulario2AFamiliaBuscarView
 
 
@@ -158,3 +161,19 @@ def test_get_familias_buscar_rejects_invalid_filter():
 
     assert response.status_code == 400
     assert response.data['error'] == 'El filtro familia_id debe ser un número entero'
+
+
+def test_codigo_sinpad_de_familia_recorre_la_cadena():
+    with patch(
+        'app_sgbh.services.formulario_2a_familia.Formulario2AFamilia'
+    ) as familia:
+        familia.objects.filter.return_value.values_list.return_value.first.return_value = (
+            '261404'
+        )
+        assert codigo_sinpad_de_familia(14) == '261404'
+
+    familia.objects.filter.assert_called_once_with(pk=14)
+    familia.objects.filter.return_value.values_list.assert_called_once_with(
+        'vivienda__formulario_2a__emergencia__codigo_sinpad',
+        flat=True,
+    )

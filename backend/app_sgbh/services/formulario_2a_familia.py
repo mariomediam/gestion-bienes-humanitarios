@@ -99,6 +99,23 @@ class Formulario2AFamiliaService:
                 ) from None
 
 
+def codigo_sinpad_de_familia(familia_id):
+    """Return the codigo_sinpad reached from a familia.
+
+    The chain is familia, vivienda, formulario and emergencia.
+    Returns None when the familia does not exist or the emergency
+    has no SINPAD code.
+    """
+    return (
+        Formulario2AFamilia.objects.filter(pk=familia_id)
+        .values_list(
+            'vivienda__formulario_2a__emergencia__codigo_sinpad',
+            flat=True,
+        )
+        .first()
+    )
+
+
 def _require_familia(familia_id):
     try:
         return Formulario2AFamilia.objects.select_for_update().get(pk=familia_id)
