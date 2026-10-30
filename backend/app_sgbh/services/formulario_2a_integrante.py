@@ -17,6 +17,7 @@ from ..models import (
     TipoDiscapacidad,
 )
 from .formulario_2a import Formulario2AService, Formulario2AServiceError
+from .formulario_2a_familia import codigo_sinpad_de_familia
 
 _SMALLINT_MAX = 32767
 _EDAD_MIN = 0
@@ -118,9 +119,10 @@ class Formulario2AIntegranteService:
         The parent familia must exist and its Formulario 2A must still
         accept changes. numero_orden is the next order of that familia:
         one more than its current maximum, or 1 when it has no integrantes.
-        A persona cannot be repeated in the same familia. Catalog foreign
-        keys and the persona must exist when they are sent. fecha_creacion
-        uses the model default.
+        A persona cannot be repeated in the same familia, nor in the same
+        emergency. The emergency is the codigo_sinpad of the familia. Catalog
+        foreign keys and the persona must exist when they are sent.
+        fecha_creacion uses the model default.
         """
         _require_edad(edad)
         _require_gestante(gestante_semanas)
@@ -133,6 +135,7 @@ class Formulario2AIntegranteService:
             _require_formulario_modificable(formulario)
             _require_persona(persona_id)
             _require_persona_unica(familia_id, persona_id)
+            _require_persona_unica_en_emergencia(familia_id, persona_id)
             _require_catalogos(
                 rol_familiar_id=rol_familiar_id,
                 condicion_persona_id=condicion_persona_id,
@@ -344,6 +347,27 @@ def _tiene_planilla(integrante_id):
 def _require_persona(persona_id):
     if not Persona.objects.filter(pk=persona_id).exists():
         raise Formulario2AIntegranteServiceError('La persona indicada no existe')
+
+
+def _require_persona_unica_en_emergencia(familia_id, persona_id):
+    """Reject when the persona is already an integrante of the same emergency.
+
+    The emergency is the codigo_sinpad reached from the familia. Search
+    combines that code with persona_id. When the familia has no SINPAD code,
+    search would ignore the emergency filter, so the check does not run.
+    """
+    codigo_sinpad = codigo_sinpad_de_familia(familia_id)
+    if codigo_sinpad is None:
+        return
+    existentes = Formulario2AIntegranteService.search(
+        codigo_sinpad=codigo_sinpad,
+        persona_id=persona_id,
+    )
+    if existentes.exists():
+        raise Formulario2AIntegranteServiceError(
+            'La persona ya está registrada como integrante de esta emergencia',
+            conflict=True,
+        )
 
 
 def _require_persona_unica(familia_id, persona_id, *, exclude_integrante_id=None):

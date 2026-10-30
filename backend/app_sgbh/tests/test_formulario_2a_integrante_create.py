@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -52,6 +53,21 @@ def _create_kwargs(**overrides):
     }
     data.update(overrides)
     return data
+
+
+@contextmanager
+def _persona_libre_en_emergencia(codigo_sinpad='261404'):
+    with (
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.codigo_sinpad_de_familia',
+            return_value=codigo_sinpad,
+        ) as codigo,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegranteService.search',
+        ) as search,
+    ):
+        search.return_value.exists.return_value = False
+        yield codigo, search
 
 
 def _padres_existentes(familia, vivienda, formulario, estado_registro_id=1):
@@ -310,6 +326,85 @@ def test_create_rejects_duplicated_persona_in_the_familia():
     integrante.assert_not_called()
 
 
+def test_create_rejects_persona_already_in_the_same_emergencia():
+    with (
+        patch('app_sgbh.services.formulario_2a_integrante.transaction.atomic'),
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AFamilia'
+        ) as familia,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AVivienda'
+        ) as vivienda,
+        patch('app_sgbh.services.formulario_2a_integrante.Formulario2A') as formulario,
+        patch('app_sgbh.services.formulario_2a.PlanillaEntrega') as planilla,
+        patch('app_sgbh.services.formulario_2a_integrante.Persona') as persona,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
+        ) as integrante,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.codigo_sinpad_de_familia',
+            return_value='261404',
+        ) as codigo_sinpad,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegranteService.search',
+        ) as search,
+    ):
+        _padres_existentes(familia, vivienda, formulario)
+        planilla.objects.filter.return_value.exists.return_value = False
+        persona.objects.filter.return_value.exists.return_value = True
+        integrante.objects.filter.return_value.exists.return_value = False
+        search.return_value.exists.return_value = True
+
+        with pytest.raises(Formulario2AIntegranteServiceError) as exc:
+            Formulario2AIntegranteService.create(**_create_kwargs())
+
+    assert exc.value.conflict is True
+    assert exc.value.message == (
+        'La persona ya está registrada como integrante de esta emergencia'
+    )
+    codigo_sinpad.assert_called_once_with(8)
+    search.assert_called_once_with(codigo_sinpad='261404', persona_id=15)
+    integrante.assert_not_called()
+
+
+def test_create_skips_emergencia_check_when_codigo_sinpad_is_missing():
+    with (
+        patch('app_sgbh.services.formulario_2a_integrante.transaction.atomic'),
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AFamilia'
+        ) as familia,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AVivienda'
+        ) as vivienda,
+        patch('app_sgbh.services.formulario_2a_integrante.Formulario2A') as formulario,
+        patch('app_sgbh.services.formulario_2a.PlanillaEntrega') as planilla,
+        patch('app_sgbh.services.formulario_2a_integrante.Persona') as persona,
+        patch('app_sgbh.services.formulario_2a_integrante.RolFamiliar') as rol,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
+        ) as integrante,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.codigo_sinpad_de_familia',
+            return_value=None,
+        ),
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegranteService.search',
+        ) as search,
+    ):
+        _padres_existentes(familia, vivienda, formulario)
+        planilla.objects.filter.return_value.exists.return_value = False
+        persona.objects.filter.return_value.exists.return_value = True
+        integrante.objects.filter.return_value.exists.return_value = False
+        rol.objects.filter.return_value.exists.return_value = False
+
+        with pytest.raises(Formulario2AIntegranteServiceError) as exc:
+            Formulario2AIntegranteService.create(**_create_kwargs())
+
+    assert exc.value.message == 'El rol familiar indicado no existe'
+    search.assert_not_called()
+    integrante.assert_not_called()
+
+
 def test_create_rejects_unknown_rol_familiar():
     with (
         patch('app_sgbh.services.formulario_2a_integrante.transaction.atomic'),
@@ -326,6 +421,7 @@ def test_create_rejects_unknown_rol_familiar():
         patch(
             'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
         ) as integrante,
+        _persona_libre_en_emergencia(),
     ):
         _padres_existentes(familia, vivienda, formulario)
         planilla.objects.filter.return_value.exists.return_value = False
@@ -362,6 +458,7 @@ def test_create_rejects_unknown_optional_catalog():
         patch(
             'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
         ) as integrante,
+        _persona_libre_en_emergencia(),
     ):
         _padres_existentes(familia, vivienda, formulario)
         planilla.objects.filter.return_value.exists.return_value = False
@@ -400,6 +497,7 @@ def test_create_rejects_when_numero_orden_reaches_the_column_limit():
         patch(
             'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
         ) as integrante,
+        _persona_libre_en_emergencia(),
     ):
         _padres_existentes(familia, vivienda, formulario)
         planilla.objects.filter.return_value.exists.return_value = False
@@ -450,6 +548,7 @@ def test_create_saves_when_references_exist():
         patch(
             'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
         ) as integrante,
+        _persona_libre_en_emergencia(),
     ):
         _padres_existentes(familia, vivienda, formulario)
         planilla.objects.filter.return_value.exists.return_value = False
@@ -530,6 +629,7 @@ def test_create_skips_optional_catalogs_when_they_are_null():
         patch(
             'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
         ) as integrante,
+        _persona_libre_en_emergencia(),
     ):
         _padres_existentes(familia, vivienda, formulario)
         planilla.objects.filter.return_value.exists.return_value = False
