@@ -310,7 +310,7 @@ Regla física: `grado_lesion_id` solo puede tener valor cuando `tipo_danio_perso
 - `apellido_paterno` NVARCHAR(50).
 - `apellido_materno` NVARCHAR(50).
 - `nombres` NVARCHAR(150).
-- `fecha_nacimiento` DATE.
+- `fecha_nacimiento` DATE NULL.
 - `sexo` CHAR(1).
 - `telefono` NVARCHAR(50).
 - `correo` NVARCHAR(50).

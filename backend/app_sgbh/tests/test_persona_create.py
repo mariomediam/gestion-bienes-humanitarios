@@ -81,6 +81,23 @@ def test_parse_crear_stores_blank_telefono_and_correo_as_empty_string():
     assert parsed['correo'] == ''
 
 
+@pytest.mark.parametrize('value', [None, '', '   '])
+def test_parse_crear_accepts_blank_fecha_nacimiento(value):
+    parsed, error = _parse_crear(_body(fecha_nacimiento=value))
+
+    assert error is None
+    assert parsed['fecha_nacimiento'] is None
+
+
+def test_parse_crear_defaults_fecha_nacimiento_when_omitted():
+    body = _body()
+    del body['fecha_nacimiento']
+    parsed, error = _parse_crear(body)
+
+    assert error is None
+    assert parsed['fecha_nacimiento'] is None
+
+
 def test_parse_crear_treats_blank_document_as_empty():
     parsed, error = _parse_crear(
         _body(tipo_documento_id='', numero_documento='   ')
@@ -196,6 +213,26 @@ def test_create_saves_without_document():
         c_usuari_login='mmedina',
     )
     persona.return_value.save.assert_called_once_with()
+
+
+def test_create_saves_null_fecha_nacimiento():
+    with (
+        patch('app_sgbh.services.persona.transaction.atomic'),
+        patch('app_sgbh.services.persona.TipoDocumento'),
+        patch('app_sgbh.services.persona.Persona') as persona,
+    ):
+        persona.return_value.pk = 4
+        persona.objects.filter.return_value.exists.return_value = False
+
+        PersonaService.create(**_service_kwargs(fecha_nacimiento=None))
+
+    persona.objects.filter.assert_called_once_with(
+        apellido_paterno__iexact='Medina',
+        apellido_materno__iexact='Lopez',
+        nombres__iexact='Mario',
+        fecha_nacimiento=None,
+    )
+    assert persona.call_args.kwargs['fecha_nacimiento'] is None
 
 
 def test_create_saves_blank_telefono_and_correo_as_empty_string():
@@ -365,6 +402,30 @@ def test_persona_serializer_returns_null_tipo_documento_name():
     assert data['numero_documento'] is None
 
 
+def test_persona_serializer_returns_null_fecha_nacimiento():
+    persona = SimpleNamespace(
+        persona_id=4,
+        tipo_documento_id=None,
+        tipo_documento=None,
+        numero_documento=None,
+        apellido_paterno='Medina',
+        apellido_materno='Lopez',
+        nombres='Mario',
+        fecha_nacimiento=None,
+        sexo='M',
+        telefono='',
+        correo='',
+        esta_activo=True,
+        c_usuari_login='mmedina',
+        fecha_creacion='2026-10-09T12:00:00Z',
+        fecha_modificacion=None,
+    )
+
+    data = PersonaSerializer(persona).data
+
+    assert data['fecha_nacimiento'] is None
+
+
 def test_post_personas_returns_bad_request_when_document_is_incomplete():
     factory = APIRequestFactory()
     request = factory.post(
@@ -443,6 +504,30 @@ def test_post_personas_returns_created_person():
     assert create.call_args.kwargs['c_usuari_login'] == 'mmedina'
     assert create.call_args.kwargs['apellido_paterno'] == 'Medina'
     assert create.call_args.kwargs['tipo_documento_id'] is None
+
+
+def test_post_personas_accepts_null_fecha_nacimiento():
+    factory = APIRequestFactory()
+    request = factory.post(
+        '/api/sgbh/personas/',
+        _body(fecha_nacimiento=None),
+        format='json',
+    )
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+    instance = object()
+
+    with (
+        patch(
+            'app_sgbh.views.persona_view.PersonaService.create',
+            return_value=instance,
+        ) as create,
+        patch('app_sgbh.views.persona_view.PersonaSerializer') as serializer_cls,
+    ):
+        serializer_cls.return_value.data = {'persona_id': 4}
+        response = PersonaCreateView.as_view()(request)
+
+    assert response.status_code == 201
+    assert create.call_args.kwargs['fecha_nacimiento'] is None
 
 
 def _service_kwargs(**overrides):

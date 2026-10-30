@@ -169,7 +169,10 @@ class IntegranteBusquedaSerializer(serializers.Serializer):
     apellido_paterno = serializers.CharField(source='persona.apellido_paterno')
     apellido_materno = serializers.CharField(source='persona.apellido_materno')
     nombres = serializers.CharField(source='persona.nombres')
-    fecha_nacimiento = serializers.DateField(source='persona.fecha_nacimiento')
+    fecha_nacimiento = serializers.DateField(
+        source='persona.fecha_nacimiento',
+        allow_null=True,
+    )
     sexo = serializers.CharField(source='persona.sexo')
     telefono = serializers.CharField(source='persona.telefono')
     correo = serializers.CharField(source='persona.correo')

@@ -177,12 +177,14 @@ def test_serializer_returns_null_names_when_optional_joins_are_missing():
     row.persona.tipo_documento_id = None
     row.persona.numero_documento = None
     row.persona.tipo_documento = None
+    row.persona.fecha_nacimiento = None
     row.familia.vivienda.formulario_2a.emergencia.codigo_sinpad = None
 
     data = IntegranteBusquedaSerializer(row).data
 
     assert data['tipo_documento_id'] is None
     assert data['numero_documento'] is None
+    assert data['fecha_nacimiento'] is None
     assert data['tipo_documento_codigo'] is None
     assert data['tipo_danio_personal_nombre'] is None
     assert data['grado_lesion_nombre'] is None

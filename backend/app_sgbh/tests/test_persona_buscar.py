@@ -172,6 +172,30 @@ def test_persona_busqueda_serializer_returns_null_document_type():
     assert data['esta_activo_tipo_documento'] is None
 
 
+def test_persona_busqueda_serializer_returns_null_fecha_nacimiento():
+    persona = SimpleNamespace(
+        persona_id=4,
+        tipo_documento_id=None,
+        tipo_documento=None,
+        numero_documento=None,
+        apellido_paterno='Medina',
+        apellido_materno='Lopez',
+        nombres='Mario',
+        fecha_nacimiento=None,
+        sexo='M',
+        telefono='',
+        correo='',
+        esta_activo=True,
+        fecha_creacion='2026-10-09T12:00:00Z',
+        c_usuari_login='mmedina',
+        fecha_modificacion=None,
+    )
+
+    data = PersonaBusquedaSerializer(persona).data
+
+    assert data['fecha_nacimiento'] is None
+
+
 def test_get_personas_buscar_returns_rows():
     factory = APIRequestFactory()
     request = factory.get(

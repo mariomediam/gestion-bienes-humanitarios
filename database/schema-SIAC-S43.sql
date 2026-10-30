@@ -795,7 +795,7 @@ CREATE TABLE [dbo].[S43personas](
 	[apellido_paterno] [nvarchar](50) NOT NULL,
 	[apellido_materno] [nvarchar](50) NOT NULL,
 	[nombres] [nvarchar](150) NOT NULL,
-	[fecha_nacimiento] [date] NOT NULL,
+	[fecha_nacimiento] [date] NULL,
 	[sexo] [char](1) NOT NULL,
 	[telefono] [nvarchar](50) NOT NULL,
 	[correo] [nvarchar](50) NOT NULL,

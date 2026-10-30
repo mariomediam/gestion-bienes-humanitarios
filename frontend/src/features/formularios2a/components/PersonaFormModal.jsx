@@ -112,10 +112,6 @@ function validate(form) {
   validarTextoOpcional(form.telefono, 'telefono', 50, errors)
   validarTextoOpcional(form.correo, 'correo', 50, errors)
 
-  if (!form.fecha_nacimiento) {
-    errors.fecha_nacimiento = 'El campo fecha_nacimiento es obligatorio'
-  }
-
   if (!OPCIONES_SEXO.some((opcion) => opcion.value === form.sexo)) {
     errors.sexo = 'El campo sexo es obligatorio'
   }
@@ -287,7 +283,7 @@ export default function PersonaFormModal({
       apellido_paterno: form.apellido_paterno.trim(),
       apellido_materno: form.apellido_materno.trim(),
       nombres: form.nombres.trim(),
-      fecha_nacimiento: form.fecha_nacimiento,
+      fecha_nacimiento: form.fecha_nacimiento || null,
       sexo: form.sexo,
       telefono: form.telefono.trim(),
       correo: form.correo.trim(),

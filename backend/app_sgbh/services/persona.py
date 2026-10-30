@@ -82,7 +82,9 @@ class PersonaService:
         sent, tipo_documento_id must exist in S43cat_tipos_documento and
         that pair must not already exist. The combination of
         apellido_paterno, apellido_materno, nombres and fecha_nacimiento
-        must not already exist. Text is compared without case sensitivity.
+        must not already exist. fecha_nacimiento may be null when the date
+        is unknown; a null date is part of that combination. Text is
+        compared without case sensitivity.
         Personas without a document do not conflict with each other on the
         document pair.
         c_usuari_login comes from the authenticated user.
@@ -326,7 +328,10 @@ def _require_identidad_disponible(
     fecha_nacimiento,
     exclude_id=None,
 ):
-    """Reject the same surnames, given names and birth date on another persona."""
+    """Reject the same surnames, given names and birth date on another persona.
+
+    A null birth date matches other null birth dates.
+    """
     queryset = Persona.objects.filter(
         apellido_paterno__iexact=apellido_paterno,
         apellido_materno__iexact=apellido_materno,

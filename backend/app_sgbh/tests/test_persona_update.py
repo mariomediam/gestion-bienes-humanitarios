@@ -143,6 +143,27 @@ def test_update_keeps_creator_and_sets_modification_date():
     assert persona.objects.filter.return_value.exclude.call_count == 2
 
 
+def test_update_stores_null_fecha_nacimiento():
+    patches = _patch_update()
+    with patches[0], patches[1] as tipo_documento, patches[2] as persona, patches[3]:
+        row = _Row()
+        persona.DoesNotExist = _DoesNotExist
+        persona.objects.get.return_value = row
+        tipo_documento.objects.filter.return_value.exists.return_value = True
+        persona.objects.filter.return_value.exclude.return_value.exists.return_value = False
+
+        PersonaService.update(4, **_service_kwargs(fecha_nacimiento=None))
+
+    assert row.fecha_nacimiento is None
+    assert row.saved is True
+    persona.objects.filter.assert_any_call(
+        apellido_paterno__iexact='Medina',
+        apellido_materno__iexact='Lopez',
+        nombres__iexact='Mario',
+        fecha_nacimiento=None,
+    )
+
+
 def test_update_stores_blank_telefono_and_correo_as_empty_string():
     patches = _patch_update()
     with patches[0], patches[1] as tipo_documento, patches[2] as persona, patches[3]:
@@ -266,3 +287,27 @@ def test_put_personas_returns_updated_person():
     assert update.call_args.kwargs['esta_activo'] is False
     assert 'c_usuari_login' not in update.call_args.kwargs
     serializer_cls.assert_called_once_with(instance)
+
+
+def test_put_personas_accepts_null_fecha_nacimiento():
+    factory = APIRequestFactory()
+    request = factory.put(
+        '/api/sgbh/personas/4/',
+        _body(fecha_nacimiento=None),
+        format='json',
+    )
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+    instance = object()
+
+    with (
+        patch(
+            'app_sgbh.views.persona_view.PersonaService.update',
+            return_value=instance,
+        ) as update,
+        patch('app_sgbh.views.persona_view.PersonaSerializer') as serializer_cls,
+    ):
+        serializer_cls.return_value.data = {'persona_id': 4}
+        response = PersonaDetailView.as_view()(request, persona_id=4)
+
+    assert response.status_code == 200
+    assert update.call_args.kwargs['fecha_nacimiento'] is None

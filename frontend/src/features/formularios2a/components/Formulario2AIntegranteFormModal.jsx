@@ -203,15 +203,16 @@ export default function Formulario2AIntegranteFormModal({
 
   function handlePersonaChange(option) {
     const edad = option ? edadEnAnios(option.fecha_nacimiento) : null
+    const edadTexto = edad === null ? (option ? '' : null) : String(edad)
     setForm((current) => ({
       ...current,
       persona: option,
-      ...(edad === null ? {} : { edad: String(edad) }),
+      ...(edadTexto === null ? {} : { edad: edadTexto }),
     }))
     setErrors((current) => ({
       ...current,
       persona: '',
-      ...(edad === null ? {} : { edad: '' }),
+      ...(edadTexto === null ? {} : { edad: '' }),
     }))
   }
 

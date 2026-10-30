@@ -23,6 +23,26 @@ class OptionalCharField(serializers.CharField):
         return super().run_validation(data)
 
 
+class OptionalDateField(serializers.DateField):
+    """Date field that stores a blank value as null."""
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('required', False)
+        kwargs.setdefault('allow_null', True)
+        kwargs.setdefault('default', None)
+        kwargs.setdefault('input_formats', ['%Y-%m-%d'])
+        super().__init__(**kwargs)
+
+    def run_validation(self, data=serializers.empty):
+        if isinstance(data, str):
+            data = data.strip()
+            if data == '':
+                if not self.allow_null:
+                    self.fail('null')
+                return None
+        return super().run_validation(data)
+
+
 class OptionalSmallIntField(serializers.IntegerField):
     """Smallint field that treats a blank value as null."""
 
@@ -44,6 +64,7 @@ class PersonaCreateSerializer(serializers.Serializer):
     matching CK_personas_documento.
     c_usuari_login is taken from the authenticated user, not from the body.
     esta_activo defaults to true, matching the column default.
+    fecha_nacimiento may be omitted, blank or null when the date is unknown.
     """
 
     tipo_documento_id = OptionalSmallIntField(
@@ -98,11 +119,8 @@ class PersonaCreateSerializer(serializers.Serializer):
             'max_length': 'El campo nombres no debe superar 150 caracteres',
         },
     )
-    fecha_nacimiento = serializers.DateField(
-        input_formats=['%Y-%m-%d'],
+    fecha_nacimiento = OptionalDateField(
         error_messages={
-            'required': 'El campo fecha_nacimiento es obligatorio',
-            'null': 'El campo fecha_nacimiento es obligatorio',
             'invalid': 'El campo fecha_nacimiento debe tener el formato AAAA-MM-DD',
         },
     )
@@ -190,7 +208,7 @@ class PersonaBusquedaSerializer(serializers.Serializer):
     apellido_paterno = serializers.CharField()
     apellido_materno = serializers.CharField()
     nombres = serializers.CharField()
-    fecha_nacimiento = serializers.DateField()
+    fecha_nacimiento = serializers.DateField(allow_null=True)
     sexo = serializers.CharField()
     telefono = serializers.CharField()
     correo = serializers.CharField()
@@ -230,7 +248,7 @@ class PersonaSerializer(serializers.Serializer):
     apellido_paterno = serializers.CharField()
     apellido_materno = serializers.CharField()
     nombres = serializers.CharField()
-    fecha_nacimiento = serializers.DateField()
+    fecha_nacimiento = serializers.DateField(allow_null=True)
     sexo = serializers.CharField()
     telefono = serializers.CharField()
     correo = serializers.CharField()
