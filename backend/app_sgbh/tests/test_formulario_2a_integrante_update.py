@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -71,6 +72,21 @@ def _update_kwargs(**overrides):
     }
     data.update(overrides)
     return data
+
+
+@contextmanager
+def _persona_libre_en_emergencia(codigo_sinpad='261404'):
+    with (
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.codigo_sinpad_de_familia',
+            return_value=codigo_sinpad,
+        ) as codigo,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegranteService.search',
+        ) as search,
+    ):
+        search.return_value.exclude.return_value.exists.return_value = False
+        yield codigo, search
 
 
 def _padres_existentes(familia, vivienda, formulario, estado_registro_id=1):
@@ -238,6 +254,94 @@ def test_update_rejects_duplicated_persona_in_the_familia():
     assert row.saved is False
 
 
+def test_update_rejects_persona_already_in_the_same_emergencia():
+    row = _Integrante()
+    with (
+        patch('app_sgbh.services.formulario_2a_integrante.transaction.atomic'),
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AFamilia'
+        ) as familia,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AVivienda'
+        ) as vivienda,
+        patch('app_sgbh.services.formulario_2a_integrante.Formulario2A') as formulario,
+        patch('app_sgbh.services.formulario_2a.PlanillaEntrega') as planilla,
+        patch('app_sgbh.services.formulario_2a_integrante.Persona') as persona,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
+        ) as integrante,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.codigo_sinpad_de_familia',
+            return_value='261404',
+        ) as codigo_sinpad,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegranteService.search',
+        ) as search,
+    ):
+        integrante.objects.select_for_update.return_value.get.return_value = row
+        _padres_existentes(familia, vivienda, formulario)
+        planilla.objects.filter.return_value.exists.return_value = False
+        persona.objects.filter.return_value.exists.return_value = True
+        integrante.objects.filter.return_value.exclude.return_value.exists.return_value = (
+            False
+        )
+        search.return_value.exclude.return_value.exists.return_value = True
+
+        with pytest.raises(Formulario2AIntegranteServiceError) as exc:
+            Formulario2AIntegranteService.update(31, **_update_kwargs())
+
+    assert exc.value.conflict is True
+    assert exc.value.message == (
+        'La persona ya está registrada como integrante de esta emergencia'
+    )
+    codigo_sinpad.assert_called_once_with(8)
+    search.assert_called_once_with(codigo_sinpad='261404', persona_id=16)
+    search.return_value.exclude.assert_called_once_with(pk=31)
+    assert row.saved is False
+
+
+def test_update_skips_emergencia_check_when_codigo_sinpad_is_missing():
+    row = _Integrante()
+    with (
+        patch('app_sgbh.services.formulario_2a_integrante.transaction.atomic'),
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AFamilia'
+        ) as familia,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AVivienda'
+        ) as vivienda,
+        patch('app_sgbh.services.formulario_2a_integrante.Formulario2A') as formulario,
+        patch('app_sgbh.services.formulario_2a.PlanillaEntrega') as planilla,
+        patch('app_sgbh.services.formulario_2a_integrante.Persona') as persona,
+        patch('app_sgbh.services.formulario_2a_integrante.RolFamiliar') as rol,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
+        ) as integrante,
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.codigo_sinpad_de_familia',
+            return_value=None,
+        ),
+        patch(
+            'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegranteService.search',
+        ) as search,
+    ):
+        integrante.objects.select_for_update.return_value.get.return_value = row
+        _padres_existentes(familia, vivienda, formulario)
+        planilla.objects.filter.return_value.exists.return_value = False
+        persona.objects.filter.return_value.exists.return_value = True
+        integrante.objects.filter.return_value.exclude.return_value.exists.return_value = (
+            False
+        )
+        rol.objects.filter.return_value.exists.return_value = False
+
+        with pytest.raises(Formulario2AIntegranteServiceError) as exc:
+            Formulario2AIntegranteService.update(31, **_update_kwargs())
+
+    assert exc.value.message == 'El rol familiar indicado no existe'
+    search.assert_not_called()
+    assert row.saved is False
+
+
 def test_update_keeps_familia_orden_and_fecha_creacion():
     row = _Integrante()
     with (
@@ -262,6 +366,7 @@ def test_update_keeps_familia_orden_and_fecha_creacion():
         patch(
             'app_sgbh.services.formulario_2a_integrante.Formulario2AIntegrante'
         ) as integrante,
+        _persona_libre_en_emergencia() as (codigo_sinpad, search),
     ):
         integrante.objects.select_for_update.return_value.get.return_value = row
         stored = object()
@@ -298,6 +403,9 @@ def test_update_keeps_familia_orden_and_fecha_creacion():
     integrante.objects.select_for_update.return_value.get.assert_called_once_with(pk=31)
     integrante.objects.filter.return_value.exclude.assert_called_once_with(pk=31)
     integrante.objects.select_related.return_value.get.assert_called_once_with(pk=31)
+    codigo_sinpad.assert_called_once_with(8)
+    search.assert_called_once_with(codigo_sinpad='261404', persona_id=16)
+    search.return_value.exclude.assert_called_once_with(pk=31)
 
 
 def test_put_integrantes_rejects_familia_id():

@@ -182,7 +182,8 @@ class Formulario2AIntegranteService:
         The body matches create except familia_id. That column, numero_orden
         and fecha_creacion stay as stored. Rejected when the parent form is
         inactive, a related Planilla BAH is in state EMITIDA, or the persona
-        is already an integrante of the same familia.
+        is already an integrante of the same familia or the same emergency.
+        The row being updated is excluded from both checks.
         """
         _require_edad(edad)
         _require_gestante(gestante_semanas)
@@ -196,6 +197,11 @@ class Formulario2AIntegranteService:
             _require_formulario_modificable(formulario)
             _require_persona(persona_id)
             _require_persona_unica(
+                integrante.familia_id,
+                persona_id,
+                exclude_integrante_id=integrante.pk,
+            )
+            _require_persona_unica_en_emergencia(
                 integrante.familia_id,
                 persona_id,
                 exclude_integrante_id=integrante.pk,
@@ -349,12 +355,18 @@ def _require_persona(persona_id):
         raise Formulario2AIntegranteServiceError('La persona indicada no existe')
 
 
-def _require_persona_unica_en_emergencia(familia_id, persona_id):
+def _require_persona_unica_en_emergencia(
+    familia_id,
+    persona_id,
+    *,
+    exclude_integrante_id=None,
+):
     """Reject when the persona is already an integrante of the same emergency.
 
     The emergency is the codigo_sinpad reached from the familia. Search
     combines that code with persona_id. When the familia has no SINPAD code,
     search would ignore the emergency filter, so the check does not run.
+    exclude_integrante_id omits the row being updated.
     """
     codigo_sinpad = codigo_sinpad_de_familia(familia_id)
     if codigo_sinpad is None:
@@ -363,6 +375,8 @@ def _require_persona_unica_en_emergencia(familia_id, persona_id):
         codigo_sinpad=codigo_sinpad,
         persona_id=persona_id,
     )
+    if exclude_integrante_id is not None:
+        existentes = existentes.exclude(pk=exclude_integrante_id)
     if existentes.exists():
         raise Formulario2AIntegranteServiceError(
             'La persona ya está registrada como integrante de esta emergencia',
