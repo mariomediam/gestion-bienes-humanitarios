@@ -251,6 +251,16 @@ export const sgbhApi = {
     return response.data
   },
 
+  cargarFormularios2A: async (archivo) => {
+    const formData = new FormData()
+    formData.append('archivo', archivo)
+    const response = await api.post('/api/sgbh/formularios-2a/cargar/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000,
+    })
+    return response.data
+  },
+
   actualizarFormulario2A: async (formulario2aId, data) => {
     const response = await api.put(`/api/sgbh/formularios-2a/${formulario2aId}/`, data)
     return response.data

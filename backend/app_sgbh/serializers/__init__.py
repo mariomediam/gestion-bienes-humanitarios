@@ -14,6 +14,11 @@ from .formulario_2a_archivo import (
     Formulario2AArchivoBusquedaSerializer,
     Formulario2AArchivoSerializer,
 )
+from .formulario_2a_carga import (
+    CargaFormularios2AResultadoSerializer,
+    CargaFormularios2ASerializer,
+    mensaje_error_carga,
+)
 from .formulario_2a_familia import (
     FamiliaBusquedaSerializer,
     FamiliaCreateSerializer,
@@ -85,6 +90,8 @@ __all__ = [
     'BienBusquedaSerializer',
     'BienCreateSerializer',
     'BienUpdateSerializer',
+    'CargaFormularios2AResultadoSerializer',
+    'CargaFormularios2ASerializer',
     'CategoriaBienSerializer',
     'CategoriaMedioVidaSerializer',
     'CondicionPersonaSerializer',
@@ -119,6 +126,7 @@ __all__ = [
     'MaterialParedSerializer',
     'MaterialPisoSerializer',
     'MaterialTechoSerializer',
+    'mensaje_error_carga',
     'MovimientoBusquedaSerializer',
     'MovimientoCreateSerializer',
     'MovimientoPlanillaBahBusquedaSerializer',

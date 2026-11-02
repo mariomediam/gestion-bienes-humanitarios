@@ -22,6 +22,7 @@ from .views import (
     Formulario2AArchivoDescargarView,
     Formulario2AArchivoDetailView,
     Formulario2ABuscarView,
+    Formulario2ACargaView,
     Formulario2ACreateView,
     Formulario2ADetailView,
     Formulario2AReporteView,
@@ -242,6 +243,11 @@ urlpatterns = [
         'formularios-2a/',
         Formulario2ACreateView.as_view(),
         name='formularios-2a',
+    ),
+    path(
+        'formularios-2a/cargar/',
+        Formulario2ACargaView.as_view(),
+        name='formularios-2a-cargar',
     ),
     path(
         'formularios-2a/<int:formulario_2a_id>/',

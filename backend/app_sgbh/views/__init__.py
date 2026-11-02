@@ -18,6 +18,7 @@ from .formulario_2a_archivo_view import (
     Formulario2AArchivoDescargarView,
     Formulario2AArchivoDetailView,
 )
+from .formulario_2a_carga_view import Formulario2ACargaView
 from .formulario_2a_familia_view import (
     Formulario2AFamiliaBuscarView,
     Formulario2AFamiliaCreateView,
