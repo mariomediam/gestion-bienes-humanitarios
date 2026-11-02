@@ -1,10 +1,6 @@
 {
   "formularios": [
     {
-      "emergencia_id": 1,
-      "departamento_id": "20",
-      "provincia_id": "01",
-      "distrito_id": "01",
       "fecha_empadronamiento": "2026-10-15",
       "hora_empadronamiento": "08:30",
       "localidad": "Catacaos",
@@ -17,9 +13,6 @@
       "otros_ubicacion": null,
       "numero_hoja": 1,
       "total_hojas": 1,
-      "institucion": "Municipalidad Provincial de Piura",
-      "evaluador_id": 1,
-      "estado_registro_id": 1,
       "viviendas": [
         {
           "numero_lote": "04",
@@ -45,7 +38,6 @@
                     "correo": "",
                     "esta_activo": true
                   },
-                  "rol_familiar_id": 1,
                   "edad": 38,
                   "condicion_persona_id": 1,
                   "tipo_danio_personal_id": null,
@@ -67,7 +59,6 @@
                     "correo": "",
                     "esta_activo": true
                   },
-                  "rol_familiar_id": 1,
                   "edad": 10,
                   "condicion_persona_id": 1,
                   "tipo_danio_personal_id": null,
@@ -105,7 +96,6 @@
                     "correo": "",
                     "esta_activo": true
                   },
-                  "rol_familiar_id": 1,
                   "edad": 51,
                   "condicion_persona_id": 1,
                   "tipo_danio_personal_id": null,
@@ -143,7 +133,6 @@
                     "correo": "",
                     "esta_activo": true
                   },
-                  "rol_familiar_id": 1,
                   "edad": 44,
                   "condicion_persona_id": 1,
                   "tipo_danio_personal_id": null,
@@ -166,10 +155,6 @@
       ]
     },
     {
-      "emergencia_id": 1,
-      "departamento_id": "20",
-      "provincia_id": "01",
-      "distrito_id": "01",
       "fecha_empadronamiento": "2026-10-15",
       "hora_empadronamiento": null,
       "localidad": "La Unión",
@@ -182,9 +167,6 @@
       "otros_ubicacion": null,
       "numero_hoja": 1,
       "total_hojas": null,
-      "institucion": null,
-      "evaluador_id": 1,
-      "estado_registro_id": 1,
       "viviendas": [
         {
           "numero_lote": "12",
@@ -210,7 +192,6 @@
                     "correo": "jose.farfan@correo.com",
                     "esta_activo": true
                   },
-                  "rol_familiar_id": 1,
                   "edad": 34,
                   "condicion_persona_id": 1,
                   "tipo_danio_personal_id": null,

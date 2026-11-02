@@ -154,15 +154,54 @@ class _Carga:
         self._parche.stop()
 
 
-def test_ejemplo_json_es_valido():
+def test_ejemplo_json_no_trae_los_datos_que_completa_la_pantalla():
     ejemplo = json.loads(_EJEMPLO.read_text(encoding='utf-8'))
+    formulario = ejemplo['formularios'][0]
+
+    for campo in (
+        'emergencia_id',
+        'departamento_id',
+        'provincia_id',
+        'distrito_id',
+        'institucion',
+        'evaluador_id',
+        'estado_registro_id',
+    ):
+        assert campo not in formulario
+    assert 'rol_familiar_id' not in (
+        formulario['viviendas'][0]['familias'][0]['integrantes'][0]
+    )
+
+
+def test_ejemplo_json_es_valido_despues_de_completar_la_pantalla():
+    ejemplo = json.loads(_EJEMPLO.read_text(encoding='utf-8'))
+    for formulario in ejemplo['formularios']:
+        formulario.update({
+            'emergencia_id': 4,
+            'departamento_id': '20',
+            'provincia_id': '01',
+            'distrito_id': '01',
+            'institucion': 'Municipalidad Provincial de Piura',
+            'evaluador_id': 7,
+            'estado_registro_id': 1,
+        })
+        for vivienda in formulario['viviendas']:
+            for familia in vivienda['familias']:
+                for indice, integrante in enumerate(familia['integrantes']):
+                    integrante['rol_familiar_id'] = 1 if indice == 0 else 2
+
     parsed, error = _parse(ejemplo)
 
     assert error is None
     assert len(parsed['formularios']) == 2
     assert parsed['formularios'][0]['fecha_empadronamiento'] == date(2026, 10, 15)
-    assert len(parsed['formularios'][0]['viviendas']) == 2
-    assert len(parsed['formularios'][0]['viviendas'][0]['familias']) == 2
+    assert parsed['formularios'][0]['institucion'] == 'Municipalidad Provincial de Piura'
+    assert parsed['formularios'][0]['estado_registro_id'] == 1
+    roles = [
+        integrante['rol_familiar_id']
+        for integrante in parsed['formularios'][0]['viviendas'][0]['familias'][0]['integrantes']
+    ]
+    assert roles == [1, 2]
     persona = parsed['formularios'][0]['viviendas'][0]['familias'][0]['integrantes'][1]
     assert persona['persona']['tipo_documento_id'] is None
     assert persona['persona']['numero_documento'] is None

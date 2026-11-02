@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ExcelIcon from '@components/icons/ExcelIcon'
 import PlusIcon from '@components/icons/PlusIcon'
-import Formulario2ACargaModal from '@features/formularios2a/components/Formulario2ACargaModal'
 import Formulario2ACodigoSinpadModal from '@features/formularios2a/components/Formulario2ACodigoSinpadModal'
 import Formulario2AFormModal from '@features/formularios2a/components/Formulario2AFormModal'
 import Formularios2ABusquedaForm from '@features/formularios2a/components/Formularios2ABusquedaForm'
@@ -15,7 +14,6 @@ import useFormularios2ABusqueda, {
 export default function Formularios2APage() {
   const navigate = useNavigate()
   const [codigoModalAbierto, setCodigoModalAbierto] = useState(false)
-  const [cargaAbierta, setCargaAbierta] = useState(false)
   const [emergenciaSeleccionada, setEmergenciaSeleccionada] = useState(null)
   const {
     loading,
@@ -71,7 +69,7 @@ export default function Formularios2APage() {
           </button>
           <button
             type="button"
-            onClick={() => setCargaAbierta(true)}
+            onClick={() => navigate('/formularios-2A/cargar')}
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             Cargar archivo JSON
@@ -109,10 +107,6 @@ export default function Formularios2APage() {
         />
       )}
 
-      <Formulario2ACargaModal
-        isOpen={cargaAbierta}
-        onClose={() => setCargaAbierta(false)}
-      />
       <Formulario2ACodigoSinpadModal
         isOpen={codigoModalAbierto}
         onClose={() => setCodigoModalAbierto(false)}

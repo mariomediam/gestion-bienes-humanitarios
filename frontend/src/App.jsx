@@ -10,6 +10,7 @@ import Formulario2ADetallePage from '@features/formularios2a/pages/Formulario2AD
 import Formulario2AReportePage from '@features/formularios2a/pages/Formulario2AReportePage'
 import BienesPage from '@features/bienes/pages/BienesPage'
 import PersonasPage from '@features/personas/pages/PersonasPage'
+import Formularios2ACargaPage from '@features/formularios2a/pages/Formularios2ACargaPage'
 import Formularios2APage from '@features/formularios2a/pages/Formularios2APage'
 import MovimientoFormPage from '@features/movimientos/pages/MovimientoFormPage'
 import MovimientoVerPage from '@features/movimientos/pages/MovimientoVerPage'
@@ -91,6 +92,7 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="emergencias" element={<EmergenciasPage />} />
           <Route path="formularios-2A" element={<Formularios2APage />} />
+          <Route path="formularios-2A/cargar" element={<Formularios2ACargaPage />} />
           <Route path="bah-bienes" element={<BienesPage />} />
           <Route path="personas" element={<PersonasPage />} />
           <Route path="alm-movimientos/nuevo" element={<MovimientoFormPage />} />
