@@ -63,6 +63,7 @@ from .views import (
     TipoDocumentoListView,
     TipoMedioVidaListView,
     MovimientoBuscarView,
+    MovimientoCantidadesSalidaView,
     MovimientoCreateView,
     MovimientoDetailView,
     MovimientoPlanillaBahBuscarView,
@@ -194,6 +195,11 @@ urlpatterns = [
         'movimientos/<int:movimiento_id>/',
         MovimientoDetailView.as_view(),
         name='movimientos-detalle',
+    ),
+    path(
+        'movimientos/<int:movimiento_id>/cantidades-salida/',
+        MovimientoCantidadesSalidaView.as_view(),
+        name='movimientos-cantidades-salida',
     ),
     path(
         'movimientos/buscar/',
