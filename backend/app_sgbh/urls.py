@@ -66,6 +66,7 @@ from .views import (
     MovimientoCantidadesSalidaView,
     MovimientoCreateView,
     MovimientoDetailView,
+    MovimientoDevolucionBuscarView,
     MovimientoPlanillaBahBuscarView,
     TipoMovimientoListView,
     TipoPeligroListView,
@@ -210,6 +211,11 @@ urlpatterns = [
         'movimientos/buscar-planilla-bah/',
         MovimientoPlanillaBahBuscarView.as_view(),
         name='movimientos-buscar-planilla-bah',
+    ),
+    path(
+        'movimientos/buscar-devoluciones/',
+        MovimientoDevolucionBuscarView.as_view(),
+        name='movimientos-buscar-devoluciones',
     ),
     path(
         'materiales-pared/',

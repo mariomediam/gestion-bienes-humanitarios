@@ -631,6 +631,15 @@ def parse_documento_referencia(raw_value):
     return _parse_optional_text(raw_value, 'documento_referencia', 100)
 
 
+def parse_documento_origen_referencia(raw_value):
+    """Parse the optional documento_origen_referencia query param.
+
+    The value is the computed origin document. Its longest source is
+    S43alm_movimientos.documento_referencia (100).
+    """
+    return _parse_optional_text(raw_value, 'documento_origen_referencia', 100)
+
+
 def parse_destinatario(raw_value):
     """Parse the optional destinatario query param."""
     return _parse_optional_text(raw_value, 'destinatario', 250)
