@@ -271,7 +271,7 @@ class Formulario2AService:
         with transaction.atomic(using=DB_ALIAS):
             try:
                 formulario = Formulario2A.objects.get(pk=formulario_2a_id)
-            except Formulario2A.DoesNotExist:
+            except Formulario2A.DoesNotExist:                
                 raise Formulario2AServiceError(
                     'El formulario EDAN 2A indicado no existe',
                     not_found=True,
@@ -281,17 +281,17 @@ class Formulario2AService:
 
             if Formulario2AVivienda.objects.filter(
                 formulario_2a_id=formulario_2a_id,
-            ).exists():
+            ).exists():                
                 raise Formulario2AServiceError(
-                    'No se puede eliminar el formulario EDAN 2A porque tiene viviendas asociadas',
+                    'No se puede eliminar el formulario EDAN 2A porque tiene viviendas asociadas xxx',
                     conflict=True,
                 )
 
             try:
                 formulario.delete()
-            except ProtectedError:
+            except ProtectedError as e:
                 raise Formulario2AServiceError(
-                    'No se puede eliminar el formulario EDAN 2A porque tiene viviendas asociadas',
+                    'No se puede eliminar el formulario EDAN 2A porque tiene viviendas o archivos asociados',
                     conflict=True,
                 )
 
