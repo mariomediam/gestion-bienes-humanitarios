@@ -80,78 +80,9 @@
                   "observacion": null
                 }
               ]
-            },
-            {
-              "integrantes": [
-                {
-                  "persona": {
-                    "tipo_documento_id": 1,
-                    "numero_documento": "40111222",
-                    "apellido_paterno": "Sandoval",
-                    "apellido_materno": "Cruz",
-                    "nombres": "Pedro",
-                    "fecha_nacimiento": "1975-01-20",
-                    "sexo": "M",
-                    "telefono": "",
-                    "correo": "",
-                    "esta_activo": true
-                  },
-                  "edad": 51,
-                  "condicion_persona_id": 1,
-                  "tipo_danio_personal_id": null,
-                  "grado_lesion_id": null,
-                  "gestante_semanas": null,
-                  "tipo_discapacidad_id": null,
-                  "enfermedad_cronica_id": null
-                }
-              ],
-              "medios_vida": []
-            }
+            }            
           ]
-        },
-        {
-          "numero_lote": "05",
-          "tenencia_propia": null,
-          "tipo_uso_instalacion_id": 1,
-          "condicion_vivienda_id": null,
-          "material_techo_id": null,
-          "material_pared_id": null,
-          "material_piso_id": null,
-          "familias": [
-            {
-              "integrantes": [
-                {
-                  "persona": {
-                    "tipo_documento_id": 1,
-                    "numero_documento": "70888999",
-                    "apellido_paterno": "Chunga",
-                    "apellido_materno": "Sernaqué",
-                    "nombres": "Rosa",
-                    "fecha_nacimiento": null,
-                    "sexo": "F",
-                    "telefono": "",
-                    "correo": "",
-                    "esta_activo": true
-                  },
-                  "edad": 44,
-                  "condicion_persona_id": 1,
-                  "tipo_danio_personal_id": null,
-                  "grado_lesion_id": null,
-                  "gestante_semanas": null,
-                  "tipo_discapacidad_id": null,
-                  "enfermedad_cronica_id": null
-                }
-              ],
-              "medios_vida": [
-                {
-                  "tipo_medio_vida_id": 1,
-                  "cantidad": 2,
-                  "observacion": null
-                }
-              ]
-            }
-          ]
-        }
+        }        
       ]
     },
     {

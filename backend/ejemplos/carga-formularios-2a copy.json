@@ -1,0 +1,211 @@
+{
+  "formularios": [
+    {
+      "fecha_empadronamiento": "2026-10-15",
+      "hora_empadronamiento": "08:30",
+      "localidad": "Catacaos",
+      "barrio_sector_urbanizacion": "Buenos Aires",
+      "centro_poblado": null,
+      "caserio": null,
+      "anexo": null,
+      "calle_manzana": "Mz. A lote 4",
+      "edificio_piso_dpto": null,
+      "otros_ubicacion": null,
+      "numero_hoja": 1,
+      "total_hojas": 1,
+      "viviendas": [
+        {
+          "numero_lote": "04",
+          "tenencia_propia": true,
+          "tipo_uso_instalacion_id": 1,
+          "condicion_vivienda_id": 1,
+          "material_techo_id": 1,
+          "material_pared_id": 1,
+          "material_piso_id": 1,
+          "familias": [
+            {
+              "integrantes": [
+                {
+                  "persona": {
+                    "tipo_documento_id": 1,
+                    "numero_documento": "45678901",
+                    "apellido_paterno": "García",
+                    "apellido_materno": "Ramos",
+                    "nombres": "Ana María",
+                    "fecha_nacimiento": "1988-04-12",
+                    "sexo": "F",
+                    "telefono": "969111222",
+                    "correo": "",
+                    "esta_activo": true
+                  },
+                  "edad": 38,
+                  "condicion_persona_id": 1,
+                  "tipo_danio_personal_id": null,
+                  "grado_lesion_id": null,
+                  "gestante_semanas": null,
+                  "tipo_discapacidad_id": null,
+                  "enfermedad_cronica_id": null
+                },
+                {
+                  "persona": {
+                    "tipo_documento_id": null,
+                    "numero_documento": null,
+                    "apellido_paterno": "García",
+                    "apellido_materno": "Ramos",
+                    "nombres": "Luis",
+                    "fecha_nacimiento": "2016-09-03",
+                    "sexo": "M",
+                    "telefono": "",
+                    "correo": "",
+                    "esta_activo": true
+                  },
+                  "edad": 10,
+                  "condicion_persona_id": 1,
+                  "tipo_danio_personal_id": null,
+                  "grado_lesion_id": null,
+                  "gestante_semanas": null,
+                  "tipo_discapacidad_id": null,
+                  "enfermedad_cronica_id": null
+                }
+              ],
+              "medios_vida": [
+                {
+                  "tipo_medio_vida_id": 1,
+                  "cantidad": 4,
+                  "observacion": "Aves de corral"
+                },
+                {
+                  "tipo_medio_vida_id": 2,
+                  "cantidad": 1,
+                  "observacion": null
+                }
+              ]
+            },
+            {
+              "integrantes": [
+                {
+                  "persona": {
+                    "tipo_documento_id": 1,
+                    "numero_documento": "40111222",
+                    "apellido_paterno": "Sandoval",
+                    "apellido_materno": "Cruz",
+                    "nombres": "Pedro",
+                    "fecha_nacimiento": "1975-01-20",
+                    "sexo": "M",
+                    "telefono": "",
+                    "correo": "",
+                    "esta_activo": true
+                  },
+                  "edad": 51,
+                  "condicion_persona_id": 1,
+                  "tipo_danio_personal_id": null,
+                  "grado_lesion_id": null,
+                  "gestante_semanas": null,
+                  "tipo_discapacidad_id": null,
+                  "enfermedad_cronica_id": null
+                }
+              ],
+              "medios_vida": []
+            }
+          ]
+        },
+        {
+          "numero_lote": "05",
+          "tenencia_propia": null,
+          "tipo_uso_instalacion_id": 1,
+          "condicion_vivienda_id": null,
+          "material_techo_id": null,
+          "material_pared_id": null,
+          "material_piso_id": null,
+          "familias": [
+            {
+              "integrantes": [
+                {
+                  "persona": {
+                    "tipo_documento_id": 1,
+                    "numero_documento": "70888999",
+                    "apellido_paterno": "Chunga",
+                    "apellido_materno": "Sernaqué",
+                    "nombres": "Rosa",
+                    "fecha_nacimiento": null,
+                    "sexo": "F",
+                    "telefono": "",
+                    "correo": "",
+                    "esta_activo": true
+                  },
+                  "edad": 44,
+                  "condicion_persona_id": 1,
+                  "tipo_danio_personal_id": null,
+                  "grado_lesion_id": null,
+                  "gestante_semanas": null,
+                  "tipo_discapacidad_id": null,
+                  "enfermedad_cronica_id": null
+                }
+              ],
+              "medios_vida": [
+                {
+                  "tipo_medio_vida_id": 1,
+                  "cantidad": 2,
+                  "observacion": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fecha_empadronamiento": "2026-10-15",
+      "hora_empadronamiento": null,
+      "localidad": "La Unión",
+      "barrio_sector_urbanizacion": null,
+      "centro_poblado": "La Unión",
+      "caserio": null,
+      "anexo": null,
+      "calle_manzana": null,
+      "edificio_piso_dpto": null,
+      "otros_ubicacion": null,
+      "numero_hoja": 1,
+      "total_hojas": null,
+      "viviendas": [
+        {
+          "numero_lote": "12",
+          "tenencia_propia": false,
+          "tipo_uso_instalacion_id": 1,
+          "condicion_vivienda_id": null,
+          "material_techo_id": null,
+          "material_pared_id": null,
+          "material_piso_id": null,
+          "familias": [
+            {
+              "integrantes": [
+                {
+                  "persona": {
+                    "tipo_documento_id": 1,
+                    "numero_documento": "33222111",
+                    "apellido_paterno": "Farfán",
+                    "apellido_materno": "León",
+                    "nombres": "José",
+                    "fecha_nacimiento": "1992-07-08",
+                    "sexo": "M",
+                    "telefono": "969333444",
+                    "correo": "jose.farfan@correo.com",
+                    "esta_activo": true
+                  },
+                  "edad": 34,
+                  "condicion_persona_id": 1,
+                  "tipo_danio_personal_id": null,
+                  "grado_lesion_id": null,
+                  "gestante_semanas": null,
+                  "tipo_discapacidad_id": null,
+                  "enfermedad_cronica_id": null
+                }
+              ],
+              "medios_vida": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
