@@ -73,6 +73,8 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
               <th scope="col" className="px-5 py-3 font-medium">Tipo de movimiento</th>
               <th scope="col" className="px-5 py-3 font-medium">Fecha de movimiento</th>
               <th scope="col" className="px-5 py-3 font-medium">Documento de referencia</th>
+              <th scope="col" className="px-5 py-3 font-medium">Número de planilla</th>
+              <th scope="col" className="px-5 py-3 font-medium">Año de planilla</th>
               <th scope="col" className="px-5 py-3 font-medium">Destinatario</th>
               <th scope="col" className="px-5 py-3 font-medium">Bienes</th>
               <th scope="col" className="px-5 py-3 font-medium">Acciones</th>
@@ -81,7 +83,7 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
           <tbody>
             {movimientos.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-6 text-center text-gray-500">
+                <td colSpan={8} className="px-5 py-6 text-center text-gray-500">
                   No se encontraron movimientos de almacén
                 </td>
               </tr>
@@ -93,6 +95,8 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
                     {formatFechaMovimiento(movimiento.fecha_movimiento)}
                   </td>
                   <td className="px-5 py-3 text-gray-800">{texto(movimiento.documento_referencia)}</td>
+                  <td className="px-5 py-3 text-gray-800 whitespace-nowrap">{texto(movimiento.numero_planilla)}</td>
+                  <td className="px-5 py-3 text-gray-800 whitespace-nowrap">{texto(movimiento.anio_planilla)}</td>
                   <td className="px-5 py-3 text-gray-800">{texto(movimiento.destinatario)}</td>
                   <td className="px-5 py-3 text-gray-800">
                     <BienesCell detalles={movimiento.detalles} es_movimiento_mixto={movimiento.tipo_movimiento_naturaleza === "M"} />

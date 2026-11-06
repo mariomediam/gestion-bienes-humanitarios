@@ -276,8 +276,11 @@ class MovimientoBusquedaSerializer(serializers.Serializer):
 
     Almacén, tipo, estado and encargado columns come from the joins.
     encargado_almacen_nombre is apellido paterno, apellido materno and nombres.
-    tipo_movimiento_origen is requiere_movimiento_origen. detalles lists the
-    movement lines without repeating the header.
+    tipo_movimiento_origen is requiere_movimiento_origen. numero_planilla and
+    anio_planilla come from the left join to S43bah_planilla_entrega on
+    movimiento_id = movimiento_almacen_id. Both are null when that planilla
+    does not exist. detalles lists the movement lines without repeating the
+    header.
     """
 
     movimiento_id = serializers.IntegerField()
@@ -287,6 +290,8 @@ class MovimientoBusquedaSerializer(serializers.Serializer):
     movimiento_origen_id = serializers.IntegerField(allow_null=True)
     fecha_movimiento = serializers.DateTimeField()
     documento_referencia = serializers.CharField(allow_null=True)
+    numero_planilla = serializers.IntegerField(allow_null=True)
+    anio_planilla = serializers.IntegerField(allow_null=True)
     fecha_documento = serializers.DateField(allow_null=True)
     destinatario = serializers.CharField(allow_null=True)
     observacion = serializers.CharField(allow_null=True)

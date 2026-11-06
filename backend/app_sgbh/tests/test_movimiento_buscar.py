@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.db.models import Prefetch
+from django.db.models import F, FilteredRelation, Prefetch
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -13,6 +13,18 @@ from app_sgbh.serializers.movimiento import MovimientoBusquedaSerializer
 from app_sgbh.services.movimiento import MovimientoService, _inicio_de_dia
 from app_sgbh.text_search import text_like_pattern
 from app_sgbh.views.movimiento_view import MovimientoBuscarView, _parse_busqueda
+
+
+def _assert_planilla_left_join(queryset):
+    """The search left joins S43bah_planilla_entrega once and reads its columns."""
+    joined = queryset.annotate.call_args.kwargs
+    planilla = joined['planilla_entrega']
+    assert isinstance(planilla, FilteredRelation)
+    assert planilla.relation_name == 'planillas_entrega'
+    assert isinstance(joined['numero_planilla'], F)
+    assert joined['numero_planilla'].name == 'planilla_entrega__numero_planilla'
+    assert isinstance(joined['anio_planilla'], F)
+    assert joined['anio_planilla'].name == 'planilla_entrega__anio_planilla'
 
 
 def test_parse_busqueda_omits_every_filter_when_params_are_empty():
@@ -30,6 +42,7 @@ def test_parse_busqueda_omits_every_filter_when_params_are_empty():
         'observacion': None,
         'encargado_almacen_id': None,
         'bien_nombre': None,
+        'numero_planilla': None,
         'fecha_desde': None,
         'fecha_hasta': None,
     }
@@ -50,6 +63,7 @@ def test_parse_busqueda_accepts_several_filters_together():
             'observacion': 'Entrega parcial',
             'encargado_almacen_id': '4',
             'bien_nombre': ' Frazada ',
+            'numero_planilla': '4',
         }
     )
 
@@ -65,6 +79,7 @@ def test_parse_busqueda_accepts_several_filters_together():
         'observacion': 'Entrega parcial',
         'encargado_almacen_id': 4,
         'bien_nombre': 'Frazada',
+        'numero_planilla': 4,
         'fecha_desde': date(2026, 1, 1),
         'fecha_hasta': date(2026, 3, 31),
     }
@@ -103,6 +118,7 @@ def test_parse_busqueda_accepts_several_filters_together():
             'observacion no debe superar 1000 caracteres',
         ),
         ({'bien_nombre': 'a' * 251}, 'bien_nombre no debe superar 250 caracteres'),
+        ({'numero_planilla': 'abc'}, 'numero_planilla debe ser un número entero'),
     ],
 )
 def test_parse_busqueda_rejects_invalid_filters(params, message):
@@ -115,6 +131,7 @@ def test_parse_busqueda_rejects_invalid_filters(params, message):
 def test_search_returns_every_row_when_no_filter_is_sent():
     queryset = MagicMock()
     queryset.prefetch_related.return_value = queryset
+    queryset.annotate.return_value = queryset
     queryset.order_by.return_value = 'rows'
 
     with patch('app_sgbh.services.movimiento.Movimiento') as movimiento:
@@ -130,12 +147,14 @@ def test_search_returns_every_row_when_no_filter_is_sent():
     )
     queryset.filter.assert_not_called()
     queryset.distinct.assert_not_called()
+    _assert_planilla_left_join(queryset)
     queryset.order_by.assert_called_once_with('-fecha_movimiento')
 
 
 def test_search_prefetches_one_detail_list_per_movement():
     queryset = MagicMock()
     queryset.prefetch_related.return_value = queryset
+    queryset.annotate.return_value = queryset
     queryset.order_by.return_value = 'rows'
     detalle_qs = MagicMock()
     detalle_qs.order_by.return_value = 'detalles'
@@ -162,6 +181,7 @@ def test_search_prefetches_one_detail_list_per_movement():
 def test_search_combines_filters_with_and():
     queryset = MagicMock()
     queryset.prefetch_related.return_value = queryset
+    queryset.annotate.return_value = queryset
     queryset.filter.return_value = queryset
     queryset.distinct.return_value = queryset
     queryset.order_by.return_value = 'rows'
@@ -181,6 +201,7 @@ def test_search_combines_filters_with_and():
             observacion='Entrega parcial',
             encargado_almacen_id=4,
             bien_nombre='Frazada',
+            numero_planilla=4,
         )
 
     assert result == 'rows'
@@ -212,8 +233,10 @@ def test_search_combines_filters_with_and():
             (),
             {'detalles__bien__nombre__ilike_pattern': text_like_pattern('Frazada')},
         ),
+        ((), {'numero_planilla': 4}),
     ]
     queryset.distinct.assert_called_once_with()
+    _assert_planilla_left_join(queryset)
     queryset.order_by.assert_called_once_with('-fecha_movimiento')
 
 
@@ -226,6 +249,8 @@ def test_serializer_returns_joined_columns():
         movimiento_origen_id=8,
         fecha_movimiento=timezone.make_aware(datetime(2026, 3, 1, 8, 30)),
         documento_referencia='GR-001',
+        numero_planilla=4,
+        anio_planilla=2026,
         fecha_documento=date(2026, 3, 1),
         destinatario='Municipalidad',
         observacion='Entrega parcial',
@@ -294,6 +319,8 @@ def test_serializer_returns_joined_columns():
     assert data['movimiento_id'] == 10
     assert data['movimiento_origen_id'] == 8
     assert data['documento_referencia'] == 'GR-001'
+    assert data['numero_planilla'] == 4
+    assert data['anio_planilla'] == 2026
     assert data['fecha_confirmacion'] is None
     assert data['almacen_codigo'] == 'ALM-01'
     assert data['almacen_nombre'] == 'Almacén central'
@@ -352,6 +379,7 @@ def test_get_movimientos_buscar_returns_rows():
             'documento_referencia': 'GR-001',
             'encargado_almacen_id': '4',
             'bien_nombre': 'Frazada',
+            'numero_planilla': '4',
         },
     )
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
@@ -382,6 +410,7 @@ def test_get_movimientos_buscar_returns_rows():
         observacion=None,
         encargado_almacen_id=4,
         bien_nombre='Frazada',
+        numero_planilla=4,
         fecha_desde=date(2026, 1, 1),
         fecha_hasta=date(2026, 3, 31),
     )
@@ -417,6 +446,7 @@ def test_get_movimientos_buscar_returns_every_row_without_params():
         observacion=None,
         encargado_almacen_id=None,
         bien_nombre=None,
+        numero_planilla=None,
         fecha_desde=None,
         fecha_hasta=None,
     )

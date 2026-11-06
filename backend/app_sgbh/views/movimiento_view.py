@@ -12,6 +12,7 @@ from app_sgbh.query_params import (
     parse_estado_movimiento_id,
     parse_movimiento_id,
     parse_movimiento_origen_id,
+    parse_numero_planilla,
     parse_observacion,
     parse_optional_date,
     parse_tipo_movimiento_id,
@@ -170,6 +171,7 @@ def _parse_busqueda(params):
         ('observacion', parse_observacion),
         ('encargado_almacen_id', parse_encargado_almacen_id),
         ('bien_nombre', parse_bien_nombre),
+        ('numero_planilla', parse_numero_planilla),
     )
     values = {}
     for name, parser in parsers:

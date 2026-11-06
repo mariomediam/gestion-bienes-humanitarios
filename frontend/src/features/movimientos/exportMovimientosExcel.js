@@ -6,6 +6,8 @@ const HEADER = [
   'Tipo de movimiento',
   'Fecha de movimiento',
   'Documento de referencia',
+  'Número de planilla',
+  'Año de planilla',
   'Destinatario',
   'Bienes',
 ]
@@ -44,6 +46,8 @@ function rowValues(movimiento) {
     texto(movimiento.tipo_movimiento_nombre),
     textoFecha(movimiento.fecha_movimiento),
     texto(movimiento.documento_referencia),
+    texto(movimiento.numero_planilla),
+    texto(movimiento.anio_planilla),
     texto(movimiento.destinatario),
     textoBienes(movimiento.detalles),
   ]

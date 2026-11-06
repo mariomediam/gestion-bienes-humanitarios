@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
 from django.db import IntegrityError, transaction
-from django.db.models import Prefetch, ProtectedError
+from django.db.models import F, FilteredRelation, Prefetch, ProtectedError
 from django.utils import timezone
 
 from ..db_router import DB_ALIAS
@@ -58,6 +58,7 @@ class MovimientoService:
         observacion=None,
         encargado_almacen_id=None,
         bien_nombre=None,
+        numero_planilla=None,
     ):
         """Return S43alm_movimientos rows using optional filters combined with AND.
 
@@ -69,16 +70,28 @@ class MovimientoService:
         case-insensitive partial match. bien_nombre matches
         S43cat_bah_bienes.nombre of a detail line. The movement is included
         when at least one line matches, and detalles still lists every line.
-        The other filters are exact. Ordered by fecha_movimiento descending.
-        With no filters, every row is returned. The queryset is ready for
+        The query also left joins S43bah_planilla_entrega on movimiento_id =
+        movimiento_almacen_id. numero_planilla and anio_planilla come from that
+        join and are null when the movement has no planilla. The
+        numero_planilla filter is exact on that same join. The other filters
+        are exact. Ordered by fecha_movimiento descending. With no filters,
+        every row is returned. The queryset is ready for
         MovimientoBusquedaSerializer.
         """
-        queryset = Movimiento.objects.select_related(
-            'almacen',
-            'tipo_movimiento',
-            'estado_movimiento',
-            'encargado_almacen',
-        ).prefetch_related(Prefetch('detalles', queryset=_detalles_busqueda()))
+        queryset = (
+            Movimiento.objects.select_related(
+                'almacen',
+                'tipo_movimiento',
+                'estado_movimiento',
+                'encargado_almacen',
+            )
+            .prefetch_related(Prefetch('detalles', queryset=_detalles_busqueda()))
+            .annotate(
+                planilla_entrega=FilteredRelation('planillas_entrega'),
+                numero_planilla=F('planilla_entrega__numero_planilla'),
+                anio_planilla=F('planilla_entrega__anio_planilla'),
+            )
+        )
         if movimiento_id is not None:
             queryset = queryset.filter(movimiento_id=movimiento_id)
         if almacen_id is not None:
@@ -116,6 +129,8 @@ class MovimientoService:
                 bien_nombre,
             )
             queryset = queryset.distinct()
+        if numero_planilla is not None:
+            queryset = queryset.filter(numero_planilla=numero_planilla)
 
         return queryset.order_by('-fecha_movimiento')
 
