@@ -43,6 +43,7 @@ def test_parse_busqueda_omits_every_filter_when_params_are_empty():
         'encargado_almacen_id': None,
         'bien_nombre': None,
         'numero_planilla': None,
+        'naturaleza': None,
         'fecha_desde': None,
         'fecha_hasta': None,
     }
@@ -64,6 +65,7 @@ def test_parse_busqueda_accepts_several_filters_together():
             'encargado_almacen_id': '4',
             'bien_nombre': ' Frazada ',
             'numero_planilla': '4',
+            'naturaleza': 's',
         }
     )
 
@@ -80,6 +82,7 @@ def test_parse_busqueda_accepts_several_filters_together():
         'encargado_almacen_id': 4,
         'bien_nombre': 'Frazada',
         'numero_planilla': 4,
+        'naturaleza': 'S',
         'fecha_desde': date(2026, 1, 1),
         'fecha_hasta': date(2026, 3, 31),
     }
@@ -119,6 +122,7 @@ def test_parse_busqueda_accepts_several_filters_together():
         ),
         ({'bien_nombre': 'a' * 251}, 'bien_nombre no debe superar 250 caracteres'),
         ({'numero_planilla': 'abc'}, 'numero_planilla debe ser un número entero'),
+        ({'naturaleza': 'X'}, 'El filtro naturaleza debe ser E, S o M'),
     ],
 )
 def test_parse_busqueda_rejects_invalid_filters(params, message):
@@ -202,6 +206,7 @@ def test_search_combines_filters_with_and():
             encargado_almacen_id=4,
             bien_nombre='Frazada',
             numero_planilla=4,
+            naturaleza='S',
         )
 
     assert result == 'rows'
@@ -234,6 +239,7 @@ def test_search_combines_filters_with_and():
             {'detalles__bien__nombre__ilike_pattern': text_like_pattern('Frazada')},
         ),
         ((), {'numero_planilla': 4}),
+        ((), {'tipo_movimiento__naturaleza': 'S'}),
     ]
     queryset.distinct.assert_called_once_with()
     _assert_planilla_left_join(queryset)
@@ -380,6 +386,7 @@ def test_get_movimientos_buscar_returns_rows():
             'encargado_almacen_id': '4',
             'bien_nombre': 'Frazada',
             'numero_planilla': '4',
+            'naturaleza': 'S',
         },
     )
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
@@ -411,6 +418,7 @@ def test_get_movimientos_buscar_returns_rows():
         encargado_almacen_id=4,
         bien_nombre='Frazada',
         numero_planilla=4,
+        naturaleza='S',
         fecha_desde=date(2026, 1, 1),
         fecha_hasta=date(2026, 3, 31),
     )
@@ -447,6 +455,7 @@ def test_get_movimientos_buscar_returns_every_row_without_params():
         encargado_almacen_id=None,
         bien_nombre=None,
         numero_planilla=None,
+        naturaleza=None,
         fecha_desde=None,
         fecha_hasta=None,
     )

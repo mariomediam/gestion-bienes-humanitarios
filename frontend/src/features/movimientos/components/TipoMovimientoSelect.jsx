@@ -15,6 +15,7 @@ export default function TipoMovimientoSelect({
   onChange,
   disabled,
   excluirIds = [],
+  naturaleza,
 }) {
   const [tipos, setTipos] = useState([])
   const [loading, setLoading] = useState(true)
@@ -23,9 +24,13 @@ export default function TipoMovimientoSelect({
 
   useEffect(() => {
     let active = true
+    const params = {}
+    if (naturaleza) {
+      params.naturaleza = naturaleza
+    }
 
     sgbhApi
-      .getTiposMovimiento()
+      .getTiposMovimiento(params)
       .then((rows) => {
         if (active) {
           setTipos(rows)
@@ -45,7 +50,7 @@ export default function TipoMovimientoSelect({
     return () => {
       active = false
     }
-  }, [])
+  }, [naturaleza])
 
   return (
     <select

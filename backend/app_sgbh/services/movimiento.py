@@ -59,6 +59,7 @@ class MovimientoService:
         encargado_almacen_id=None,
         bien_nombre=None,
         numero_planilla=None,
+        naturaleza=None,
     ):
         """Return S43alm_movimientos rows using optional filters combined with AND.
 
@@ -73,8 +74,9 @@ class MovimientoService:
         The query also left joins S43bah_planilla_entrega on movimiento_id =
         movimiento_almacen_id. numero_planilla and anio_planilla come from that
         join and are null when the movement has no planilla. The
-        numero_planilla filter is exact on that same join. The other filters
-        are exact. Ordered by fecha_movimiento descending. With no filters,
+        numero_planilla filter is exact on that same join. naturaleza matches
+        S43cat_alm_tipos_movimiento.naturaleza. The other filters are exact.
+        Ordered by fecha_movimiento descending. With no filters,
         every row is returned. The queryset is ready for
         MovimientoBusquedaSerializer.
         """
@@ -131,6 +133,9 @@ class MovimientoService:
             queryset = queryset.distinct()
         if numero_planilla is not None:
             queryset = queryset.filter(numero_planilla=numero_planilla)
+
+        if naturaleza is not None:
+            queryset = queryset.filter(tipo_movimiento__naturaleza=naturaleza)
 
         return queryset.order_by('-fecha_movimiento')
 
