@@ -18,10 +18,14 @@ class MovimientoDevolucionService:
         estado_movimiento_id=None,
         movimiento_origen_id=None,
         fecha_movimiento=None,
+        fecha_desde=None,
+        fecha_hasta=None,
         documento_referencia=None,
         fecha_documento_desde=None,
         fecha_documento_hasta=None,
         documento_origen_referencia=None,
+        numero_planilla=None,
+        bien_nombre=None,
     ):
         """Return S43alm_movimientos rows whose type code is DEVOLUCION.
 
@@ -37,14 +41,20 @@ class MovimientoDevolucionService:
         joined with +, so the expression stays valid on SQL Server 2008 R2.
 
         Every filter is optional and combined with AND. movimiento_id,
-        almacen_id, estado_movimiento_id and movimiento_origen_id are exact.
-        fecha_movimiento matches that calendar day, because the column stores
-        date and time. fecha_documento_desde and fecha_documento_hasta bound
-        fecha_documento, inclusive. documento_referencia and
-        documento_origen_referencia use a case-insensitive partial match.
-        With no filters, every DEVOLUCION row is returned. Ordered by
-        fecha_movimiento descending and movimiento_detalle_id. The queryset
-        is ready for MovimientoDevolucionBusquedaSerializer.
+        almacen_id, estado_movimiento_id, movimiento_origen_id and
+        numero_planilla are exact. numero_planilla matches the origin
+        planilla. fecha_movimiento matches that calendar day, because the
+        column stores date and time. fecha_desde and fecha_hasta bound
+        fecha_movimiento by calendar day, inclusive, and they also combine
+        with fecha_movimiento when that filter is set. fecha_documento_desde
+        and fecha_documento_hasta bound fecha_documento, inclusive.
+        documento_referencia, documento_origen_referencia and bien_nombre
+        use a case-insensitive partial match. bien_nombre matches
+        S43cat_bah_bienes.nombre. The movement stays in the result when at
+        least one line matches, and every detail line of that movement is
+        still returned. With no filters, every DEVOLUCION row is returned.
+        Ordered by fecha_movimiento descending and movimiento_detalle_id.
+        The queryset is ready for MovimientoDevolucionBusquedaSerializer.
         """
         queryset = (
             Movimiento.objects.filter(tipo_movimiento__codigo=_CODIGO_DEVOLUCION)
@@ -66,6 +76,14 @@ class MovimientoDevolucionService:
                     fecha_movimiento + timedelta(days=1)
                 ),
             )
+        if fecha_desde is not None:
+            queryset = queryset.filter(
+                fecha_movimiento__gte=_inicio_de_dia(fecha_desde)
+            )
+        if fecha_hasta is not None:
+            queryset = queryset.filter(
+                fecha_movimiento__lt=_inicio_de_dia(fecha_hasta + timedelta(days=1))
+            )
         if documento_referencia is not None:
             queryset = filter_text_like(
                 queryset,
@@ -81,6 +99,17 @@ class MovimientoDevolucionService:
                 queryset,
                 'documento_origen_referencia',
                 documento_origen_referencia,
+            )
+        if numero_planilla is not None:
+            queryset = queryset.filter(movimiento_origen__planillas_entrega__numero_planilla=numero_planilla)
+        if bien_nombre is not None:
+            coincidencias = filter_text_like(
+                Movimiento.objects.filter(tipo_movimiento__codigo=_CODIGO_DEVOLUCION),
+                'detalles__bien__nombre',
+                bien_nombre,
+            )
+            queryset = queryset.filter(
+                movimiento_id__in=coincidencias.values('movimiento_id')
             )
 
         return queryset.order_by(

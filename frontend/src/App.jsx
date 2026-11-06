@@ -12,6 +12,7 @@ import BienesPage from '@features/bienes/pages/BienesPage'
 import PersonasPage from '@features/personas/pages/PersonasPage'
 import Formularios2ACargaPage from '@features/formularios2a/pages/Formularios2ACargaPage'
 import Formularios2APage from '@features/formularios2a/pages/Formularios2APage'
+import DevolucionesPage from '@features/devoluciones/pages/DevolucionesPage'
 import MovimientoFormPage from '@features/movimientos/pages/MovimientoFormPage'
 import MovimientoVerPage from '@features/movimientos/pages/MovimientoVerPage'
 import MovimientosPage from '@features/movimientos/pages/MovimientosPage'
@@ -99,6 +100,7 @@ function App() {
           <Route path="alm-movimientos/:movimientoId/editar" element={<MovimientoFormPage />} />
           <Route path="alm-movimientos/:movimientoId/ver" element={<MovimientoVerPage />} />
           <Route path="alm-movimientos" element={<MovimientosPage />} />
+          <Route path="alm-devolucion" element={<DevolucionesPage />} />
           <Route path="alm-planilla-bah/nuevo/:formulario2aId" element={<PlanillaBahFormPage />} />
           <Route path="alm-planilla-bah/:movimientoId/editar" element={<PlanillaBahFormPage />} />
           <Route path="alm-planilla-bah/:planillaEntregaId/reporte" element={<PlanillaBahReportePage />} />

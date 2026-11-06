@@ -206,6 +206,11 @@ export const sgbhApi = {
     return response.data
   },
 
+  buscarDevoluciones: async (params) => {
+    const response = await api.get('/api/sgbh/movimientos/buscar-devoluciones/', { params })
+    return response.data
+  },
+
   buscarPlanillasBah: async (params) => {
     const response = await api.get('/api/sgbh/movimientos/buscar-planilla-bah/', { params })
     return response.data

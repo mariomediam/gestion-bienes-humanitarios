@@ -35,9 +35,13 @@ def test_parse_busqueda_omits_every_filter_when_params_are_empty():
         'movimiento_origen_id': None,
         'documento_referencia': None,
         'documento_origen_referencia': None,
+        'numero_planilla': None,
+        'bien_nombre': None,
         'fecha_movimiento': None,
         'fecha_documento_desde': None,
         'fecha_documento_hasta': None,
+        'fecha_desde': None,
+        'fecha_hasta': None,
     }
 
 
@@ -53,6 +57,10 @@ def test_parse_busqueda_accepts_several_filters_together():
             'fecha_documento_desde': '2026-01-01',
             'fecha_documento_hasta': '2026-03-31',
             'documento_origen_referencia': ' 4-2026 ',
+            'numero_planilla': '4',
+            'bien_nombre': ' Frazada ',
+            'fecha_desde': '2026-01-01',
+            'fecha_hasta': '2026-03-31',
         }
     )
 
@@ -64,9 +72,13 @@ def test_parse_busqueda_accepts_several_filters_together():
         'movimiento_origen_id': 8,
         'documento_referencia': 'GR-010',
         'documento_origen_referencia': '4-2026',
+        'numero_planilla': 4,
+        'bien_nombre': 'Frazada',
         'fecha_movimiento': date(2026, 3, 2),
         'fecha_documento_desde': date(2026, 1, 1),
         'fecha_documento_hasta': date(2026, 3, 31),
+        'fecha_desde': date(2026, 1, 1),
+        'fecha_hasta': date(2026, 3, 31),
     }
 
 
@@ -103,6 +115,10 @@ def test_parse_busqueda_accepts_several_filters_together():
             {'documento_origen_referencia': 'a' * 101},
             'documento_origen_referencia no debe superar 100 caracteres',
         ),
+        ({'numero_planilla': 'abc'}, 'numero_planilla debe ser un número entero'),
+        ({'bien_nombre': 'a' * 251}, 'bien_nombre no debe superar 250 caracteres'),
+        ({'fecha_desde': '01-03-2026'}, 'fecha_desde debe tener el formato AAAA-MM-DD'),
+        ({'fecha_hasta': '31/03/2026'}, 'fecha_hasta debe tener el formato AAAA-MM-DD'),
     ],
 )
 def test_parse_busqueda_rejects_invalid_filters(params, message):
@@ -242,6 +258,58 @@ def test_search_combines_filters_with_and():
             },
         ),
     ]
+
+
+def test_search_bounds_fecha_movimiento_and_numero_planilla():
+    queryset = _queryset()
+    desde = date(2026, 1, 1)
+    hasta = date(2026, 3, 31)
+
+    with patch('app_sgbh.services.movimiento_devolucion.Movimiento') as movimiento:
+        movimiento.objects.filter.return_value = queryset
+        result = MovimientoDevolucionService.search(
+            fecha_desde=desde,
+            fecha_hasta=hasta,
+            numero_planilla=4,
+        )
+
+    assert result == 'rows'
+    assert queryset.filter.call_args_list == [
+        ((), {'fecha_movimiento__gte': _inicio_de_dia(desde)}),
+        (
+            (),
+            {
+                'fecha_movimiento__lt': _inicio_de_dia(hasta + timedelta(days=1)),
+            },
+        ),
+        (
+            (),
+            {'movimiento_origen__planillas_entrega__numero_planilla': 4},
+        ),
+    ]
+
+
+def test_search_keeps_every_detail_when_bien_nombre_matches():
+    queryset = _queryset()
+    coincidencias = MagicMock()
+    lineas = MagicMock()
+    lineas.values.return_value = 'ids'
+    coincidencias.filter.return_value = lineas
+
+    with patch('app_sgbh.services.movimiento_devolucion.Movimiento') as movimiento:
+        movimiento.objects.filter.side_effect = [queryset, coincidencias]
+        result = MovimientoDevolucionService.search(bien_nombre='Frazada')
+
+    assert result == 'rows'
+    assert movimiento.objects.filter.call_args_list == [
+        ((), {'tipo_movimiento__codigo': 'DEVOLUCION'}),
+        ((), {'tipo_movimiento__codigo': 'DEVOLUCION'}),
+    ]
+    coincidencias.filter.assert_called_once_with(
+        detalles__bien__nombre__ilike_pattern=text_like_pattern('Frazada'),
+    )
+    lineas.values.assert_called_once_with('movimiento_id')
+    queryset.filter.assert_called_once_with(movimiento_id__in='ids')
 
 
 def _devolucion():
@@ -385,6 +453,10 @@ def test_get_movimientos_buscar_devoluciones_returns_rows():
             'fecha_documento_desde': '2026-01-01',
             'fecha_documento_hasta': '2026-03-31',
             'documento_origen_referencia': '4-2026',
+            'numero_planilla': '4',
+            'bien_nombre': 'Frazada',
+            'fecha_desde': '2026-01-01',
+            'fecha_hasta': '2026-03-31',
         },
     )
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
@@ -411,9 +483,13 @@ def test_get_movimientos_buscar_devoluciones_returns_rows():
         movimiento_origen_id=8,
         documento_referencia='DEV-010',
         documento_origen_referencia='4-2026',
+        numero_planilla=4,
+        bien_nombre='Frazada',
         fecha_movimiento=date(2026, 3, 2),
         fecha_documento_desde=date(2026, 1, 1),
         fecha_documento_hasta=date(2026, 3, 31),
+        fecha_desde=date(2026, 1, 1),
+        fecha_hasta=date(2026, 3, 31),
     )
     serializer_cls.assert_called_once_with('queryset', many=True)
 
@@ -443,9 +519,30 @@ def test_get_movimientos_buscar_devoluciones_returns_every_row_without_params():
         movimiento_origen_id=None,
         documento_referencia=None,
         documento_origen_referencia=None,
+        numero_planilla=None,
+        bien_nombre=None,
         fecha_movimiento=None,
         fecha_documento_desde=None,
         fecha_documento_hasta=None,
+        fecha_desde=None,
+        fecha_hasta=None,
+    )
+
+
+def test_get_movimientos_buscar_devoluciones_rejects_inverted_fecha_movimiento():
+    factory = APIRequestFactory()
+    request = factory.get(
+        '/api/sgbh/movimientos/buscar-devoluciones/',
+        {'fecha_desde': '2026-04-01', 'fecha_hasta': '2026-03-01'},
+    )
+    force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
+
+    response = MovimientoDevolucionBuscarView.as_view()(request)
+
+    assert response.status_code == 400
+    assert (
+        response.data['error']
+        == 'El filtro fecha_desde no puede ser posterior a fecha_hasta'
     )
 
 
