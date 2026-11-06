@@ -14,7 +14,7 @@ class MovimientoCantidadesSalidaService:
         """Return salida quantities and the entradas posted against them.
 
         One row per S43alm_movimiento_detalle line of movimiento_id when
-        S43cat_alm_tipos_movimiento.naturaleza is S. cantidad_salida is
+        S43cat_alm_tipos_movimiento.naturaleza is S. cantidad_origen is
         ABS(cantidad) of that line. cantidad_entrada is the sum of
         ABS(cantidad) of detail lines whose movement has naturaleza E and
         movimiento_origen_id equal to movimiento_id, grouped by bien_id.
@@ -40,7 +40,7 @@ class MovimientoCantidadesSalidaService:
                 movimiento__tipo_movimiento__naturaleza='S',
             )
             .annotate(
-                cantidad_salida=Abs('cantidad'),
+                cantidad_origen=Abs('cantidad'),
                 cantidad_entrada=Coalesce(
                     Subquery(cantidad_entrada, output_field=_CANTIDAD),
                     Value(Decimal('0')),
@@ -53,7 +53,7 @@ class MovimientoCantidadesSalidaService:
                 'bien_id',
                 'bien_nombre',
                 'abreviatura_nombre',
-                'cantidad_salida',
+                'cantidad_origen',
                 'cantidad_entrada',
             )
         )

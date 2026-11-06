@@ -13,7 +13,7 @@ from app_sgbh.services.movimiento_cantidades_salida import (
 _MOVIMIENTO_ID_MAX = 2147483647
 
 
-class MovimientoCantidadesSalidaView(APIView):
+class MovimientoCantidadesPorDevolverView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, movimiento_id):

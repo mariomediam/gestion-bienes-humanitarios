@@ -63,7 +63,7 @@ from .views import (
     TipoDocumentoListView,
     TipoMedioVidaListView,
     MovimientoBuscarView,
-    MovimientoCantidadesSalidaView,
+    MovimientoCantidadesPorDevolverView,
     MovimientoCreateView,
     MovimientoDetailView,
     MovimientoDevolucionBuscarView,
@@ -198,9 +198,9 @@ urlpatterns = [
         name='movimientos-detalle',
     ),
     path(
-        'movimientos/<int:movimiento_id>/cantidades-salida/',
-        MovimientoCantidadesSalidaView.as_view(),
-        name='movimientos-cantidades-salida',
+        'movimientos/<int:movimiento_id>/cantidades-por-devolver/',
+        MovimientoCantidadesPorDevolverView.as_view(),
+        name='movimientos-cantidades-por-devolver',
     ),
     path(
         'movimientos/buscar/',

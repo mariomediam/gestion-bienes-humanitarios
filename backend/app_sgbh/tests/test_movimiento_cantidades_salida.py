@@ -15,7 +15,7 @@ from app_sgbh.services.movimiento_cantidades_salida import (
     MovimientoCantidadesSalidaService,
 )
 from app_sgbh.views.movimiento_cantidades_salida_view import (
-    MovimientoCantidadesSalidaView,
+    MovimientoCantidadesPorDevolverView,
 )
 
 
@@ -35,9 +35,9 @@ def test_list_keeps_each_salida_line_and_sums_entradas_by_bien():
 
     assert ('movimiento_id', 159) in _lookup_pairs(query.where)
     assert ('naturaleza', 'S') in _lookup_pairs(query.where)
-    assert isinstance(query.annotations['cantidad_salida'], Abs)
+    assert isinstance(query.annotations['cantidad_origen'], Abs)
     assert (
-        query.annotations['cantidad_salida'].source_expressions[0].target.column
+        query.annotations['cantidad_origen'].source_expressions[0].target.column
         == 'cantidad'
     )
 
@@ -58,7 +58,7 @@ def test_list_keeps_each_salida_line_and_sums_entradas_by_bien():
         'bien_id',
         'bien_nombre',
         'abreviatura_nombre',
-        'cantidad_salida',
+        'cantidad_origen',
         'cantidad_entrada',
     )
 
@@ -69,7 +69,7 @@ def test_serializer_returns_salida_and_entrada_columns():
             'bien_id': 7,
             'bien_nombre': 'Motobomba',
             'abreviatura_nombre': 'UND',
-            'cantidad_salida': Decimal('2.000000'),
+            'cantidad_origen': Decimal('2.000000'),
             'cantidad_entrada': Decimal('1.000000'),
         }
     ).data
@@ -78,7 +78,7 @@ def test_serializer_returns_salida_and_entrada_columns():
         'bien_id': 7,
         'bien_nombre': 'Motobomba',
         'abreviatura_nombre': 'UND',
-        'cantidad_salida': '2.000000',
+        'cantidad_origen': '2.000000',
         'cantidad_entrada': '1.000000',
     }
 
@@ -89,7 +89,7 @@ def test_serializer_returns_null_abreviatura_and_zero_entrada():
             'bien_id': 7,
             'bien_nombre': 'Motobomba',
             'abreviatura_nombre': None,
-            'cantidad_salida': Decimal('2.000000'),
+            'cantidad_origen': Decimal('2.000000'),
             'cantidad_entrada': Decimal('0'),
         }
     ).data
@@ -101,7 +101,7 @@ def test_serializer_returns_null_abreviatura_and_zero_entrada():
 def test_url_resolves_cantidades_salida():
     match = resolve('/api/sgbh/movimientos/159/cantidades-salida/')
 
-    assert match.func.view_class is MovimientoCantidadesSalidaView
+    assert match.func.view_class is MovimientoCantidadesPorDevolverView
     assert match.kwargs == {'movimiento_id': 159}
 
 
@@ -121,7 +121,7 @@ def test_get_returns_rows():
         ) as serializer_cls,
     ):
         serializer_cls.return_value.data = rows
-        response = MovimientoCantidadesSalidaView.as_view()(request, movimiento_id=159)
+        response = MovimientoCantidadesPorDevolverView.as_view()(request, movimiento_id=159)
 
     assert response.status_code == 200
     assert response.data == rows
@@ -134,7 +134,7 @@ def test_get_rejects_movimiento_id_out_of_range():
     request = factory.get('/api/sgbh/movimientos/0/cantidades-salida/')
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
 
-    response = MovimientoCantidadesSalidaView.as_view()(request, movimiento_id=0)
+    response = MovimientoCantidadesPorDevolverView.as_view()(request, movimiento_id=0)
 
     assert response.status_code == 400
     assert response.data['error'] == 'El campo movimiento_id debe ser un número entero'
@@ -149,7 +149,7 @@ def test_get_returns_500_when_the_query_fails():
         'app_sgbh.views.movimiento_cantidades_salida_view.MovimientoCantidadesSalidaService.list',
         side_effect=Exception('db'),
     ):
-        response = MovimientoCantidadesSalidaView.as_view()(request, movimiento_id=159)
+        response = MovimientoCantidadesPorDevolverView.as_view()(request, movimiento_id=159)
 
     assert response.status_code == 500
     assert (
