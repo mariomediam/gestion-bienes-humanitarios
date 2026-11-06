@@ -14,6 +14,7 @@ const useDevolucionesBusquedaStore = create((set) => ({
   searched: false,
   devoluciones: [],
   actualizarAlRegresar: false,
+  devolucionCreadaId: null,
 
   setBienNombre: (bienNombre) => set({ bienNombre }),
 
@@ -36,6 +37,17 @@ const useDevolucionesBusquedaStore = create((set) => ({
 
   solicitarActualizacion: () => set({ actualizarAlRegresar: true }),
 
+  prepararDevolucionCreada: (movimientoId) =>
+    set({
+      bienNombre: '',
+      filtros: { ...EMPTY_FILTROS_DEVOLUCION },
+      avanzadaAbierta: false,
+      searched: true,
+      devoluciones: [],
+      actualizarAlRegresar: false,
+      devolucionCreadaId: movimientoId,
+    }),
+
   limpiar: () =>
     set({
       bienNombre: '',
@@ -44,6 +56,7 @@ const useDevolucionesBusquedaStore = create((set) => ({
       searched: false,
       devoluciones: [],
       actualizarAlRegresar: false,
+      devolucionCreadaId: null,
     }),
 }));
 

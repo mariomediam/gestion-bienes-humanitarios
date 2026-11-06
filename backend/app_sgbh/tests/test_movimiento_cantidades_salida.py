@@ -99,7 +99,7 @@ def test_serializer_returns_null_abreviatura_and_zero_entrada():
 
 
 def test_url_resolves_cantidades_salida():
-    match = resolve('/api/sgbh/movimientos/159/cantidades-salida/')
+    match = resolve('/api/sgbh/movimientos/159/cantidades-por-devolver/')
 
     assert match.func.view_class is MovimientoCantidadesPorDevolverView
     assert match.kwargs == {'movimiento_id': 159}
@@ -107,7 +107,7 @@ def test_url_resolves_cantidades_salida():
 
 def test_get_returns_rows():
     factory = APIRequestFactory()
-    request = factory.get('/api/sgbh/movimientos/159/cantidades-salida/')
+    request = factory.get('/api/sgbh/movimientos/159/cantidades-por-devolver/')
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
     rows = [{'bien_id': 7}]
 
@@ -131,7 +131,7 @@ def test_get_returns_rows():
 
 def test_get_rejects_movimiento_id_out_of_range():
     factory = APIRequestFactory()
-    request = factory.get('/api/sgbh/movimientos/0/cantidades-salida/')
+    request = factory.get('/api/sgbh/movimientos/0/cantidades-por-devolver/')
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
 
     response = MovimientoCantidadesPorDevolverView.as_view()(request, movimiento_id=0)
@@ -142,7 +142,7 @@ def test_get_rejects_movimiento_id_out_of_range():
 
 def test_get_returns_500_when_the_query_fails():
     factory = APIRequestFactory()
-    request = factory.get('/api/sgbh/movimientos/159/cantidades-salida/')
+    request = factory.get('/api/sgbh/movimientos/159/cantidades-por-devolver/')
     force_authenticate(request, user=ExternalUser(login='mmedina', nombre='Mario'))
 
     with patch(

@@ -92,7 +92,7 @@ export default function DevolucionesResultados({ devoluciones, onModificar, onEl
                     {formatFechaMovimiento(devolucion.fecha_movimiento)}
                   </td>
                   <td className="px-5 py-3 text-gray-800">
-                    {texto(devolucion.documento_origen_referencia)}
+                    {texto(`${devolucion.tipo_movimiento_origen_nombre} ${devolucion.documento_origen_referencia}`)}
                   </td>
                   <td className="px-5 py-3 text-gray-800">{texto(devolucion.documento_referencia)}</td>
                   <td className="px-5 py-3 text-gray-800">
@@ -104,7 +104,8 @@ export default function DevolucionesResultados({ devoluciones, onModificar, onEl
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
                     <div className="flex gap-2">
                       <Link
-                        to={`/alm-devolucion/${devolucion.movimiento_id}/ver`}
+                        to={`/alm-movimientos/${devolucion.movimiento_id}/ver`}
+                        state={{ volverA: '/alm-devolucion' }}
                         aria-label="Ver"
                         className={actionButtonClassName}
                       >

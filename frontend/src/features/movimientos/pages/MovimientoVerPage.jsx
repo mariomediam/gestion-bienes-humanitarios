@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { sgbhApi } from '@api/sgbhApi'
 import EncargadoAlmacenSelect from '@features/movimientos/components/EncargadoAlmacenSelect'
@@ -88,6 +88,8 @@ function formularioDesdeMovimiento(movimiento, siguienteKey) {
 export default function MovimientoVerPage() {
   const { movimientoId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const volverA = location.state?.volverA || '/alm-movimientos'
   const lineaId = useRef(0)
   const [form, setForm] = useState(EMPTY_FORM)
   const [lineas, setLineas] = useState([])
@@ -106,7 +108,7 @@ export default function MovimientoVerPage() {
         if (!movimiento) {
           salir = true
           toast.error('El movimiento de almacén indicado no existe')
-          navigate('/alm-movimientos')
+          navigate(volverA)
           return
         }
         const cargado = formularioDesdeMovimiento(movimiento, () => {
@@ -120,7 +122,7 @@ export default function MovimientoVerPage() {
         if (!active) return
         salir = true
         toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de movimientos de almacén'))
-        navigate('/alm-movimientos')
+        navigate(volverA)
       })
       .finally(() => {
         if (active && !salir) {
@@ -131,13 +133,13 @@ export default function MovimientoVerPage() {
     return () => {
       active = false
     }
-  }, [movimientoId, navigate])
+  }, [movimientoId, navigate, volverA])
 
   if (cargandoMovimiento) {
     return (
       <div className="space-y-6">
         <Link
-          to="/alm-movimientos"
+          to={volverA}
           className="inline-flex text-sm font-medium text-[#1e3064] hover:underline focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 rounded-sm"
         >
           Volver al listado
@@ -150,7 +152,7 @@ export default function MovimientoVerPage() {
   return (
     <div className="space-y-6">
       <Link
-        to="/alm-movimientos"
+        to={volverA}
         className="inline-flex text-sm font-medium text-[#1e3064] hover:underline focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 rounded-sm"
       >
         Volver al listado
@@ -276,7 +278,7 @@ export default function MovimientoVerPage() {
 
         <div>
           <Link
-            to="/alm-movimientos"
+            to={volverA}
             className="inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-[#1e3064] bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e3064] focus:ring-offset-2 transition-colors"
           >
             Volver al listado

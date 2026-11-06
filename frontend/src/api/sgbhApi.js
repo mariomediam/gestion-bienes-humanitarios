@@ -206,6 +206,13 @@ export const sgbhApi = {
     return response.data
   },
 
+  getCantidadesPorDevolver: async (movimientoId) => {
+    const response = await api.get(
+      `/api/sgbh/movimientos/${movimientoId}/cantidades-por-devolver/`,
+    )
+    return response.data
+  },
+
   buscarDevoluciones: async (params) => {
     const response = await api.get('/api/sgbh/movimientos/buscar-devoluciones/', { params })
     return response.data

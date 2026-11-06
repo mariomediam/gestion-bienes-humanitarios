@@ -9,6 +9,19 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error || fallback
 }
 
+export async function mostrarDevolucionRecienCreada(movimientoId) {
+  const { prepararDevolucionCreada, setResultados } = useDevolucionesBusquedaStore.getState()
+  prepararDevolucionCreada(movimientoId)
+
+  try {
+    const rows = await sgbhApi.buscarDevoluciones({ movimiento_id: movimientoId })
+    setResultados(agruparDevoluciones(rows))
+    useDevolucionesBusquedaStore.setState({ devolucionCreadaId: null })
+  } catch (error) {
+    toast.error(getErrorMessage(error, 'No se pudo obtener la búsqueda de devoluciones'))
+  }
+}
+
 export default function useDevolucionesBusqueda() {
   const [loading, setLoading] = useState(false)
   const bienNombre = useDevolucionesBusquedaStore((state) => state.bienNombre)
@@ -41,7 +54,13 @@ export default function useDevolucionesBusqueda() {
   }
 
   useEffect(() => {
-    const { searched: yaBuscado, actualizarAlRegresar } = useDevolucionesBusquedaStore.getState()
+    const { devolucionCreadaId, searched: yaBuscado, actualizarAlRegresar } =
+      useDevolucionesBusquedaStore.getState()
+
+    if (devolucionCreadaId) {
+      mostrarDevolucionRecienCreada(devolucionCreadaId)
+      return
+    }
 
     if (!yaBuscado || !actualizarAlRegresar) return
 
