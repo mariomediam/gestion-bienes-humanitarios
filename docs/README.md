@@ -11,5 +11,6 @@ Este directorio contiene el contexto funcional y técnico del módulo S43 del si
 - `04-reglas-negocio-almacen.md`: reglas del módulo de almacén.
 - `05-integracion-modulos.md`: interacción EDAN → BAH → almacén.
 - `06-decisiones-no-definidas.md`: decisiones que Cursor no debe asumir.
+- `07-archivo-json-carga-formularios-2a.md`: formato del JSON que genera el sistema móvil para cargar Formularios EDAN 2A.
 
 El esquema exacto de base de datos está en `../database/schema-SIAC-S43.sql`.
