@@ -18,6 +18,10 @@ const actionTooltipClassName =
 const deleteTooltipClassName =
   'pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-red-600 px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'
 
+const TIPO_MOVIMIENTO_DEVOLUCION_ID = 5
+const TIPO_MOVIMIENTO_ENTREGA_BAH_ID = 7
+const TIPO_MOVIMIENTO_EXCLUIDOS = [TIPO_MOVIMIENTO_DEVOLUCION_ID, TIPO_MOVIMIENTO_ENTREGA_BAH_ID]
+
 function texto(value) {
   if (value === null || value === undefined || value === '') {
     return '—'
@@ -88,7 +92,7 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
                 </td>
               </tr>
             ) : (
-              movimientos.filter((movimiento) => movimiento.tipo_movimiento_codigo !== "ENTREGA_BAH").map((movimiento) => (
+              movimientos.filter((movimiento) => !TIPO_MOVIMIENTO_EXCLUIDOS.includes(movimiento.tipo_movimiento_id)).map((movimiento) => (
                 <tr key={movimiento.movimiento_id} className="border-t border-gray-100 align-top">
                   <td className="px-5 py-3 text-gray-800">{texto(movimiento.tipo_movimiento_nombre)}</td>
                   <td className="px-5 py-3 text-gray-800 whitespace-nowrap">

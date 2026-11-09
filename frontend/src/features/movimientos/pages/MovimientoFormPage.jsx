@@ -10,6 +10,7 @@ import TipoMovimientoSelect from '@features/movimientos/components/TipoMovimient
 const ALMACEN_CENTRAL_ID = 1
 const ESTADO_MOVIMIENTO_CONFIRMADO_ID = 2
 const TIPO_MOVIMIENTO_ENTREGA_BAH_ID = 7
+const TIPO_MOVIMIENTO_DEVOLUCION_ID = 5
 
 const EMPTY_FORM = {
   tipo_movimiento_id: '',
@@ -406,7 +407,7 @@ export default function MovimientoFormPage() {
                 value={form.tipo_movimiento_id}
                 onChange={handleTipoChange}
                 disabled={loading}
-                excluirIds={[TIPO_MOVIMIENTO_ENTREGA_BAH_ID]}
+                excluirIds={[TIPO_MOVIMIENTO_ENTREGA_BAH_ID, TIPO_MOVIMIENTO_DEVOLUCION_ID]}
               />
               {errores.tipo_movimiento_id && (
                 <p className="mt-1 text-xs text-red-600">{errores.tipo_movimiento_id}</p>
