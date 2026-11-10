@@ -94,7 +94,7 @@ class MovimientoDetalle(models.Model):
         ]
 
     def __str__(self):
-        return str(self.movimiento_detalle_id)
+        return f'Movimiento id: {self.movimiento.movimiento_id} - Movimiento detalle id: {self.movimiento_detalle_id} - Bien id: {self.bien.bien_id} - Bien nombre: {self.bien.nombre}'
 
 
 class Movimiento(models.Model):
@@ -165,7 +165,7 @@ class Movimiento(models.Model):
         ]
 
     def __str__(self):
-        return str(self.movimiento_id)
+        return f'Movimiento id: {self.movimiento_id} - Tipo de movimiento id: {self.tipo_movimiento_id} - Fecha de movimiento: {self.fecha_movimiento} - Documento de referencia: {self.documento_referencia} - Almacen id: {self.almacen_id}'
 
 
 class AlmacenStockActual(models.Model):
@@ -383,7 +383,7 @@ class PlanillaEntrega(models.Model):
         verbose_name_plural = 'Planillas de entrega'
 
     def __str__(self):
-        return f'{self.numero_planilla}-{self.anio_planilla}'
+        return f'Planilla id: {self.planilla_entrega_id} - Número: {self.numero_planilla} - Año: {self.anio_planilla} Movimiento id: {self.movimiento_almacen_id}'
 
 
 class EstadoMovimiento(models.Model):
@@ -476,7 +476,7 @@ class Bien(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.codigo} - {self.nombre}'
+        return f'Bien id: {self.bien_id} - Código: {self.codigo} - Nombre: {self.nombre}'
 
 
 class CategoriaBien(models.Model):
@@ -1017,7 +1017,7 @@ class Emergencia(models.Model):
         verbose_name_plural = 'Emergencias'
 
     def __str__(self):
-        return self.numero_evaluacion
+        return f'Evaluación: {self.numero_evaluacion} - Código SINPAD: {self.codigo_sinpad}'
 
 
 class Formulario2A(models.Model):
@@ -1084,7 +1084,7 @@ class Formulario2A(models.Model):
         ]
 
     def __str__(self):
-        return str(self.formulario_2a_id)
+        return f'Emergencia id: {self.emergencia.emergencia_id} - Código SINPAD: {self.emergencia.codigo_sinpad} - Formulario id: {self.formulario_2a_id}'
 
 
 class SqlServerUUIDField(models.UUIDField):
@@ -1139,7 +1139,8 @@ class Formulario2AArchivo(models.Model):
         verbose_name_plural = 'Archivos del formulario 2A'
 
     def __str__(self):
-        return self.nombre_original
+        return f'Emergencia id: {self.formulario_2a.emergencia.emergencia_id} - Código SINPAD: {self.formulario_2a.emergencia.codigo_sinpad} - Formulario id: {self.formulario_2a.formulario_2a_id} - Archivo id: {self.archivo_id} - Nombre original: {self.nombre_original}'
+
 
 
 class Formulario2AFamilia(models.Model):
@@ -1171,7 +1172,7 @@ class Formulario2AFamilia(models.Model):
         ]
 
     def __str__(self):
-        return str(self.familia_id)
+        return f'Emergencia id: {self.vivienda.formulario_2a.emergencia.emergencia_id} - Código SINPAD: {self.vivienda.formulario_2a.emergencia.codigo_sinpad} - Formulario id: {self.vivienda.formulario_2a.formulario_2a_id} - Vivienda id: {self.vivienda.vivienda_id} - Lote: {self.vivienda.numero_lote} - Familia id: {self.familia_id}'
 
 
 class Formulario2AIntegrante(models.Model):
@@ -1278,7 +1279,7 @@ class Formulario2AIntegrante(models.Model):
         ]
 
     def __str__(self):
-        return str(self.integrante_id)
+        return f'Emergencia id: {self.familia.vivienda.formulario_2a.emergencia.emergencia_id} - Código SINPAD: {self.familia.vivienda.formulario_2a.emergencia.codigo_sinpad} - Formulario id: {self.familia.vivienda.formulario_2a.formulario_2a_id} - Vivienda id: {self.familia.vivienda.vivienda_id} - Lote: {self.familia.vivienda.numero_lote} - Familia id: {self.familia_id} - Integrante id: {self.integrante_id} - Persona id: {self.persona_id} - Persona nombre: {self.persona.nombres} {self.persona.apellido_paterno} {self.persona.apellido_materno} Documento: {self.persona.numero_documento}'
 
 
 class Formulario2AMedioVida(models.Model):
@@ -1318,7 +1319,7 @@ class Formulario2AMedioVida(models.Model):
         ]
 
     def __str__(self):
-        return str(self.medio_vida_id)
+        return f'Emergencia id: {self.familia.vivienda.formulario_2a.emergencia.emergencia_id} - Código SINPAD: {self.familia.vivienda.formulario_2a.emergencia.codigo_sinpad} - Formulario id: {self.familia.vivienda.formulario_2a.formulario_2a_id} - Vivienda id: {self.familia.vivienda.vivienda_id} - Lote: {self.familia.vivienda.numero_lote} - Familia id: {self.familia_id} - Medio de vida id: {self.medio_vida_id} - Tipo de medio de vida: {self.tipo_medio_vida.nombre}'
 
 
 class Formulario2AVivienda(models.Model):
@@ -1395,7 +1396,7 @@ class Formulario2AVivienda(models.Model):
         ]
 
     def __str__(self):
-        return str(self.vivienda_id)
+        return f'Emergencia id: {self.formulario_2a.emergencia.emergencia_id} - Código SINPAD: {self.formulario_2a.emergencia.codigo_sinpad} - Formulario id: {self.formulario_2a.formulario_2a_id} - Vivienda id: {self.vivienda_id} - Lote: {self.numero_lote}'
 
 
 class Persona(models.Model):
@@ -1439,7 +1440,7 @@ class Persona(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.apellido_paterno} {self.apellido_materno}, {self.nombres}'
+        return f'{self.apellido_paterno} {self.apellido_materno}, {self.nombres} Documento: {self.numero_documento}'
 
 
 class Distrito(models.Model):

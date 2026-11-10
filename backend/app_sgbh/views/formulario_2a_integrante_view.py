@@ -57,7 +57,10 @@ class Formulario2AIntegranteCreateView(APIView):
             payload = IntegranteSerializer(created).data
         except Formulario2AIntegranteServiceError as exc:
             return _respuesta_error_servicio(exc)
-        except Exception:
+        except Exception as e:
+            print("****************************************************")
+            print(e)
+            print("****************************************************")
             return Response(
                 {'error': 'No se pudo registrar el integrante'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

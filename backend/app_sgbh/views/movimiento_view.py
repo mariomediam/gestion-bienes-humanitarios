@@ -54,7 +54,10 @@ class MovimientoCreateView(APIView):
             payload = MovimientoSerializer(created).data
         except MovimientoServiceError as exc:
             return _respuesta_error_servicio(exc)
-        except Exception:
+        except Exception as exc:
+            print("*************** ERROR ***************")
+            print(exc)
+            print("*************** ERROR ***************")
             return Response(
                 {'error': 'No se pudo registrar el movimiento de almacén'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

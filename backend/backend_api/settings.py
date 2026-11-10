@@ -52,9 +52,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'auditlog',
 
     # Local apps
-    'app_auth',     
+    'app_auth',
+    'app_audit',
     'app_sgbh',
 ]
 
@@ -65,6 +67,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'app_audit.middleware.AuditContextMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -119,9 +122,30 @@ DATABASES = {
     },
 }
 
-DATABASE_ROUTERS = [    
+DATABASE_ROUTERS = [
     'app_sgbh.db_router.SgbhDatabaseRouter',
+    'app_audit.db_router.AuditDatabaseRouter',
 ]
+
+# django-auditlog. The log table lives on the default connection (GENERAL).
+# S43 models are unmanaged, so they are listed here instead of included in bulk.
+AUDITLOG_LOGENTRY_MODEL = 'app_audit.AuditLogEntry'
+AUDITLOG_DISABLE_REMOTE_ADDR = False
+AUDITLOG_STORE_JSON_CHANGES = True
+AUDITLOG_INCLUDE_TRACKING_MODELS = (
+    'app_sgbh.Persona',
+    'app_sgbh.Emergencia',
+    'app_sgbh.Formulario2A',
+    'app_sgbh.Formulario2AVivienda',
+    'app_sgbh.Formulario2AFamilia',
+    'app_sgbh.Formulario2AIntegrante',
+    'app_sgbh.Formulario2AMedioVida',
+    'app_sgbh.Formulario2AArchivo',
+    'app_sgbh.PlanillaEntrega',
+    'app_sgbh.Movimiento',
+    'app_sgbh.MovimientoDetalle',
+    'app_sgbh.Bien',
+)
 
 AUTH_PASSWORD_VALIDATORS = []
 

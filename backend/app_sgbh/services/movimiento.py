@@ -206,7 +206,11 @@ class MovimientoService:
             )
             try:
                 movimiento.save()
-            except IntegrityError:
+            except IntegrityError as e:
+
+                print("*************** ERROR ***************")
+                print(e)
+                print("*************** ERROR ***************")
                 raise MovimientoServiceError(
                     'No se pudo registrar el movimiento de almacén'
                 ) from None
