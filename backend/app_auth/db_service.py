@@ -7,7 +7,12 @@ from django.conf import settings
 
 
 def _get_connection():
-    """Create a direct pyodbc connection to the GENERAL database."""
+    """Create a direct pyodbc connection to the GENERAL database.
+
+    autocommit matches SSMS: each stored procedure confirms its own writes.
+    These procedures record side effects (for example login audit) and were
+    written for clients that do not wrap the call in an outer transaction.
+    """
     db_config = settings.DATABASES['default']
     conn_str = (
             f"DRIVER={{{db_config['OPTIONS']['driver']}}};"
@@ -19,7 +24,7 @@ def _get_connection():
             f"TDS_Version=7.3;"
             f"Encryption=off;"
         )
-    return pyodbc.connect(conn_str)
+    return pyodbc.connect(conn_str, autocommit=True)
 
 
 def validate_user(login: str, password: str) -> dict:
@@ -89,7 +94,6 @@ def change_user_password(login: str, new_password: str) -> None:
             "EXEC S07ModificarClaveUsuario @Login=?, @ClaveNueva=?",
             (login, new_password)
         )
-        conn.commit()
     finally:
         conn.close()
 
