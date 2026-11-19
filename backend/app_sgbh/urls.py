@@ -62,6 +62,10 @@ from .views import (
     TipoDiscapacidadListView,
     TipoDocumentoListView,
     TipoMedioVidaListView,
+    MovimientoArchivoBuscarView,
+    MovimientoArchivoCreateView,
+    MovimientoArchivoDescargarView,
+    MovimientoArchivoDetailView,
     MovimientoBuscarView,
     MovimientoCantidadesPorDevolverView,
     MovimientoCreateView,
@@ -216,6 +220,26 @@ urlpatterns = [
         'movimientos/buscar-devoluciones/',
         MovimientoDevolucionBuscarView.as_view(),
         name='movimientos-buscar-devoluciones',
+    ),
+    path(
+        'movimientos/archivos/buscar/',
+        MovimientoArchivoBuscarView.as_view(),
+        name='movimientos-archivos-buscar',
+    ),
+    path(
+        'movimientos/<int:movimiento_id>/archivos/',
+        MovimientoArchivoCreateView.as_view(),
+        name='movimientos-archivos',
+    ),
+    path(
+        'movimientos/<int:movimiento_id>/archivos/<archivo_uuid:archivo_id>/',
+        MovimientoArchivoDetailView.as_view(),
+        name='movimientos-archivos-detalle',
+    ),
+    path(
+        'movimientos/<int:movimiento_id>/archivos/<archivo_uuid:archivo_id>/descargar/',
+        MovimientoArchivoDescargarView.as_view(),
+        name='movimientos-archivos-descargar',
     ),
     path(
         'materiales-pared/',

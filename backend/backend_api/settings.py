@@ -143,6 +143,7 @@ AUDITLOG_INCLUDE_TRACKING_MODELS = (
     'app_sgbh.Formulario2AArchivo',
     'app_sgbh.PlanillaEntrega',
     'app_sgbh.Movimiento',
+    'app_sgbh.MovimientoArchivo',
     'app_sgbh.MovimientoDetalle',
     'app_sgbh.Bien',
 )

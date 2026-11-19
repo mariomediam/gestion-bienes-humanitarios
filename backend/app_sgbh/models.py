@@ -1142,6 +1142,43 @@ class Formulario2AArchivo(models.Model):
         return f'Emergencia id: {self.formulario_2a.emergencia.emergencia_id} - Código SINPAD: {self.formulario_2a.emergencia.codigo_sinpad} - Formulario id: {self.formulario_2a.formulario_2a_id} - Archivo id: {self.archivo_id} - Nombre original: {self.nombre_original}'
 
 
+class MovimientoArchivo(models.Model):
+    # Random UUID. The client does not send it.
+    archivo_id = SqlServerUUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    movimiento = models.ForeignKey(
+        Movimiento,
+        on_delete=models.PROTECT,
+        db_column='movimiento_id',
+        db_index=False,
+        related_name='archivos',
+    )
+    nombre_original = models.CharField(max_length=255)
+    nombre_archivo = models.CharField(max_length=255)
+    ruta_archivo = models.CharField(max_length=500)
+    extension = models.CharField(max_length=10, null=True, blank=True)
+    tamano_bytes = models.BigIntegerField(null=True, blank=True)
+    esta_activo = models.BooleanField(default=True)
+    fecha_registro = models.DateTimeField(default=timezone.now)
+    # Login from the authenticated token. No foreign key in the schema.
+    c_usuari_login = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = 'S43alm_movimientos_archivos'
+        verbose_name = 'Archivo del movimiento de almacén'
+        verbose_name_plural = 'Archivos del movimiento de almacén'
+
+    def __str__(self):
+        return (
+            f'Movimiento id: {self.movimiento.movimiento_id} - '
+            f'Archivo id: {self.archivo_id} - '
+            f'Nombre original: {self.nombre_original}'
+        )
+
 
 class Formulario2AFamilia(models.Model):
     familia_id = models.AutoField(primary_key=True)

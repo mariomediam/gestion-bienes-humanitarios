@@ -49,6 +49,23 @@ Campos:
 
 Restricción relevante: `movimiento_origen_id` no puede apuntar al mismo `movimiento_id`.
 
+### `S43alm_movimientos_archivos`
+
+Documentos digitales de un movimiento de almacén. El archivo se guarda fuera de SQL Server. La fila guarda la ruta relativa.
+
+Campos:
+
+- `archivo_id` UNIQUEIDENTIFIER, PK. La aplicación envía un UUID. `NEWID()` cubre un alta hecha fuera de la aplicación.
+- `movimiento_id` INT, FK a `S43alm_movimientos`.
+- `nombre_original` VARCHAR(255).
+- `nombre_archivo` VARCHAR(255).
+- `ruta_archivo` VARCHAR(500).
+- `extension` VARCHAR(10) NULL.
+- `tamano_bytes` BIGINT NULL.
+- `esta_activo` BIT. La baja es lógica.
+- `fecha_registro` DATETIME2.
+- `c_usuari_login` CHAR(20). Sale del usuario autenticado.
+
 ### `S43alm_movimiento_detalle`
 
 Única tabla de detalle de bienes que entran o salen del almacén. También contiene los bienes de una Planilla BAH.
@@ -367,6 +384,8 @@ S43bah_planilla_entrega
         | movimiento_almacen_id
         v
 S43alm_movimientos
+        |
+        +--> S43alm_movimientos_archivos
         |
         v
 S43alm_movimiento_detalle ----> S43cat_bah_bienes

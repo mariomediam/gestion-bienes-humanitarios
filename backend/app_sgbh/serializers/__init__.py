@@ -61,6 +61,10 @@ from .movimiento import (
     MovimientoCreateSerializer,
     MovimientoSerializer,
 )
+from .movimiento_archivo import (
+    MovimientoArchivoBusquedaSerializer,
+    MovimientoArchivoSerializer,
+)
 from .movimiento_cantidades_salida import MovimientoCantidadesSalidaSerializer
 from .movimiento_planilla_bah import MovimientoPlanillaBahBusquedaSerializer
 from .persona import (
@@ -128,6 +132,8 @@ __all__ = [
     'MaterialPisoSerializer',
     'MaterialTechoSerializer',
     'mensaje_error_carga',
+    'MovimientoArchivoBusquedaSerializer',
+    'MovimientoArchivoSerializer',
     'MovimientoBusquedaSerializer',
     'MovimientoCantidadesSalidaSerializer',
     'MovimientoCreateSerializer',

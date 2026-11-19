@@ -11,6 +11,7 @@ from ..models import (
     Bien,
     EstadoMovimiento,
     Movimiento,
+    MovimientoArchivo,
     MovimientoDetalle,
     Personal,
     PlanillaEntrega,
@@ -309,9 +310,9 @@ class MovimientoService:
 
         Detail rows are removed first because FK_alm_mov_det_movimiento
         does not cascade. Rejected when a planilla BAH references this
-        movement through movimiento_almacen_id, or when another movement
-        uses it as movimiento_origen_id. The checks and the deletes run
-        in one transaction.
+        movement through movimiento_almacen_id, when another movement
+        uses it as movimiento_origen_id, or when a digital file row
+        references it. The checks and the deletes run in one transaction.
         """
         with transaction.atomic(using=DB_ALIAS):
             try:
@@ -346,6 +347,12 @@ def _reject_si_no_se_puede_eliminar(movimiento_id):
         raise MovimientoServiceError(
             'No se puede eliminar el movimiento de almacén porque '
             'es origen de otro movimiento',
+            conflict=True,
+        )
+    if MovimientoArchivo.objects.filter(movimiento_id=movimiento_id).exists():
+        raise MovimientoServiceError(
+            'No se puede eliminar el movimiento de almacén porque '
+            'tiene archivos asociados',
             conflict=True,
         )
 

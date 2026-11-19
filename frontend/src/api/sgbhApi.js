@@ -223,6 +223,45 @@ export const sgbhApi = {
     return response.data
   },
 
+  buscarArchivosMovimiento: async (params) => {
+    const response = await api.get('/api/sgbh/movimientos/archivos/buscar/', { params })
+    return response.data
+  },
+
+  crearArchivoMovimiento: async (movimientoId, archivo, { onUploadProgress, signal } = {}) => {
+    const formData = new FormData()
+    formData.append('archivo', archivo)
+    const response = await api.post(
+      `/api/sgbh/movimientos/${movimientoId}/archivos/`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 120000,
+        onUploadProgress,
+        signal,
+      },
+    )
+    return response.data
+  },
+
+  eliminarArchivoMovimiento: async (movimientoId, archivoId) => {
+    await api.delete(
+      `/api/sgbh/movimientos/${movimientoId}/archivos/${archivoId}/`,
+    )
+  },
+
+  descargarArchivoMovimiento: async (movimientoId, archivoId, nombreOriginal) => {
+    try {
+      const response = await api.get(
+        `/api/sgbh/movimientos/${movimientoId}/archivos/${archivoId}/descargar/`,
+        { responseType: 'blob', timeout: 120000 },
+      )
+      guardarDescarga(response, nombreOriginal)
+    } catch (error) {
+      await errorConCuerpoLegible(error)
+    }
+  },
+
   getTiposDanioPersonal: async (params) => {
     const response = await api.get('/api/sgbh/tipos-danio-personal/', { params })
     return response.data

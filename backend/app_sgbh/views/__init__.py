@@ -55,6 +55,12 @@ from .material_techo_view import MaterialTechoListView
 from .movimiento_cantidades_salida_view import MovimientoCantidadesPorDevolverView
 from .movimiento_devolucion_view import MovimientoDevolucionBuscarView
 from .movimiento_planilla_bah_view import MovimientoPlanillaBahBuscarView
+from .movimiento_archivo_view import (
+    MovimientoArchivoBuscarView,
+    MovimientoArchivoCreateView,
+    MovimientoArchivoDescargarView,
+    MovimientoArchivoDetailView,
+)
 from .movimiento_view import (
     MovimientoBuscarView,
     MovimientoCreateView,

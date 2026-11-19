@@ -19,6 +19,7 @@ from app_sgbh.models import (
     Formulario2AMedioVida,
     Formulario2AVivienda,
     Movimiento,
+    MovimientoArchivo,
     MovimientoDetalle,
     Persona,
     PlanillaEntrega,
@@ -36,6 +37,7 @@ TRACKED_MODELS = (
     Formulario2AArchivo,
     PlanillaEntrega,
     Movimiento,
+    MovimientoArchivo,
     MovimientoDetalle,
     Bien,
 )

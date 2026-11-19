@@ -24,7 +24,7 @@ class _Row:
 
 
 @contextmanager
-def _patched(*, row=None, linked=False, origen=False):
+def _patched(*, row=None, linked=False, origen=False, archivos=False):
     with ExitStack() as stack:
         mocks = {
             'atomic': stack.enter_context(
@@ -39,6 +39,9 @@ def _patched(*, row=None, linked=False, origen=False):
             'planilla': stack.enter_context(
                 patch('app_sgbh.services.movimiento.PlanillaEntrega')
             ),
+            'archivo': stack.enter_context(
+                patch('app_sgbh.services.movimiento.MovimientoArchivo')
+            ),
         }
         if row is None:
             row = _Row()
@@ -47,6 +50,7 @@ def _patched(*, row=None, linked=False, origen=False):
         mocks['movimiento'].objects.get.return_value = row
         mocks['movimiento'].objects.filter.return_value.exists.return_value = origen
         mocks['planilla'].objects.filter.return_value.exists.return_value = linked
+        mocks['archivo'].objects.filter.return_value.exists.return_value = archivos
         yield mocks
 
 
@@ -101,6 +105,21 @@ def test_delete_rejects_movement_used_as_origin():
         'No se puede eliminar el movimiento de almacén porque '
         'es origen de otro movimiento'
     )
+    mocks['detalle'].objects.filter.assert_not_called()
+    assert mocks['row'].deleted is False
+
+
+def test_delete_rejects_movement_with_files():
+    with _patched(archivos=True) as mocks:
+        with pytest.raises(MovimientoServiceError) as exc:
+            MovimientoService.delete(15)
+
+    assert exc.value.conflict is True
+    assert exc.value.message == (
+        'No se puede eliminar el movimiento de almacén porque '
+        'tiene archivos asociados'
+    )
+    mocks['archivo'].objects.filter.assert_called_once_with(movimiento_id=15)
     mocks['detalle'].objects.filter.assert_not_called()
     assert mocks['row'].deleted is False
 
