@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
+import PaperclipIcon from '@components/icons/PaperclipIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
 import DevolucionEliminarModal from '@features/devoluciones/components/DevolucionEliminarModal'
+import MovimientoArchivosModal from '@features/movimientos/components/MovimientoArchivosModal'
 import { formatFechaMovimiento } from '@utils/dates'
 
 const actionButtonClassName =
@@ -60,6 +62,7 @@ function BienesCell({ detalles, es_movimiento_mixto }) {
 export default function DevolucionesResultados({ devoluciones, onModificar, onEliminado }) {
   const navigate = useNavigate()
   const [devolucionAEliminar, setDevolucionAEliminar] = useState(null)
+  const [devolucionArchivos, setDevolucionArchivos] = useState(null)
 
   return (
     <section className="bg-white rounded-lg border border-gray-200">
@@ -102,7 +105,7 @@ export default function DevolucionesResultados({ devoluciones, onModificar, onEl
                     />
                   </td>
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Link
                         to={`/alm-movimientos/${devolucion.movimiento_id}/ver`}
                         state={{ volverA: '/alm-devolucion' }}
@@ -130,6 +133,17 @@ export default function DevolucionesResultados({ devoluciones, onModificar, onEl
                       </button>
                       <button
                         type="button"
+                        aria-label="Archivos adjuntos"
+                        className={actionButtonClassName}
+                        onClick={() => setDevolucionArchivos(devolucion)}
+                      >
+                        <PaperclipIcon className="w-4 h-4" />
+                        <span className={actionTooltipClassName} aria-hidden="true">
+                          Archivos adjuntos
+                        </span>
+                      </button>
+                      <button
+                        type="button"
                         aria-label="Eliminar"
                         onClick={() => setDevolucionAEliminar(devolucion)}
                         className={deleteButtonClassName}
@@ -153,6 +167,11 @@ export default function DevolucionesResultados({ devoluciones, onModificar, onEl
         devolucion={devolucionAEliminar}
         onClose={() => setDevolucionAEliminar(null)}
         onEliminado={onEliminado}
+      />
+      <MovimientoArchivosModal
+        isOpen={devolucionArchivos !== null}
+        movimiento={devolucionArchivos}
+        onClose={() => setDevolucionArchivos(null)}
       />
     </section>
   )
