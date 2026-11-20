@@ -51,10 +51,11 @@ def _modelos():
             'app_sgbh.services.movimiento_archivo.uuid.uuid4',
             return_value=_FIXED_UUID,
         ),
+        patch('app_sgbh.services.movimiento_archivo._record_create') as record_create,
     ):
         movimiento.DoesNotExist = _DoesNotExist
         archivo.return_value.pk = _ARCHIVO_ID
-        yield movimiento, archivo
+        yield movimiento, archivo, record_create
 
 
 def _post(data, movimiento_id=10):
@@ -72,7 +73,7 @@ def test_create_writes_the_file_and_saves_the_row(tmp_path):
     uploaded = _upload()
     uploaded.name = r'C:\temp\guia.PDF'
 
-    with _storage(tmp_path), _modelos() as (movimiento, archivo):
+    with _storage(tmp_path), _modelos() as (movimiento, archivo, record_create):
         stored = archivo.objects.get.return_value
 
         result = MovimientoArchivoService.create(
@@ -95,12 +96,13 @@ def test_create_writes_the_file_and_saves_the_row(tmp_path):
         c_usuari_login='mmedina',
     )
     archivo.return_value.save.assert_called_once_with()
+    record_create.assert_called_once_with(stored)
     written = tmp_path / 'movimientos' / '10' / _FIXED_NAME
     assert written.read_bytes() == b'%PDF-1.4'
 
 
 def test_create_removes_the_file_when_the_insert_fails(tmp_path):
-    with _storage(tmp_path), _modelos() as (_movimiento, archivo):
+    with _storage(tmp_path), _modelos() as (_movimiento, archivo, record_create):
         archivo.return_value.save.side_effect = RuntimeError('db')
 
         with pytest.raises(RuntimeError, match='db'):
@@ -112,6 +114,7 @@ def test_create_removes_the_file_when_the_insert_fails(tmp_path):
 
     written = tmp_path / 'movimientos' / '10' / _FIXED_NAME
     assert not written.exists()
+    record_create.assert_not_called()
 
 
 @pytest.mark.parametrize('login', ['', '   ', 'a' * 21])
@@ -129,7 +132,7 @@ def test_create_rejects_an_unidentified_user(tmp_path, login):
 
 
 def test_create_rejects_unknown_movimiento(tmp_path):
-    with _storage(tmp_path), _modelos() as (movimiento, archivo):
+    with _storage(tmp_path), _modelos() as (movimiento, archivo, record_create):
         movimiento.objects.select_for_update.return_value.get.side_effect = (
             _DoesNotExist
         )
@@ -144,6 +147,7 @@ def test_create_rejects_unknown_movimiento(tmp_path):
     assert exc.value.not_found is True
     assert exc.value.message == 'El movimiento de almacén indicado no existe'
     archivo.assert_not_called()
+    record_create.assert_not_called()
     assert list(tmp_path.rglob('*')) == []
 
 

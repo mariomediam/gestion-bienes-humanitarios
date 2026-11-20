@@ -1,12 +1,16 @@
+import logging
 import uuid
 from pathlib import Path
 
+from auditlog.context import disable_auditlog
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 
 from ..db_router import DB_ALIAS
 from ..models import Movimiento, MovimientoArchivo
+
+logger = logging.getLogger(__name__)
 
 _NOMBRE_MAX = 255
 _EXTENSION_MAX = 10
@@ -52,6 +56,13 @@ class MovimientoArchivoService:
         the relative path, the extension and the size. c_usuari_login is
         the authenticated login. esta_activo and fecha_registro use the
         model defaults. When the insert fails, the stored file is removed.
+
+        The audit row lives on GENERAL. It is written after the SIAC
+        transaction commits. Doing it inside the same atomic block leaves
+        the archivo insert uncommitted while GENERAL runs SET ARITHABORT.
+        A lock on GENERAL then keeps the request at 100% and, when that
+        session is killed, rolls the insert back. The file stays on disk
+        and the table stays empty.
         """
         login = _require_login(c_usuari_login)
         nombre_original, extension = _require_upload(archivo)
@@ -61,10 +72,10 @@ class MovimientoArchivoService:
             raise MovimientoArchivoServiceError('No se pudo almacenar el archivo')
 
         destination = _destination(ruta_archivo)
-        with transaction.atomic(using=DB_ALIAS):
-            _require_movimiento(movimiento_id)
-            _write_upload(destination, archivo)
-            try:
+        try:
+            with transaction.atomic(using=DB_ALIAS):
+                _require_movimiento(movimiento_id)
+                _write_upload(destination, archivo)
                 row = MovimientoArchivo(
                     movimiento_id=movimiento_id,
                     nombre_original=nombre_original,
@@ -74,11 +85,13 @@ class MovimientoArchivoService:
                     tamano_bytes=archivo.size,
                     c_usuari_login=login,
                 )
-                row.save()
+                with disable_auditlog():
+                    row.save()
                 stored = MovimientoArchivo.objects.get(pk=row.pk)
-            except Exception:
-                _delete_file(destination)
-                raise
+        except Exception:
+            _delete_file(destination)
+            raise
+        _record_create(stored)
         return stored
 
     @staticmethod
@@ -136,6 +149,24 @@ _CONTENT_TYPES = {
     'jpeg': 'image/jpeg',
     'png': 'image/png',
 }
+
+
+def _record_create(instance):
+    """Write the GENERAL audit row for one archivo that is already committed.
+
+    A failure here must not remove the file or the SIAC row. The caller
+    has already committed both.
+    """
+    try:
+        from auditlog.receivers import log_create
+
+        log_create(sender=type(instance), instance=instance, created=True)
+    except Exception:
+        logger.exception(
+            'No se pudo registrar la auditoría del archivo %s del movimiento %s',
+            getattr(instance, 'pk', None),
+            getattr(instance, 'movimiento_id', None),
+        )
 
 
 def _require_login(c_usuari_login):

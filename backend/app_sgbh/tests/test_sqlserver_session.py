@@ -29,7 +29,11 @@ def test_enable_arithabort_on_sql_server():
 
     enable_arithabort(sender=None, connection=connection)
 
-    assert connection.cursor_obj.statements == ['SET ARITHABORT ON']
+    assert connection.cursor_obj.statements == [
+        'SET LOCK_TIMEOUT 15000',
+        'SET ARITHABORT ON',
+        'SET LOCK_TIMEOUT -1',
+    ]
 
 
 def test_enable_arithabort_ignores_other_vendors():
