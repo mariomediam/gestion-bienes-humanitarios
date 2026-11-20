@@ -93,14 +93,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend_api.wsgi.application'
 
 # Database - SQL Server 2008 R2
+# datetime and datetime2 keep the server clock. This server is America/Lima
+# (GETDATE and SYSDATETIME). The connection zone makes Django read and write
+# that clock instead of UTC.
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
+        'ENGINE': 'backend_api.sqlserver',
         'NAME': env('DB_NAME'),
         'USER': env('DB_USERNAME'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
+        'TIME_ZONE': 'America/Lima',
         'OPTIONS': {
             'driver': 'FreeTDS',
             'host_is_server': True,
@@ -108,12 +112,13 @@ DATABASES = {
         },
     },
     'sgbh': {
-        'ENGINE': 'mssql',
+        'ENGINE': 'backend_api.sqlserver',
         'NAME': env('DB_SIAC'),
         'USER': env('DB_USERNAME'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
+        'TIME_ZONE': 'America/Lima',
         'OPTIONS': {
             'driver': 'FreeTDS',
             'host_is_server': True,
