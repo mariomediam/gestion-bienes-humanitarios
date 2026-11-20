@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
+import PaperclipIcon from '@components/icons/PaperclipIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import MovimientoArchivosModal from '@features/movimientos/components/MovimientoArchivosModal'
 import PlanillaBahEliminarModal from '@features/planillasBah/components/PlanillaBahEliminarModal'
 import {
   formatFechaEntrega,
@@ -63,6 +65,7 @@ function BienesCell({ detalles }) {
 export default function PlanillasBahResultados({ planillas, onModificar, onEliminada }) {
   const navigate = useNavigate()
   const [planillaAEliminar, setPlanillaAEliminar] = useState(null)
+  const [planillaArchivos, setPlanillaArchivos] = useState(null)
 
   return (
     <section className="bg-white rounded-lg border border-gray-200">
@@ -108,7 +111,7 @@ export default function PlanillasBahResultados({ planillas, onModificar, onElimi
                     <BienesCell detalles={planilla.detalles} />
                   </td>
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <button
                         type="button"
                         aria-label="Ver"
@@ -131,6 +134,17 @@ export default function PlanillasBahResultados({ planillas, onModificar, onElimi
                           Modificar
                         </span>
                       </Link>
+                      <button
+                        type="button"
+                        aria-label="Archivos adjuntos"
+                        className={actionButtonClassName}
+                        onClick={() => setPlanillaArchivos(planilla)}
+                      >
+                        <PaperclipIcon className="w-4 h-4" />
+                        <span className={actionTooltipClassName} aria-hidden="true">
+                          Archivos adjuntos
+                        </span>
+                      </button>
                       <button
                         type="button"
                         aria-label="Eliminar"
@@ -156,6 +170,11 @@ export default function PlanillasBahResultados({ planillas, onModificar, onElimi
         planilla={planillaAEliminar}
         onClose={() => setPlanillaAEliminar(null)}
         onEliminada={onEliminada}
+      />
+      <MovimientoArchivosModal
+        isOpen={planillaArchivos !== null}
+        movimiento={planillaArchivos}
+        onClose={() => setPlanillaArchivos(null)}
       />
     </section>
   )

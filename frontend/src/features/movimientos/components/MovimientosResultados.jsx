@@ -109,7 +109,7 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
                     <BienesCell detalles={movimiento.detalles} es_movimiento_mixto={movimiento.tipo_movimiento_naturaleza === "M"} />
                   </td>
                   <td className="relative z-10 px-5 py-3 whitespace-nowrap">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Link
                         to={`/alm-movimientos/${movimiento.movimiento_id}/ver`}
                         aria-label="Ver"
