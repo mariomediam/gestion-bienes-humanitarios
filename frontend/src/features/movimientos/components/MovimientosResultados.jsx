@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import EyeIcon from '@components/icons/EyeIcon'
+import PaperclipIcon from '@components/icons/PaperclipIcon'
 import PencilIcon from '@components/icons/PencilIcon'
 import TrashIcon from '@components/icons/TrashIcon'
+import MovimientoArchivosModal from '@features/movimientos/components/MovimientoArchivosModal'
 import MovimientoEliminarModal from '@features/movimientos/components/MovimientoEliminarModal'
 import { formatFechaMovimiento } from '@utils/dates'
 
@@ -61,6 +63,7 @@ function BienesCell({ detalles, es_movimiento_mixto }) {
 export default function MovimientosResultados({ movimientos, onModificar, onEliminado }) {
   const navigate = useNavigate()
   const [movimientoAEliminar, setMovimientoAEliminar] = useState(null)
+  const [movimientoArchivos, setMovimientoArchivos] = useState(null)
 
   
 
@@ -133,6 +136,17 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
                       </button>
                       <button
                         type="button"
+                        aria-label="Archivos adjuntos"
+                        className={actionButtonClassName}
+                        onClick={() => setMovimientoArchivos(movimiento)}
+                      >
+                        <PaperclipIcon className="w-4 h-4" />
+                        <span className={actionTooltipClassName} aria-hidden="true">
+                          Archivos adjuntos
+                        </span>
+                      </button>
+                      <button
+                        type="button"
                         aria-label="Eliminar"
                         onClick={() => setMovimientoAEliminar(movimiento)}
                         className={deleteButtonClassName}
@@ -156,6 +170,11 @@ export default function MovimientosResultados({ movimientos, onModificar, onElim
         movimiento={movimientoAEliminar}
         onClose={() => setMovimientoAEliminar(null)}
         onEliminado={onEliminado}
+      />
+      <MovimientoArchivosModal
+        isOpen={movimientoArchivos !== null}
+        movimiento={movimientoArchivos}
+        onClose={() => setMovimientoArchivos(null)}
       />
     </section>
   )
