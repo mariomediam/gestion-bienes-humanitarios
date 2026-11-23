@@ -21,6 +21,8 @@ from app_sgbh.serializers import (
     first_error_message,
 )
 from app_sgbh.services.emergencia import EmergenciaService, EmergenciaServiceError
+from app_auth.permissions import RequiereMenu
+MENU_CODIGO_EMERGENCIA = '0100000000'
 
 _EMERGENCIA_ID_MAX = 2147483647
 
@@ -64,7 +66,8 @@ class EmergenciaTotalPorTipoPeligroView(APIView):
 
 
 class EmergenciaListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_EMERGENCIA
 
     def get(self, request):
         fecha_desde, error = parse_fecha_desde(request.query_params.get('fecha_desde'))
@@ -146,7 +149,9 @@ class EmergenciaBuscarView(APIView):
 
 
 class EmergenciaDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_EMERGENCIA
+    
 
     def put(self, request, emergencia_id):
         if emergencia_id < 1 or emergencia_id > _EMERGENCIA_ID_MAX:
