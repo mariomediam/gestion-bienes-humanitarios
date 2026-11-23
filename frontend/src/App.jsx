@@ -23,6 +23,19 @@ import PlanillasBahPage from '@features/planillasBah/pages/PlanillasBahPage'
 import KardexPage from '@features/kardex/pages/KardexPage'
 import StockActualPage from '@features/stockActual/pages/StockActualPage'
 import SinAccesoPage from '@features/auth/pages/SinAccesoPage'
+import RequiereMenu from '@features/auth/components/RequiereMenu'
+
+
+const MENU_CODIGOS = {
+  EMERGENCIA: '0100000000',
+  FORMULARIO_2A: '0200000000',
+  MOVIMIENTO: '0300000000',
+  PLANILLA_BAH: '0400000000',
+  BIEN: '0901000000',
+  PERSONA: '0902000000',
+  CARGAR_FORMULARIO_2A: '0600000000',
+  ALMACEN_STOCK_ACTUAL: '0700000000',
+}
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading, checkAuth } = useAuthStore()
@@ -93,26 +106,114 @@ function App() {
           }
         >
           <Route path="/" element={<DashboardPage />} />
-          <Route path="emergencias" element={<EmergenciasPage />} />
-          <Route path="formularios-2A" element={<Formularios2APage />} />
-          <Route path="formularios-2A/cargar" element={<Formularios2ACargaPage />} />
-          <Route path="bah-bienes" element={<BienesPage />} />
-          <Route path="personas" element={<PersonasPage />} />
-          <Route path="alm-movimientos/nuevo" element={<MovimientoFormPage />} />
-          <Route path="alm-movimientos/:movimientoId/editar" element={<MovimientoFormPage />} />
-          <Route path="alm-movimientos/:movimientoId/ver" element={<MovimientoVerPage />} />
-          <Route path="alm-movimientos" element={<MovimientosPage />} />
-          <Route path="alm-devolucion/nuevo/:movimientoOrigenId" element={<DevolucionFormPage />} />
-          <Route path="alm-devolucion/:movimientoId/editar" element={<DevolucionFormPage />} />
-          <Route path="alm-devolucion" element={<DevolucionesPage />} />
-          <Route path="alm-planilla-bah/nuevo/:formulario2aId" element={<PlanillaBahFormPage />} />
-          <Route path="alm-planilla-bah/:movimientoId/editar" element={<PlanillaBahFormPage />} />
-          <Route path="alm-planilla-bah/:planillaEntregaId/reporte" element={<PlanillaBahReportePage />} />
-          <Route path="alm-planilla-bah" element={<PlanillasBahPage />} />
-          <Route path="alm-stock-actual/:bienId/kardex" element={<KardexPage />} />
-          <Route path="alm-stock-actual" element={<StockActualPage />} />
-          <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
-          <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />
+          <Route
+            path="emergencias"
+            element={
+              <RequiereMenu menCodi={MENU_CODIGOS.EMERGENCIA}>
+                <EmergenciasPage />
+              </RequiereMenu>
+            }
+          />
+          
+          <Route path="formularios-2A" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.FORMULARIO_2A}>
+              <Formularios2APage />
+            </RequiereMenu>
+          } />
+          <Route path="formularios-2A/cargar" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.CARGAR_FORMULARIO_2A}>
+              <Formularios2ACargaPage />
+            </RequiereMenu>
+          } />
+          <Route path="bah-bienes" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.BIEN}>
+              <BienesPage />
+            </RequiereMenu>
+          } />
+          <Route path="personas" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.PERSONA}>
+              <PersonasPage />
+            </RequiereMenu>
+          } />
+
+          <Route path="alm-movimientos/nuevo" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.MOVIMIENTO} operacion="nuevo">
+              <MovimientoFormPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-movimientos/:movimientoId/editar" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.MOVIMIENTO} operacion="modificar">
+              <MovimientoFormPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-movimientos/:movimientoId/ver" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.MOVIMIENTO} operacion="imprimir">
+              <MovimientoVerPage />
+            </RequiereMenu>
+          } />
+
+          <Route path="alm-movimientos" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.MOVIMIENTO}>
+              <MovimientosPage />
+            </RequiereMenu>
+          } />
+
+          <Route path="alm-devolucion/nuevo/:movimientoOrigenId" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.DEVOLUCION} operacion="nuevo">
+              <DevolucionFormPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-devolucion/:movimientoId/editar" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.DEVOLUCION} operacion="modificar">
+              <DevolucionFormPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-devolucion" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.DEVOLUCION}>
+              <DevolucionesPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-planilla-bah/nuevo/:formulario2aId" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.PLANILLA_BAH} operacion="nuevo">
+              <PlanillaBahFormPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-planilla-bah/:movimientoId/editar" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.PLANILLA_BAH} operacion="modificar">
+              <PlanillaBahFormPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-planilla-bah/:planillaEntregaId/reporte" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.PLANILLA_BAH} operacion="imprimir">
+              <PlanillaBahReportePage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-planilla-bah" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.PLANILLA_BAH}>
+              <PlanillasBahPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-stock-actual/:bienId/kardex" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.ALMACEN_STOCK_ACTUAL}>
+              <KardexPage />
+            </RequiereMenu>
+          } />
+          <Route path="alm-stock-actual" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.ALMACEN_STOCK_ACTUAL}>
+              <StockActualPage />
+            </RequiereMenu>
+          } />
+          <Route path="formularios-2A/:formulario2aId/reporte" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.FORMULARIO_2A} operacion="imprimir">
+              <Formulario2AReportePage />
+            </RequiereMenu>
+          } />
+
+          <Route path="formularios-2A/:formulario2aId" element={
+            <RequiereMenu menCodi={MENU_CODIGOS.FORMULARIO_2A}>
+              <Formulario2ADetallePage />
+            </RequiereMenu>
+          } />
           <Route path="sin-acceso" element={<SinAccesoPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -37,4 +37,9 @@ export const authApi = {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
   },
+
+  getMenuAccess: async (menCodi) => {
+    const response = await api.get(`/api/auth/menus/${menCodi}/access/`);
+    return response.data;
+  },
 };
