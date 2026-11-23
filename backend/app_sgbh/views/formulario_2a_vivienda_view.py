@@ -16,15 +16,19 @@ from app_sgbh.serializers import (
     first_error_message,
 )
 
-_VIVIENDA_ID_MAX = 2147483647
 from app_sgbh.services.formulario_2a_vivienda import (
     Formulario2AViviendaService,
     Formulario2AViviendaServiceError,
 )
+from app_auth.permissions import RequiereMenu
 
+_VIVIENDA_ID_MAX = 2147483647
+MENU_CODIGO_FORMULARIO_2A = '0200000000'
 
 class Formulario2AViviendaCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -61,7 +65,9 @@ class Formulario2AViviendaCreateView(APIView):
 
 
 class Formulario2AViviendaDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def put(self, request, vivienda_id):
         if vivienda_id < 1 or vivienda_id > _VIVIENDA_ID_MAX:

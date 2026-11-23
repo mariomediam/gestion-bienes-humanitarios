@@ -14,10 +14,14 @@ from app_sgbh.services.formulario_2a_carga import (
     Formulario2ACargaService,
     Formulario2ACargaServiceError,
 )
+from app_auth.permissions import RequiereMenu
+MENU_CODIGO_FORMULARIO_2A = '0200000000'
 
 
 class Formulario2ACargaView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    
 
     def post(self, request):
         datos, error = _leer_json(request)

@@ -18,12 +18,15 @@ from app_sgbh.services.formulario_2a_familia import (
     Formulario2AFamiliaService,
     Formulario2AFamiliaServiceError,
 )
+from app_auth.permissions import RequiereMenu
 
 _FAMILIA_ID_MAX = 2147483647
-
+MENU_CODIGO_FORMULARIO_2A = '0200000000'
 
 class Formulario2AFamiliaCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -60,7 +63,9 @@ class Formulario2AFamiliaCreateView(APIView):
 
 
 class Formulario2AFamiliaDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def delete(self, request, familia_id):
         if familia_id < 1 or familia_id > _FAMILIA_ID_MAX:

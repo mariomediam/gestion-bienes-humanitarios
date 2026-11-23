@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    LoginView, RefreshTokenView, MeView, UserMenusView, ChangePasswordView
+    LoginView, RefreshTokenView, MeView, UserMenusView, ChangePasswordView, UserMenuAccessView
 )
 
 app_name = 'auth'
@@ -11,4 +11,5 @@ urlpatterns = [
     path('me/', MeView.as_view(), name='me'),
     path('menus/', UserMenusView.as_view(), name='user-menus'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('menus/<str:men_codi>/access/', UserMenuAccessView.as_view(), name='menu-access'),
 ]

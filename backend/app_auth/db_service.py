@@ -97,3 +97,27 @@ def change_user_password(login: str, new_password: str) -> None:
     finally:
         conn.close()
 
+
+
+def get_user_menu_access(login: str, men_codi: str) -> dict | None:
+    """Return permissions for one menu, or None when the user has no row."""
+    codigo = str(men_codi).strip()
+    for menu in get_user_menus(login):
+        if str(menu.get('MenCodi', '')).strip() == codigo:
+            return _normalizar_acceso(menu)
+    return None
+
+
+def _normalizar_acceso(menu: dict) -> dict:
+
+    def activo(valor):
+        return bool(valor)
+
+    return {
+        'men_codi': str(menu.get('MenCodi', '')).strip(),
+        'consultar': True,
+        'nuevo': activo(menu.get('Nuevo')), 
+        'modificar': activo(menu.get('Modificar')),
+        'eliminar': activo(menu.get('Eliminar')),
+        'imprimir': activo(menu.get('Imprimir')),
+    }

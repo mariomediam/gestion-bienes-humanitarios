@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from .db_service import validate_user, get_user_menus, change_user_password
+from .db_service import validate_user, get_user_menus, change_user_password, get_user_menu_access
 
 
 class LoginView(APIView):
@@ -154,3 +154,15 @@ class ChangePasswordView(APIView):
             {'message': 'Contraseña actualizada correctamente'},
             status=status.HTTP_200_OK
         )
+
+class UserMenuAccessView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, men_codi):
+        acceso = get_user_menu_access(request.user.login, men_codi)
+        if acceso is None:
+            return Response(
+                {'error': 'No tiene acceso a este menú'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return Response(acceso, status=status.HTTP_200_OK)

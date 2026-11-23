@@ -23,12 +23,15 @@ from app_sgbh.services.formulario_2a_integrante import (
     Formulario2AIntegranteService,
     Formulario2AIntegranteServiceError,
 )
+from app_auth.permissions import RequiereMenu
 
 _INTEGRANTE_ID_MAX = 2147483647
-
+MENU_CODIGO_FORMULARIO_2A = '0200000000'
 
 class Formulario2AIntegranteCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'nuevo'
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -70,7 +73,9 @@ class Formulario2AIntegranteCreateView(APIView):
 
 
 class Formulario2AIntegranteDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def put(self, request, integrante_id):
         if integrante_id < 1 or integrante_id > _INTEGRANTE_ID_MAX:

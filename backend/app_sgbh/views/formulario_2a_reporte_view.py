@@ -6,12 +6,16 @@ from rest_framework.views import APIView
 from app_sgbh.serializers.formulario_2a_reporte import Formulario2AReporteSerializer
 from app_sgbh.services.formulario_2a import Formulario2AServiceError
 from app_sgbh.services.formulario_2a_reporte import Formulario2AReporteService
-
+from app_auth.permissions import RequiereMenu
 _FORMULARIO_2A_ID_MAX = 2147483647
+MENU_CODIGO_FORMULARIO_2A = '0200000000'
+
 
 
 class Formulario2AReporteView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'imprimir'
 
     def get(self, request, formulario_2a_id):
         if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:

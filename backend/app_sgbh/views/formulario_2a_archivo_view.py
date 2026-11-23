@@ -19,6 +19,7 @@ from app_sgbh.services.formulario_2a_archivo import (
     Formulario2AArchivoService,
     Formulario2AArchivoServiceError,
 )
+from app_auth.permissions import RequiereMenu
 
 _FORMULARIO_2A_ID_MAX = 2147483647
 _CAMPOS_DEL_SISTEMA = (
@@ -33,10 +34,13 @@ _CAMPOS_DEL_SISTEMA = (
     'fecha_registro',
     'c_usuari_login',
 )
+MENU_CODIGO_FORMULARIO_2A = '0200000000'
 
 
 class Formulario2AArchivoCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def post(self, request, formulario_2a_id):
         if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:
@@ -89,7 +93,9 @@ class Formulario2AArchivoCreateView(APIView):
 
 
 class Formulario2AArchivoDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def delete(self, request, formulario_2a_id, archivo_id):
         if formulario_2a_id < 1 or formulario_2a_id > _FORMULARIO_2A_ID_MAX:

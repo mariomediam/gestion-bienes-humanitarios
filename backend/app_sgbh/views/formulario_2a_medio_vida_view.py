@@ -15,16 +15,21 @@ from app_sgbh.serializers import (
     MedioVidaUpdateSerializer,
     first_error_message,
 )
-
-_MEDIO_VIDA_ID_MAX = 2147483647
+from app_auth.permissions import RequiereMenu
 from app_sgbh.services.formulario_2a_medio_vida import (
     Formulario2AMedioVidaService,
     Formulario2AMedioVidaServiceError,
 )
+_MEDIO_VIDA_ID_MAX = 2147483647
+MENU_CODIGO_FORMULARIO_2A = '0200000000'
+
+
 
 
 class Formulario2AMedioVidaCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'nuevo'
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -57,7 +62,9 @@ class Formulario2AMedioVidaCreateView(APIView):
 
 
 class Formulario2AMedioVidaDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_FORMULARIO_2A
+    menu_operacion = 'modificar'
 
     def put(self, request, medio_vida_id):
         if medio_vida_id < 1 or medio_vida_id > _MEDIO_VIDA_ID_MAX:
