@@ -25,12 +25,16 @@ from app_sgbh.serializers.movimiento import (
     MovimientoUpdateSerializer,
 )
 
-_MOVIMIENTO_ID_MAX = 2147483647
 from app_sgbh.services.movimiento import MovimientoService, MovimientoServiceError
+from app_auth.permissions import RequiereMenu
+
+_MOVIMIENTO_ID_MAX = 2147483647
+MENU_CODIGO_MOVIMIENTO = '0300000000'
 
 
 class MovimientoCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_MOVIMIENTO
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -67,7 +71,8 @@ class MovimientoCreateView(APIView):
 
 
 class MovimientoDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_MOVIMIENTO
 
     def put(self, request, movimiento_id):
         if movimiento_id < 1 or movimiento_id > _MOVIMIENTO_ID_MAX:
