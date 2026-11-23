@@ -22,6 +22,7 @@ import PlanillaBahReportePage from '@features/planillasBah/pages/PlanillaBahRepo
 import PlanillasBahPage from '@features/planillasBah/pages/PlanillasBahPage'
 import KardexPage from '@features/kardex/pages/KardexPage'
 import StockActualPage from '@features/stockActual/pages/StockActualPage'
+import SinAccesoPage from '@features/auth/pages/SinAccesoPage'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading, checkAuth } = useAuthStore()
@@ -112,6 +113,7 @@ function App() {
           <Route path="alm-stock-actual" element={<StockActualPage />} />
           <Route path="formularios-2A/:formulario2aId/reporte" element={<Formulario2AReportePage />} />
           <Route path="formularios-2A/:formulario2aId" element={<Formulario2ADetallePage />} />
+          <Route path="sin-acceso" element={<SinAccesoPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
