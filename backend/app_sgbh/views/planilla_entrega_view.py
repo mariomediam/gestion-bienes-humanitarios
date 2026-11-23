@@ -24,13 +24,17 @@ from app_sgbh.services.planilla_entrega import (
     PlanillaEntregaServiceError,
     formulario_tiene_planilla_bah,
 )
-
+from app_auth.permissions import RequiereMenu
 _FORMULARIO_2A_ID_MAX = 2147483647
 _PLANILLA_ENTREGA_ID_MAX = 2147483647
+MENU_CODIGO_PLANILLA_BAH = '0400000000'
+
 
 
 class PlanillaEntregaCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_PLANILLA_BAH
+    
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -64,7 +68,8 @@ class PlanillaEntregaCreateView(APIView):
 
 
 class PlanillaEntregaDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_PLANILLA_BAH    
 
     def put(self, request, planilla_entrega_id):
         if planilla_entrega_id < 1 or planilla_entrega_id > _PLANILLA_ENTREGA_ID_MAX:

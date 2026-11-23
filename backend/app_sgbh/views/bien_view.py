@@ -18,9 +18,12 @@ from app_sgbh.serializers import (
 )
 from app_sgbh.services.bien import BienService, BienServiceError
 
+from app_auth.permissions import RequiereMenu
+MENU_CODIGO_BIEN = '0901000000'
 
 class BienCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_BIEN    
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -74,7 +77,9 @@ _BIEN_ID_MAX = 2147483647
 
 
 class BienDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_BIEN
+    
 
     def patch(self, request, bien_id):
         if bien_id < 1 or bien_id > _BIEN_ID_MAX:

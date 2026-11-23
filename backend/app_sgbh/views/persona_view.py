@@ -16,10 +16,12 @@ from app_sgbh.serializers import (
     first_error_message,
 )
 from app_sgbh.services.persona import PersonaService, PersonaServiceError
-
+from app_auth.permissions import RequiereMenu
+MENU_CODIGO_PERSONA = '0902000000'
 
 class PersonaCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_PERSONA
 
     def post(self, request):
         if not isinstance(request.data, dict):
@@ -97,7 +99,8 @@ _PERSONA_ID_MAX = 2147483647
 
 
 class PersonaDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RequiereMenu]
+    menu_codigo = MENU_CODIGO_PERSONA
 
     def put(self, request, persona_id):
         if persona_id < 1 or persona_id > _PERSONA_ID_MAX:
